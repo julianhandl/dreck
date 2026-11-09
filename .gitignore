@@ -1,0 +1,38 @@
+# Dependencies & Build
+node_modules/
+dist/
+coverage/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# SQLite (lokale Datenbanken, inkl. WAL-Dateien)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+
+# System & Logs
+.DS_Store
+*.log
+
+# Harvest-Screenshots als Vorlage für die UI (fremde Rechte, nie committen)
+design/
+
+# Local data dir of the dev server (bun run dev)
+.data/
+
+
+# direnv (local DRECK_SECRET)
+.envrc
+
+# Playwright (bun run test:e2e)
+test-results/
+playwright-report/
+e2e/.auth/
+
+.claude
+.agents
+.vscode

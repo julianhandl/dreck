@@ -1,0 +1,26 @@
+{
+  "name": "dreck",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "build": "bun run --filter @dreck/frontend build && bun run --filter @dreck/backend build",
+    "start": "bun packages/backend/dist/server.js",
+    "check": "biome check . && bun run typecheck",
+    "typecheck": "bun run --filter '*' typecheck && tsc -p e2e",
+    "test": "bun run --filter '*' test",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "E2E_SLOW_MO=500 playwright test --headed --project=desktop"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.6",
+    "@playwright/test": "^1.65.0",
+    "@types/bun": "^1.4.4",
+    "typescript": "^7.0.2"
+  }
+}

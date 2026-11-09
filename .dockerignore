@@ -1,0 +1,12 @@
+**/node_modules
+**/dist
+**/.data
+.git
+.github
+design
+ui-prototype
+docs
+*.db
+*.db-shm
+*.db-wal
+.env

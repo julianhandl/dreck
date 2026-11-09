@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+/*
+ * Restyle after design/style/style.png with a blue palette instead of green (spec section 8):
+ * warm cream ground, deep saturated blue as main colour, bright sky blue as timer accent,
+ * soft rounded surfaces, pills for toggles and chips, large durations with tabular figures.
+ */
+@theme {
+  --color-temp-canvas: oklch(97.6% 0.012 90);
+  --color-temp-surface: oklch(99.6% 0.004 90);
+  --color-temp-band: oklch(94.6% 0.014 90); /* table heads, group rows, top bar of a page */
+  --color-temp-highlight: oklch(94% 0.04 235); /* running timer, open form panel */
+  --color-temp-highlight-border: oklch(82% 0.08 235);
+  --color-temp-ink: oklch(23% 0.035 258);
+  --color-temp-ink-muted: oklch(48% 0.025 258);
+  --color-temp-divider: oklch(90.5% 0.012 90);
+  --color-temp-border: oklch(62% 0.02 258); /* inputs and outlined buttons, 3:1 */
+  --color-temp-nav: oklch(97.6% 0.012 90);
+  --color-temp-nav-active: oklch(43% 0.13 258);
+  --color-temp-on-nav: oklch(99.6% 0.004 90);
+  --color-temp-primary: oklch(43% 0.13 258);
+  --color-temp-primary-hover: oklch(37% 0.12 258);
+  --color-temp-on-primary: oklch(99.6% 0.004 90);
+  --color-temp-accent: oklch(50% 0.17 258); /* checkboxes, active tab, selected day */
+  --color-temp-accent-soft: oklch(94% 0.03 250);
+  /* play/stop of the timer, like the lime in the reference */
+  --color-temp-timer: oklch(85% 0.1 228);
+  --color-temp-timer-hover: oklch(80% 0.11 228);
+  --color-temp-on-timer: oklch(30% 0.09 258);
+  --color-temp-timer-soft: oklch(95% 0.03 232); /* running entry card */
+  --color-temp-link: oklch(45% 0.16 258);
+  --color-temp-chart: oklch(43% 0.13 258);
+  --color-temp-chart-soft: oklch(93% 0.035 250);
+  --color-temp-success: oklch(47% 0.1 175);
+  --color-temp-danger: oklch(52% 0.2 27);
+  --color-temp-selected: oklch(43% 0.13 258); /* highlighted option in a list */
+  --color-temp-on-selected: oklch(99.6% 0.004 90);
+  --color-temp-backdrop: oklch(23% 0.035 258 / 0.45);
+  --color-temp-focus: oklch(55% 0.18 258);
+
+  --radius-temp-card: 1.5rem;
+  --radius-temp-control: 0.875rem;
+  --radius-temp-option: 0.625rem; /* entry inside a popup: control radius minus its 4px padding */
+  --radius-temp-button: 9999px;
+  --radius-temp-pill: 9999px;
+
+  --shadow-temp-card:
+    0 1px 2px oklch(23% 0.035 258 / 0.04), 0 10px 30px -14px oklch(23% 0.035 258 / 0.18);
+  --shadow-temp-float:
+    0 2px 6px oklch(23% 0.035 258 / 0.08), 0 18px 40px -12px oklch(23% 0.035 258 / 0.35);
+
+  --font-temp-sans:
+    "Avenir Next", Avenir, "Segoe UI Variable Display", "Segoe UI", ui-sans-serif, system-ui,
+    sans-serif;
+
+  --text-temp-wordmark: 1.5rem; /* 24px */
+  --text-temp-page-title: 2.5rem; /* 40px */
+  --text-temp-kpi: 2.25rem; /* 36px */
+}
+
+/* Project colour from the Project ID: the element sets --project-hue (see ui/project-color.ts) */
+@theme inline {
+  --color-temp-project: oklch(
+    var(--temp-project-lightness) var(--temp-project-chroma) var(--project-hue)
+  );
+}
+
+:root {
+  --temp-project-lightness: 66%;
+  --temp-project-chroma: 0.14;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-temp-canvas: oklch(17% 0.022 258);
+    --color-temp-surface: oklch(21.5% 0.026 258);
+    --color-temp-band: oklch(25.5% 0.028 258);
+    --color-temp-highlight: oklch(28% 0.055 240);
+    --color-temp-highlight-border: oklch(45% 0.08 240);
+    --color-temp-ink: oklch(95% 0.01 90);
+    --color-temp-ink-muted: oklch(75% 0.02 258);
+    --color-temp-divider: oklch(30% 0.026 258);
+    --color-temp-border: oklch(57% 0.03 258);
+    --color-temp-nav: oklch(17% 0.022 258);
+    --color-temp-nav-active: oklch(74% 0.12 245);
+    --color-temp-on-nav: oklch(17% 0.03 258);
+    --color-temp-primary: oklch(74% 0.12 245);
+    --color-temp-primary-hover: oklch(80% 0.11 245);
+    --color-temp-on-primary: oklch(17% 0.03 258);
+    --color-temp-accent: oklch(74% 0.13 245);
+    --color-temp-accent-soft: oklch(30% 0.06 250);
+    --color-temp-timer: oklch(84% 0.1 228);
+    --color-temp-timer-hover: oklch(89% 0.09 228);
+    --color-temp-on-timer: oklch(20% 0.05 258);
+    --color-temp-timer-soft: oklch(30% 0.05 232);
+    --color-temp-link: oklch(80% 0.11 245);
+    --color-temp-chart: oklch(72% 0.13 245);
+    --color-temp-chart-soft: oklch(28% 0.045 250);
+    --color-temp-success: oklch(76% 0.12 175);
+    --color-temp-danger: oklch(72% 0.16 27);
+    --color-temp-selected: oklch(74% 0.12 245);
+    --color-temp-on-selected: oklch(17% 0.03 258);
+    --color-temp-backdrop: oklch(0% 0 0 / 0.6);
+    --color-temp-focus: oklch(78% 0.13 245);
+    --temp-project-lightness: 72%;
+    --temp-project-chroma: 0.12;
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
+
+  body {
+    background-color: var(--color-temp-canvas);
+    color: var(--color-temp-ink);
+    font-family: var(--font-temp-sans);
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-temp-focus);
+    outline-offset: 2px;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--color-temp-accent);
+  }
+}

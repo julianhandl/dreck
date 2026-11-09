@@ -1,0 +1,1841 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`openapi.json snapshot 1`] = `
+{
+  "components": {
+    "parameters": {},
+    "schemas": {
+      "Customer": {
+        "properties": {
+          "archived": {
+            "type": "boolean",
+          },
+          "hourlyRateMinor": {
+            "example": 9000,
+            "minimum": 0,
+            "type": "integer",
+          },
+          "id": {
+            "type": "integer",
+          },
+          "name": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "id",
+          "name",
+          "hourlyRateMinor",
+          "archived",
+        ],
+        "type": "object",
+      },
+      "Error": {
+        "properties": {
+          "code": {
+            "enum": [
+              "validation_failed",
+              "unauthorized",
+              "not_found",
+              "has_dependencies",
+              "name_taken",
+              "currency_locked",
+              "no_running_timer",
+              "rate_limited",
+              "internal_error",
+            ],
+            "type": "string",
+          },
+          "details": {
+            "additionalProperties": {},
+            "type": "object",
+          },
+          "message": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "code",
+          "message",
+        ],
+        "type": "object",
+      },
+      "Expense": {
+        "properties": {
+          "amountMinor": {
+            "example": 1250,
+            "exclusiveMinimum": 0,
+            "type": "integer",
+          },
+          "billable": {
+            "description": "Charged on to the customer",
+            "type": "boolean",
+          },
+          "date": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": "string",
+          },
+          "description": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string",
+          },
+          "id": {
+            "type": "integer",
+          },
+          "projectId": {
+            "exclusiveMinimum": 0,
+            "type": "integer",
+          },
+        },
+        "required": [
+          "projectId",
+          "date",
+          "amountMinor",
+          "description",
+          "billable",
+          "id",
+        ],
+        "type": "object",
+      },
+      "Project": {
+        "properties": {
+          "archived": {
+            "type": "boolean",
+          },
+          "customerId": {
+            "type": "integer",
+          },
+          "hourlyRateMinor": {
+            "example": 9000,
+            "minimum": 0,
+            "type": "integer",
+          },
+          "id": {
+            "type": "integer",
+          },
+          "name": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "id",
+          "customerId",
+          "name",
+          "hourlyRateMinor",
+          "archived",
+        ],
+        "type": "object",
+      },
+      "Report": {
+        "properties": {
+          "currency": {
+            "type": "string",
+          },
+          "customerId": {
+            "type": "integer",
+          },
+          "customers": {
+            "items": {
+              "properties": {
+                "amountMinor": {
+                  "description": "Amount of the time",
+                  "type": "integer",
+                },
+                "archived": {
+                  "type": "boolean",
+                },
+                "billableExpensesMinor": {
+                  "type": "integer",
+                },
+                "id": {
+                  "type": "integer",
+                },
+                "name": {
+                  "type": "string",
+                },
+                "ownExpensesMinor": {
+                  "type": "integer",
+                },
+                "projects": {
+                  "items": {
+                    "properties": {
+                      "amountMinor": {
+                        "description": "Amount of the time",
+                        "type": "integer",
+                      },
+                      "archived": {
+                        "type": "boolean",
+                      },
+                      "billableExpensesMinor": {
+                        "type": "integer",
+                      },
+                      "id": {
+                        "type": "integer",
+                      },
+                      "name": {
+                        "type": "string",
+                      },
+                      "ownExpensesMinor": {
+                        "type": "integer",
+                      },
+                      "roundedSeconds": {
+                        "description": "Seconds after Rounding",
+                        "type": "integer",
+                      },
+                      "seconds": {
+                        "description": "Exact seconds",
+                        "type": "integer",
+                      },
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "archived",
+                      "seconds",
+                      "roundedSeconds",
+                      "amountMinor",
+                      "billableExpensesMinor",
+                      "ownExpensesMinor",
+                    ],
+                    "type": "object",
+                  },
+                  "type": "array",
+                },
+                "roundedSeconds": {
+                  "description": "Seconds after Rounding",
+                  "type": "integer",
+                },
+                "seconds": {
+                  "description": "Exact seconds",
+                  "type": "integer",
+                },
+              },
+              "required": [
+                "id",
+                "name",
+                "archived",
+                "seconds",
+                "roundedSeconds",
+                "amountMinor",
+                "billableExpensesMinor",
+                "ownExpensesMinor",
+                "projects",
+              ],
+              "type": "object",
+            },
+            "type": "array",
+          },
+          "from": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": "string",
+          },
+          "projectId": {
+            "type": "integer",
+          },
+          "roundingMinutes": {
+            "enum": [
+              0,
+            ],
+            "type": "number",
+          },
+          "to": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": "string",
+          },
+          "totals": {
+            "properties": {
+              "amountMinor": {
+                "description": "Amount of the time",
+                "type": "integer",
+              },
+              "billableExpensesMinor": {
+                "type": "integer",
+              },
+              "ownExpensesMinor": {
+                "type": "integer",
+              },
+              "roundedSeconds": {
+                "description": "Seconds after Rounding",
+                "type": "integer",
+              },
+              "seconds": {
+                "description": "Exact seconds",
+                "type": "integer",
+              },
+            },
+            "required": [
+              "seconds",
+              "roundedSeconds",
+              "amountMinor",
+              "billableExpensesMinor",
+              "ownExpensesMinor",
+            ],
+            "type": "object",
+          },
+        },
+        "required": [
+          "from",
+          "to",
+          "currency",
+          "roundingMinutes",
+          "totals",
+          "customers",
+        ],
+        "type": "object",
+      },
+      "Settings": {
+        "properties": {
+          "currency": {
+            "example": "EUR",
+            "type": "string",
+          },
+          "defaultHourlyRateMinor": {
+            "example": 9000,
+            "minimum": 0,
+            "type": "integer",
+          },
+          "language": {
+            "enum": [
+              "de",
+              "en",
+            ],
+            "type": "string",
+          },
+          "roundingMinutes": {
+            "enum": [
+              0,
+            ],
+            "type": "number",
+          },
+          "timezone": {
+            "example": "Europe/Vienna",
+            "type": "string",
+          },
+        },
+        "required": [
+          "currency",
+          "defaultHourlyRateMinor",
+          "roundingMinutes",
+          "language",
+          "timezone",
+        ],
+        "type": "object",
+      },
+      "TimeEntry": {
+        "properties": {
+          "date": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": "string",
+          },
+          "description": {
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "durationSeconds": {
+            "description": "Without the running part; clients add \`now − runningSince\` while it runs",
+            "example": 5400,
+            "minimum": 0,
+            "type": "integer",
+          },
+          "hourlyRateMinor": {
+            "example": 9000,
+            "minimum": 0,
+            "type": "integer",
+          },
+          "hourlyRateOverridden": {
+            "description": "Hourly Rate corrected by hand",
+            "type": "boolean",
+          },
+          "id": {
+            "type": "integer",
+          },
+          "projectId": {
+            "type": "integer",
+          },
+          "runningSince": {
+            "description": "UTC, set while it runs",
+            "format": "date-time",
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+        },
+        "required": [
+          "id",
+          "projectId",
+          "date",
+          "durationSeconds",
+          "runningSince",
+          "description",
+          "hourlyRateMinor",
+          "hourlyRateOverridden",
+        ],
+        "type": "object",
+      },
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "description": "The instance secret",
+        "scheme": "bearer",
+        "type": "http",
+      },
+      "Session": {
+        "in": "cookie",
+        "name": "dreck_session",
+        "type": "apiKey",
+      },
+    },
+  },
+  "info": {
+    "title": "Dreck API",
+    "version": "0.0.0",
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "password": {
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "password",
+                ],
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "204": {
+            "description": "Logged in, session cookie set",
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "unauthorized",
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "rate_limited, see Retry-After",
+          },
+        },
+        "security": [],
+        "summary": "Log in with the instance secret and receive the session cookie",
+      },
+    },
+    "/auth/logout": {
+      "post": {
+        "responses": {
+          "204": {
+            "description": "Logged out",
+          },
+        },
+        "security": [],
+        "summary": "Delete the session cookie",
+      },
+    },
+    "/backup": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.sqlite3": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string",
+                },
+              },
+            },
+            "description": "The database file",
+          },
+        },
+        "summary": "Download a consistent snapshot of the SQLite database",
+      },
+    },
+    "/customers": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Customer",
+                  },
+                  "type": "array",
+                },
+              },
+            },
+            "description": "Customers sorted by name",
+          },
+        },
+        "summary": "List all customers, including archived ones",
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "hourlyRateMinor": {
+                    "description": "Defaults to the Default Hourly Rate",
+                    "example": 9000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "name": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "name",
+                ],
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer",
+                },
+              },
+            },
+            "description": "The created customer",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "name_taken",
+          },
+        },
+        "summary": "Create a customer",
+      },
+    },
+    "/customers/{id}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": 1,
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "not_found",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "has_dependencies",
+          },
+        },
+        "summary": "Delete a customer without projects",
+      },
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": 1,
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "applyToProjects": {
+                    "description": "Projects of this customer that take over the new Hourly Rate; their Time Entries only with applyToTimeEntries",
+                    "properties": {
+                      "applyToTimeEntries": {
+                        "description": "Existing Time Entries of these projects that take over the rate too",
+                        "properties": {
+                          "from": {
+                            "example": "2026-11-09",
+                            "format": "date",
+                            "type": "string",
+                          },
+                          "includeOverridden": {
+                            "description": "Also overwrite Time Entries corrected by hand",
+                            "type": "boolean",
+                          },
+                          "to": {
+                            "example": "2026-11-09",
+                            "format": "date",
+                            "type": "string",
+                          },
+                        },
+                        "type": "object",
+                      },
+                      "projectIds": {
+                        "items": {
+                          "exclusiveMinimum": 0,
+                          "type": "integer",
+                        },
+                        "type": "array",
+                      },
+                    },
+                    "required": [
+                      "projectIds",
+                    ],
+                    "type": "object",
+                  },
+                  "archived": {
+                    "type": "boolean",
+                  },
+                  "hourlyRateMinor": {
+                    "example": 9000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "name": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer",
+                },
+              },
+            },
+            "description": "The changed customer",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "not_found",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "name_taken",
+          },
+        },
+        "summary": "Change a customer",
+      },
+    },
+    "/expenses": {
+      "get": {
+        "description": "Sorted by date descending. Filters combine with AND.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "example": "2026-11-09",
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "example": "2026-11-09",
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "query",
+            "name": "projectId",
+            "required": false,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+          {
+            "in": "query",
+            "name": "customerId",
+            "required": false,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Expense",
+                  },
+                  "type": "array",
+                },
+              },
+            },
+            "description": "Expenses",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid filter",
+          },
+        },
+        "summary": "List expenses",
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amountMinor": {
+                    "example": 1250,
+                    "exclusiveMinimum": 0,
+                    "type": "integer",
+                  },
+                  "billable": {
+                    "description": "Charged on to the customer",
+                    "type": "boolean",
+                  },
+                  "date": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                  "projectId": {
+                    "exclusiveMinimum": 0,
+                    "type": "integer",
+                  },
+                },
+                "required": [
+                  "projectId",
+                  "date",
+                  "amountMinor",
+                  "description",
+                  "billable",
+                ],
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Expense",
+                },
+              },
+            },
+            "description": "The created expense",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+        },
+        "summary": "Create an expense",
+      },
+    },
+    "/expenses/{id}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": 1,
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "not_found",
+          },
+        },
+        "summary": "Delete an expense",
+      },
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": 1,
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amountMinor": {
+                    "example": 1250,
+                    "exclusiveMinimum": 0,
+                    "type": "integer",
+                  },
+                  "billable": {
+                    "description": "Charged on to the customer",
+                    "type": "boolean",
+                  },
+                  "date": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                  "projectId": {
+                    "exclusiveMinimum": 0,
+                    "type": "integer",
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Expense",
+                },
+              },
+            },
+            "description": "The changed expense",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "not_found",
+          },
+        },
+        "summary": "Change an expense",
+      },
+    },
+    "/projects": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Project",
+                  },
+                  "type": "array",
+                },
+              },
+            },
+            "description": "Projects sorted by name",
+          },
+        },
+        "summary": "List all projects, including archived ones",
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "customerId": {
+                    "exclusiveMinimum": 0,
+                    "type": "integer",
+                  },
+                  "hourlyRateMinor": {
+                    "description": "Defaults to the Hourly Rate of the Customer",
+                    "example": 9000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "name": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "customerId",
+                  "name",
+                ],
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project",
+                },
+              },
+            },
+            "description": "The created project",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "name_taken",
+          },
+        },
+        "summary": "Create a project",
+      },
+    },
+    "/projects/{id}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": 1,
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "not_found",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "has_dependencies",
+          },
+        },
+        "summary": "Delete a project without time entries or expenses",
+      },
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": 1,
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "applyToTimeEntries": {
+                    "description": "Existing Time Entries that take over the new Hourly Rate",
+                    "properties": {
+                      "from": {
+                        "example": "2026-11-09",
+                        "format": "date",
+                        "type": "string",
+                      },
+                      "includeOverridden": {
+                        "description": "Also overwrite Time Entries corrected by hand",
+                        "type": "boolean",
+                      },
+                      "to": {
+                        "example": "2026-11-09",
+                        "format": "date",
+                        "type": "string",
+                      },
+                    },
+                    "type": "object",
+                  },
+                  "archived": {
+                    "type": "boolean",
+                  },
+                  "customerId": {
+                    "exclusiveMinimum": 0,
+                    "type": "integer",
+                  },
+                  "hourlyRateMinor": {
+                    "example": 9000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "name": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project",
+                },
+              },
+            },
+            "description": "The changed project",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "not_found",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "name_taken",
+          },
+        },
+        "summary": "Change a project",
+      },
+    },
+    "/reports": {
+      "get": {
+        "description": "Archived customers and projects are included, a running timer counts until now. Amount per time entry = round(hourlyRateMinor × rounded seconds / 3600); sums add these.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "example": "2026-11-09",
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "example": "2026-11-09",
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "query",
+            "name": "customerId",
+            "required": false,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+          {
+            "in": "query",
+            "name": "projectId",
+            "required": false,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+          {
+            "description": "csv returns the same filters as CSV; \`Accept: text/csv\` does the same",
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "description": "csv returns the same filters as CSV; \`Accept: text/csv\` does the same",
+              "enum": [
+                "json",
+                "csv",
+              ],
+              "type": "string",
+            },
+          },
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report",
+                },
+              },
+              "text/csv": {
+                "schema": {
+                  "description": "One row per time entry and expense",
+                  "type": "string",
+                },
+              },
+            },
+            "description": "The report",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid filter",
+          },
+        },
+        "summary": "Report for a period, grouped by customer and project",
+      },
+    },
+    "/settings": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings",
+                },
+              },
+            },
+            "description": "The settings",
+          },
+        },
+        "summary": "Read the instance settings",
+      },
+      "patch": {
+        "description": "The currency is locked once a customer or an expense exists (409 currency_locked).",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "currency": {
+                    "example": "EUR",
+                    "type": "string",
+                  },
+                  "defaultHourlyRateMinor": {
+                    "example": 9000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "language": {
+                    "enum": [
+                      "de",
+                      "en",
+                    ],
+                    "type": "string",
+                  },
+                  "roundingMinutes": {
+                    "enum": [
+                      0,
+                    ],
+                    "type": "number",
+                  },
+                  "timezone": {
+                    "example": "Europe/Vienna",
+                    "type": "string",
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings",
+                },
+              },
+            },
+            "description": "The changed settings",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "currency_locked",
+          },
+        },
+        "summary": "Change the instance settings",
+      },
+    },
+    "/time-entries": {
+      "get": {
+        "description": "Sorted by date descending, within a day by creation. Filters combine with AND.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "example": "2026-11-09",
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "example": "2026-11-09",
+              "format": "date",
+              "type": "string",
+            },
+          },
+          {
+            "in": "query",
+            "name": "projectId",
+            "required": false,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+          {
+            "in": "query",
+            "name": "customerId",
+            "required": false,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TimeEntry",
+                  },
+                  "type": "array",
+                },
+              },
+            },
+            "description": "Time entries",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid filter",
+          },
+        },
+        "summary": "List time entries",
+      },
+      "post": {
+        "description": "A running time entry only comes from the timer.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "date": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "type": "string",
+                  },
+                  "durationSeconds": {
+                    "example": 5400,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "projectId": {
+                    "exclusiveMinimum": 0,
+                    "type": "integer",
+                  },
+                },
+                "required": [
+                  "projectId",
+                  "date",
+                  "durationSeconds",
+                ],
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeEntry",
+                },
+              },
+            },
+            "description": "The created time entry",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+        },
+        "summary": "Create a stopped time entry",
+      },
+    },
+    "/time-entries/{id}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": 1,
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "not_found",
+          },
+        },
+        "summary": "Delete a time entry",
+      },
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": 1,
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "date": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "durationSeconds": {
+                    "description": "On a running entry this sets the displayed total duration",
+                    "example": 5400,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "hourlyRateMinor": {
+                    "description": "Marks the entry as corrected by hand",
+                    "example": 9000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "projectId": {
+                    "description": "Takes over the rate of the new project unless hourlyRateMinor is sent along",
+                    "exclusiveMinimum": 0,
+                    "type": "integer",
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeEntry",
+                },
+              },
+            },
+            "description": "The changed time entry",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "not_found",
+          },
+        },
+        "summary": "Change a time entry",
+      },
+    },
+    "/timer": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/TimeEntry",
+                    },
+                    {
+                      "type": [
+                        "object",
+                        "null",
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+            "description": "The running time entry or null",
+          },
+        },
+        "summary": "The running time entry or null",
+      },
+    },
+    "/timer/start": {
+      "post": {
+        "description": "Stops the running timer in the same transaction and returns it as \`stopped\`.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "at": {
+                        "description": "Moment of the click; the server takes min(at, server time)",
+                        "example": "2026-11-09T17:30:00+01:00",
+                        "format": "date-time",
+                        "type": "string",
+                      },
+                      "description": {
+                        "maxLength": 2000,
+                        "type": "string",
+                      },
+                      "projectId": {
+                        "exclusiveMinimum": 0,
+                        "type": "integer",
+                      },
+                    },
+                    "required": [
+                      "projectId",
+                    ],
+                    "type": "object",
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "at": {
+                        "description": "Moment of the click; the server takes min(at, server time)",
+                        "example": "2026-11-09T17:30:00+01:00",
+                        "format": "date-time",
+                        "type": "string",
+                      },
+                      "timeEntryId": {
+                        "description": "Time entry of today",
+                        "exclusiveMinimum": 0,
+                        "type": "integer",
+                      },
+                    },
+                    "required": [
+                      "timeEntryId",
+                    ],
+                    "type": "object",
+                  },
+                ],
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "started": {
+                      "$ref": "#/components/schemas/TimeEntry",
+                    },
+                    "stopped": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/TimeEntry",
+                        },
+                        {
+                          "type": [
+                            "object",
+                            "null",
+                          ],
+                        },
+                      ],
+                    },
+                  },
+                  "required": [
+                    "started",
+                    "stopped",
+                  ],
+                  "type": "object",
+                },
+              },
+            },
+            "description": "Started and stopped time entry",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input, not a time entry of today, or at before the running start",
+          },
+        },
+        "summary": "Start a new timer or continue a time entry of today",
+      },
+    },
+    "/timer/stop": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "at": {
+                    "description": "Moment of the click; the server takes min(at, server time)",
+                    "example": "2026-11-09T17:30:00+01:00",
+                    "format": "date-time",
+                    "type": "string",
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+          "required": false,
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeEntry",
+                },
+              },
+            },
+            "description": "The stopped time entry",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input or at before the running start",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "no_running_timer",
+          },
+        },
+        "summary": "Stop the running timer",
+      },
+    },
+  },
+  "security": [
+    {
+      "Bearer": [],
+    },
+    {
+      "Session": [],
+    },
+  ],
+  "servers": [
+    {
+      "url": "/api/v1",
+    },
+  ],
+  "webhooks": {},
+}
+`;

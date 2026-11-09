@@ -1,0 +1,23 @@
+{
+  "name": "@dreck/shared",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./api/*": "./src/api/*.ts",
+    "./api-errors": "./src/api-errors/api-errors.ts",
+    "./i18n": "./src/i18n/i18n.ts",
+    "./money": "./src/money/money.ts",
+    "./report": "./src/report/report.ts",
+    "./time": "./src/time/time.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.6.3",
+    "zod": "^4.6.7"
+  }
+}

@@ -1,0 +1,27 @@
+services:
+  app:
+    image: ghcr.io/julianhandl/dreck:latest
+    restart: unless-stopped
+    read_only: true
+    environment:
+      # Optional: set your own secret (at least 32 characters). Without it one is generated into /data/secret.
+      DRECK_SECRET: ${DRECK_SECRET:-}
+    volumes:
+      - dreck-data:/data
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    command: caddy reverse-proxy --from ${DOMAIN:?Set DOMAIN in .env, e.g. DOMAIN=dreck.example.com} --to app:3000
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy-data:/data
+    depends_on:
+      - app
+
+volumes:
+  dreck-data:
+  caddy-data:
