@@ -234,7 +234,7 @@ Nur hier weicht Dreck von der Vorlage ab.
 
 - **Vorbelegung:** „Neuer Eintrag“ und „Timer starten“ mit dem Project des laufenden Timers, sonst dem zuletzt gestarteten der Woche, sonst dem einzigen wählbaren Project. Beschreibung mit Vorschlägen aus den Time Entries derselben Woche und desselben Projects. Expense mit Datum heute, Project der letzten Expense (falls noch wählbar), Billable wie zuletzt bei diesem Project. Project-Auswahl mit Tippen-zum-Filtern, zuerst „Heute verwendet“, Archived nicht wählbar.
 - **Formular „Neuer Eintrag“:** Datum, Project, Beschreibung, Dauer. Heute ohne Dauer: „Timer starten“; mit Dauer: „Eintrag speichern“. An einem früheren Tag ist die Dauer Pflicht. Kein automatisches Zusammenführen mit bestehenden Time Entries.
-- **Dauer:** nur `h:mm` (`2:30`, `0:45`; `2` = 2:00, `:45` = 0:45). Alles andere ist ein Fehler am Feld „Format h:mm, z. B. 2:30“. Im Formular > 0:00 und ≤ 24:00.
+- **Dauer:** `h:mm` (`2:30`, `0:45`; `2` = 2:00, `:45` = 0:45) oder Dezimalstunden mit Komma oder Punkt (`2,5` = 2:30, `,5` = 0:30; auf ganze Minuten gerundet). Alles andere ist ein Fehler am Feld „Format h:mm oder Stunden, z. B. 2:30 oder 2,5“. Im Formular > 0:00 und ≤ 24:00.
 - **Betrag:** tolerant („12,50“, „12.5“, „1.234,50“).
 - **Timer:** Vor dem Start steht „Stoppt X (0:47) und startet den neuen Timer.“, danach keine Meldung. Ein nach Sekunden gestoppter Timer bleibt als 0:00 stehen, der User löscht ihn selbst.
 - **Vergessener Timer** (`runningSince` über 10 h zurück oder an einem früheren Tag): steht heute in der Liste mit Hinweis. Jeder Start oder Stopp fragt zuerst „Wann hast du aufgehört?“ (Uhrzeit am Starttag, in `at` umgerechnet, nicht gespeichert) oder „Nein, bis jetzt gearbeitet“. Rückfrage statt Rückgängig. Bei einem Start mit Uhrzeit schickt die UI zwei Aufrufe: `POST /timer/stop` mit dieser Zeit, dann `POST /timer/start`; „Erneut versuchen“ ignoriert dabei `409 no_running_timer` des Stopps.
@@ -281,7 +281,7 @@ Quelle: [Visuelles Design](wayfinder/tickets/09-visuelles-design.md).
 
 ### Ebenen
 
-- **Unit** (`bun test`): nur reine Funktionen mit vielen Fällen: Rounding und Betrag, Parser für `h:mm`, „heute“ in einer Zeitzone.
+- **Unit** (`bun test`): nur reine Funktionen mit vielen Fällen: Rounding und Betrag, Parser für `h:mm` und Dezimalstunden, „heute“ in einer Zeitzone.
 - **API** (`bun test`): in-process über `app.request()`, ohne HTTP-Server und ohne Mocks. Vor jedem Test eine frische `:memory:`-DB mit `migrate()`. Echte Dateien in einem Temp-Verzeichnis nur dort, wo Dateien nötig sind: Start, Backup und Rotation, `/data/secret`, `GET /backup`, Migration der Fixture-DB.
 - **Browser** (Playwright Test, Chromium, Desktop- und Handy-Viewport), ca. 5 Kernabläufe:
   - Timer starten und stoppen

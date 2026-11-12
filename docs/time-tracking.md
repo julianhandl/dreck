@@ -33,7 +33,7 @@ Dreck does not store the time you enter anywhere else. It only uses it to calcul
 
 ## Durations
 
-Durations are always entered as `h:mm`:
+Durations are entered as `h:mm` or as decimal hours (comma or dot):
 
 | Input | Duration |
 |---|---|
@@ -41,8 +41,10 @@ Durations are always entered as `h:mm`:
 | `0:45` | 45 min |
 | `2` | 2 h |
 | `:45` | 45 min |
+| `2,5` / `2.5` | 2 h 30 min |
+| `,5` | 30 min |
 
-A plain number means hours, so `90` is 90 hours, not 90 minutes. Anything else (`2.5`, `2h`, `1:5`) is rejected with "Format h:mm, e.g. 2:30". In the dialog a duration must be more than 0:00 and at most 24:00. Durations are shown in whole minutes; seconds are kept and count in reports.
+A plain number means hours, so `90` is 90 hours, not 90 minutes. Decimal hours are rounded to whole minutes (`1,33` = 1:20). Anything else (`2h`, `1:5`, `2,`) is rejected with "Format h:mm or hours, e.g. 2:30 or 2.5". In the dialog a duration must be more than 0:00 and at most 24:00. Durations are shown in whole minutes; seconds are kept and count in reports.
 
 ## The dialog
 

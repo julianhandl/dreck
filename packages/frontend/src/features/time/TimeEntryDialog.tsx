@@ -100,7 +100,7 @@ export function TimeEntryDialog(props: TimeEntryDialogProps): ReactElement {
               name="duration"
               label={t.duration}
               placeholder="0:00"
-              inputMode="numeric"
+              inputMode="decimal"
               autoComplete="off"
               value={dialog.duration}
               onValueChange={dialog.handleDurationChange}

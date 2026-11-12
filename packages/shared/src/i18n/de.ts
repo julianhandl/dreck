@@ -87,7 +87,7 @@ export const de = {
     },
     errors: {
       projectRequired: 'Bitte ein Project wählen.',
-      durationFormat: 'Format h:mm, z. B. 2:30',
+      durationFormat: 'Format h:mm oder Stunden, z. B. 2:30 oder 2,5',
       durationRange: 'Mehr als 0:00 und höchstens 24:00.',
       durationRequired: 'Dauer fehlt. Ein Timer startet nur heute.',
     },

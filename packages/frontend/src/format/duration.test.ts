@@ -25,14 +25,34 @@ describe('parseDuration', () => {
     [' 1:15 ', 4500],
     ['0:00', 0],
     ['24:00', 86400],
+    ['2,5', 9000],
+    ['2.5', 9000],
+    [',5', 1800],
+    ['0,75', 2700],
+    ['1,33', 4800],
+    ['24,0', 86400],
   ])('%p → %p s', (input, expected) => {
     expect(parseDuration(input)).toBe(expected);
   });
 
-  test.each(['', ' ', ':', '2:', '2:5', '2:60', '1,5', '1.5', '-1:00', '2:30:00', 'abc', '1 h'])(
-    '%p is invalid',
-    (input) => {
-      expect(parseDuration(input)).toBeNull();
-    },
-  );
+  test.each([
+    '',
+    ' ',
+    ':',
+    '2:',
+    '2:5',
+    '2:60',
+    '2,',
+    '2.',
+    ',',
+    '1,5:00',
+    '1,2,5',
+    '-1,5',
+    '-1:00',
+    '2:30:00',
+    'abc',
+    '1 h',
+  ])('%p is invalid', (input) => {
+    expect(parseDuration(input)).toBeNull();
+  });
 });
