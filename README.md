@@ -2,6 +2,8 @@
 
 **Dreck** (German for “dirt”, and a slightly misspelled “track”) is a very simple time and expense tracker for one person.
 
+![Screenshot of dreck timetracking](docs/dreck.png)
+
 > Main branch is stable, but this repo is under development to add missing features like invoicing and estimates.
 
 ## Quickstart
