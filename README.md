@@ -1,8 +1,8 @@
 # Dreck
 
-**Dreck** (German for “dirt”, and a slightly misspelled “track”) is an extremely simple time and expense tracker for one person.
+**Dreck** (German for “dirt”, and a slightly misspelled “track”) is a very simple time and expense tracker for one person.
 
-> Under development until 1.0, use at your own risk, no guaranteed upgrade path.
+> Main branch is stable, but this repo is under development to add missing features like invoicing and estimates.
 
 ## Quickstart
 
@@ -11,7 +11,7 @@ docker run -d --name dreck -p 127.0.0.1:3000:3000 -v dreck-data:/data ghcr.io/ju
 docker logs dreck
 ```
 
-Open <http://localhost:3000> and paste the secret from the log as the password. Images exist for `linux/amd64` and `linux/arm64`.
+Open <http://localhost:3000> and paste the secret from the log as the password.
 
 Remove it again with `docker rm -f dreck && docker volume rm dreck-data`.
 
