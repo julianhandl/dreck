@@ -1,8 +1,6 @@
 import type { Language } from '@dreck/shared/i18n';
 import { currencyFractionDigits, minorToMajor } from '@dreck/shared/money';
-
-// Integer either plain or in groups of three with one separator throughout, then an optional fraction
-const AMOUNT = /^(\d{1,3}(?:([.,])\d{3}(?:\2\d{3})*)?|\d+)(?:([.,])(\d+))?$/;
+import { formatDecimalInput, parseDecimal } from './decimal';
 
 /** Amount in minor units as currency in the instance language (`1250` EUR → `12,50 €`). */
 export function formatMoney(amountMinor: number, currency: string, language: Language): string {
@@ -17,12 +15,7 @@ export function formatAmountInput(
   currency: string,
   language: Language,
 ): string {
-  const digits = currencyFractionDigits(currency);
-  return new Intl.NumberFormat(language, {
-    useGrouping: false,
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  }).format(minorToMajor(amountMinor, currency));
+  return formatDecimalInput(amountMinor, currencyFractionDigits(currency), language);
 }
 
 /** Symbol of the currency in the language, e.g. `€` or `$`; the code itself while it is unknown. */
@@ -45,12 +38,5 @@ export function currencySymbol(currency: string, language: Language): string {
  * Returns `null` for anything else, including negative amounts and too many decimals.
  */
 export function parseAmount(input: string, currency: string): number | null {
-  const match = AMOUNT.exec(input.replace(/\s/g, ''));
-  if (!match) return null;
-  const [, integer = '', groupSeparator, decimalSeparator, fraction = ''] = match;
-  if (groupSeparator && groupSeparator === decimalSeparator) return null;
-
-  const digits = currencyFractionDigits(currency);
-  if (fraction.length > digits) return null;
-  return Number(integer.replace(/[.,]/g, '')) * 10 ** digits + Number(fraction.padEnd(digits, '0'));
+  return parseDecimal(input, currencyFractionDigits(currency));
 }

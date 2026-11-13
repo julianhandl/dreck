@@ -7,6 +7,8 @@ export const customers = sqliteTable(
     id: integer('id').primaryKey(),
     name: text('name').notNull(),
     hourlyRateMinor: integer('hourly_rate_minor').notNull(),
+    /** Postal address for invoices, several lines. */
+    address: text('address'),
     archived: integer('archived', { mode: 'boolean' }).notNull().default(false),
   },
   (t) => [

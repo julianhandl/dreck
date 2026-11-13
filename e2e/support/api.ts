@@ -40,17 +40,37 @@ export function createProject(
   return send(request, 'post', '/projects', { customerId, name, hourlyRateMinor });
 }
 
-/** Creates a Time Entry of `hours` full hours on `date` (`YYYY-MM-DD`). */
+/** Creates a Time Entry of `hours` hours on `date` (`YYYY-MM-DD`). */
 export function createTimeEntry(
   request: APIRequestContext,
   projectId: number,
   date: string,
   hours: number,
+  description?: string,
 ): Promise<Created> {
   return send(request, 'post', '/time-entries', {
     projectId,
     date,
     durationSeconds: hours * 3600,
+    description,
+  });
+}
+
+/** Creates an Expense, Billable unless `billable` is false; `amountMinor` in cents. */
+export function createExpense(
+  request: APIRequestContext,
+  projectId: number,
+  date: string,
+  amountMinor: number,
+  description: string,
+  billable = true,
+): Promise<Created> {
+  return send(request, 'post', '/expenses', {
+    projectId,
+    date,
+    amountMinor,
+    description,
+    billable,
   });
 }
 
@@ -77,9 +97,14 @@ export async function startTimer(
 }
 
 /** All Time Entries, e.g. to check a duration the screen only shows in minutes. */
-export async function listTimeEntries(
-  request: APIRequestContext,
-): Promise<{ id: number; durationSeconds: number; runningSince: string | null }[]> {
+export async function listTimeEntries(request: APIRequestContext): Promise<
+  {
+    id: number;
+    durationSeconds: number;
+    runningSince: string | null;
+    invoiceItemId: number | null;
+  }[]
+> {
   const response = await request.get(`${API}/time-entries`);
   expect(response.ok()).toBe(true);
   return response.json();

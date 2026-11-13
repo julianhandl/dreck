@@ -56,8 +56,10 @@ export function useRateChange({ entries, newRateMinor, projects }: RateQuestion)
     () => new Set(projects?.filter((p) => p.preselected).map((p) => p.project.id)),
   );
 
+  // Invoiced Time Entries never take over a new rate
   const inScope = entries.filter(
     (e) =>
+      e.invoiceItemId === null &&
       (projects === undefined || selected.has(e.projectId)) &&
       (from === '' || e.date >= from) &&
       (to === '' || e.date <= to),

@@ -10,7 +10,7 @@ type CheckboxFieldProps = {
 };
 
 /**
- * Native checkbox with its label, e.g. "Diese Expense ist billable".
+ * Native checkbox with its label, e.g. "Diese Ausgabe ist billable".
  * @example <CheckboxField label="Billable" checked={billable} onCheckedChange={setBillable} />
  */
 export function CheckboxField({

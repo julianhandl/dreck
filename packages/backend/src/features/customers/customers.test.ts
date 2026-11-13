@@ -6,7 +6,13 @@ beforeEach(async () => {
   api = await createTestApp();
 });
 
-type Customer = { id: number; name: string; hourlyRateMinor: number; archived: boolean };
+type Customer = {
+  id: number;
+  name: string;
+  hourlyRateMinor: number;
+  address: string | null;
+  archived: boolean;
+};
 type TimeEntry = { id: number; hourlyRateMinor: number; hourlyRateOverridden: boolean };
 
 describe('customers', () => {
@@ -14,7 +20,13 @@ describe('customers', () => {
     await api.call('PATCH', '/settings', { defaultHourlyRateMinor: 8000 });
     const first = await api.call<Customer>('POST', '/customers', { name: 'Acme' });
     expect(first.status).toBe(201);
-    expect(first.body).toEqual({ id: 1, name: 'Acme', hourlyRateMinor: 8000, archived: false });
+    expect(first.body).toEqual({
+      id: 1,
+      name: 'Acme',
+      hourlyRateMinor: 8000,
+      address: null,
+      archived: false,
+    });
 
     await api.call('PATCH', '/settings', { defaultHourlyRateMinor: 9500 });
     const second = await api.call<Customer>('POST', '/customers', { name: 'Beta' });

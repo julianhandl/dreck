@@ -53,6 +53,7 @@ export function updateTimeEntry(db: Db, id: number, input: TimeEntryChanges): Ti
   return db.transaction((tx) => {
     const current = tx.select().from(timeEntries).where(eq(timeEntries.id, id)).get();
     if (!current) throw new ApiError('not_found', 'Time entry not found');
+    requireNotInvoiced(current);
 
     const changes: Partial<TimeEntry> = { ...input };
     if (input.description !== undefined) changes.description = input.description || null;
@@ -79,7 +80,19 @@ export function updateTimeEntry(db: Db, id: number, input: TimeEntryChanges): Ti
   });
 }
 
+/** Deletes a Time Entry; `409 invoiced` while it is part of an Invoice. */
 export function deleteTimeEntry(db: Db, id: number): void {
-  const deleted = db.delete(timeEntries).where(eq(timeEntries.id, id)).returning().get();
-  if (!deleted) throw new ApiError('not_found', 'Time entry not found');
+  db.transaction((tx) => {
+    const entry = tx.select().from(timeEntries).where(eq(timeEntries.id, id)).get();
+    if (!entry) throw new ApiError('not_found', 'Time entry not found');
+    requireNotInvoiced(entry);
+    tx.delete(timeEntries).where(eq(timeEntries.id, id)).run();
+  });
+}
+
+/** Invoiced Time Entries and Expenses are locked until their invoice item is removed. */
+export function requireNotInvoiced(entry: { invoiceItemId: number | null }): void {
+  if (entry.invoiceItemId !== null) {
+    throw new ApiError('invoiced', 'The entry is part of an invoice and cannot change');
+  }
 }

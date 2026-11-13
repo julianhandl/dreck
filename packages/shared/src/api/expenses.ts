@@ -1,5 +1,5 @@
 import { z } from '@hono/zod-openapi';
-import { DateSchema, nonEmpty } from './common';
+import { DateSchema, InvoiceItemIdSchema, nonEmpty } from './common';
 
 export const CreateExpenseSchema = z.object({
   projectId: z.number().int().positive(),
@@ -11,9 +11,10 @@ export const CreateExpenseSchema = z.object({
 
 export type CreateExpense = z.infer<typeof CreateExpenseSchema>;
 
-export const ExpenseSchema = CreateExpenseSchema.extend({ id: z.number().int() }).openapi(
-  'Expense',
-);
+export const ExpenseSchema = CreateExpenseSchema.extend({
+  id: z.number().int(),
+  invoiceItemId: InvoiceItemIdSchema,
+}).openapi('Expense');
 
 export type Expense = z.infer<typeof ExpenseSchema>;
 

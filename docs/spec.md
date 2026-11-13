@@ -1,10 +1,10 @@
 # Dreck – Spec
 
-Stand 2026-11-09. Zusammengeführt aus der [Wayfinder-Map](wayfinder/map.md). Die Begründungen stehen in den verlinkten Tickets, diese Datei enthält nur die gültigen Entscheidungen. Bei Widerspruch gilt diese Datei. Vokabular: [`GLOSSARY.md`](../GLOSSARY.md) ist verbindlich.
+Stand 2026-11-12. Zusammengeführt aus der [Wayfinder-Map](wayfinder/map.md). Die Begründungen stehen in den verlinkten Tickets, diese Datei enthält nur die gültigen Entscheidungen. Bei Widerspruch gilt diese Datei. Vokabular: [`GLOSSARY.md`](../GLOSSARY.md) ist verbindlich.
 
 ## 1. Produkt
 
-- Einfache Zeiterfassung und Expenses für Einzelunternehmer: Arbeitszeit und Expenses auf Projects buchen und je Project und Customer auswerten. Single-User, eine Instanz pro User.
+- Einfache Zeiterfassung und Ausgaben für Einzelunternehmer: Arbeitszeit und Ausgaben auf Projects buchen, je Project und Customer auswerten und als Rechnung abrechnen. Single-User, eine Instanz pro User.
 - Selbst gehostet als Docker-Image. Open Source unter AGPL-3.0-only (Abschnitt 10).
 - **API-first:** Die UI nutzt ausschließlich die öffentliche, per OpenAPI beschriebene API. Ein späteres CLI und ein MCP-Server sollen dieselbe API nutzen.
 - Deutsch und Englisch.
@@ -15,7 +15,7 @@ Stand 2026-11-09. Zusammengeführt aus der [Wayfinder-Map](wayfinder/map.md). Di
 - Cloud-Version und Hosting vieler Instanzen (später als eigener Fork, heute kein Tenant-Konzept).
 - CLI und MCP-Server (später, die API ist dafür ausgelegt).
 - Offline-Editing und Sync, Service Worker.
-- Rechnungen, Estimates, Budgets, Tasks, Tags, Approval, Team und Multi-User, wiederkehrende oder duplizierte Expenses, Belege an Expenses, automatische Kostenaufteilung, native Apps.
+- Estimates, wiederkehrende Rechnungen, Retainer, Teilzahlungen, Versand von Rechnungen per E-Mail, PDF vom Server, mehrere Steuersätze pro Rechnung, Budgets, Tasks, Tags, Approval, Team und Multi-User, wiederkehrende oder duplizierte Ausgaben, Belege an Ausgaben, automatische Kostenaufteilung, native Apps.
 - Uhrzeiten an Time Entries, Overlap, Wochenansicht.
 
 Quellen: [Produktumfang und Grundregeln](wayfinder/tickets/00-produktumfang-und-grundregeln.md), [Offline-Sync-Modell](wayfinder/tickets/03-offline-sync-modell.md), [Wochenansicht](wayfinder/tickets/08-wochenansicht.md).
@@ -25,8 +25,8 @@ Quellen: [Produktumfang und Grundregeln](wayfinder/tickets/00-produktumfang-und-
 - Jedes Project gehört zu genau einem Customer. Interne Arbeit läuft über einen Customer wie „Intern“ (Hourly Rate 0). Kein Seed, der User legt ihn selbst an.
 - **Time Entry:** Datum, Dauer, optionale Beschreibung, Hourly Rate. Keine Uhrzeiten. Höchstens einer läuft (der Timer).
 - **Timer:** Ein neuer Timer legt einen Time Entry mit dem heutigen Datum an oder setzt einen Time Entry von heute fort. Ein neuer oder fortgesetzter Timer stoppt den laufenden. Time Entries früherer Tage lassen sich nur bearbeiten, nicht starten. Ein Timer über Mitternacht behält die ganze Dauer am Starttag. „Heute“ ist der Tag in der Zeitzone der Instanz.
-- **Expense:** Datum, Betrag > 0, Pflicht-Beschreibung, Billable ja/nein, genau ein Project. Keine Gutschriften.
-- **Währung:** eine pro Instanz. Änderbar nur, solange es weder Customer noch Expense gibt.
+- **Ausgabe:** Datum, Betrag > 0, Pflicht-Beschreibung, Billable ja/nein, genau ein Project. Keine Gutschriften.
+- **Währung:** eine pro Instanz. Änderbar nur, solange es weder Customer noch Ausgabe gibt.
 - **Hourly Rate**, Kopierkette beim Anlegen, keine Live-Vererbung: Default Hourly Rate → Customer → Project → Time Entry.
   - Ein Time Entry übernimmt beim Anlegen und beim Start eines neuen Timers die Rate seines Projects. Ein fortgesetzter Time Entry behält seine Rate.
   - Korrektur von Hand am Time Entry (Feld „Hourly Rate“ im Dialog „Time Entry bearbeiten“) markiert ihn als „von Hand korrigiert“.
@@ -37,9 +37,14 @@ Quellen: [Produktumfang und Grundregeln](wayfinder/tickets/00-produktumfang-und-
   - Eine Änderung der Default Hourly Rate betrifft nur neue Customers.
 - **Rounding:** pro Instanz 0 (exakt), 5, 6, 10, 15, 30 oder 60 Minuten. Jeder Time Entry wird für den Report einzeln aufgerundet (3 × 7 min bei 15 = 45 min); dabei zählen nur volle Minuten, Sekunden einer angefangenen Minute fallen weg. Eine Dauer auf einem Vielfachen des Rounding-Schritts bleibt dort, bis die nächste volle Minute erreicht ist (bei 15: 15:59 = 15 min, 16:00 = 30 min; bei 6: 6:59 = 6 min, 7:00 = 12 min). Gespeichert wird immer die exakte Dauer, Rounding wirkt also rückwirkend.
 - **Archived:** Customer und Project lassen sich archivieren und wiederherstellen. Archived verschwindet aus Auswahllisten und bleibt in Reports. Ein archivierter Customer blendet auch seine Projects aus; nach dem Aufheben gilt wieder der Zustand der Projects (keine Kaskade).
-- **Löschen:** Customer und Project nur ohne Abhängigkeiten, sonst nur archivieren. Time Entries und Expenses lassen sich direkt löschen.
-- **Report:** frei wählbarer Zeitraum (Kalendertage, inklusive), gegliedert nach Customer und darunter Project. Zeigt Stunden (exakt und nach Rounding), Beträge, Billable Expenses und eigene Kosten getrennt. Archived ist enthalten. Ein laufender Timer zählt bis jetzt. Export als CSV.
-- **Rechnung im Report:** Betrag pro Time Entry = `round(hourlyRateMinor × Sekunden nach Rounding / 3600)`, kaufmännisch auf die kleinste Einheit. Summen pro Project und Customer addieren diese gerundeten Beträge, damit CSV und Report übereinstimmen.
+- **Löschen:** Customer und Project nur ohne Abhängigkeiten, sonst nur archivieren. Time Entries und Ausgaben lassen sich direkt löschen.
+- **Report:** frei wählbarer Zeitraum (Kalendertage, inklusive), gegliedert nach Customer und darunter Project. Zeigt Stunden (exakt und nach Rounding), Beträge, Billable Ausgaben und eigene Kosten getrennt. Archived ist enthalten. Ein laufender Timer zählt bis jetzt. Export als CSV.
+- **Berechnung im Report:** Betrag pro Time Entry = `round(hourlyRateMinor × Sekunden nach Rounding / 3600)`, kaufmännisch auf die kleinste Einheit. Summen pro Project und Customer addieren diese gerundeten Beträge, damit CSV und Report übereinstimmen.
+- **Rechnung:** gehört zu genau einem Customer. Nummer frei wählbar und eindeutig (NOCASE); ohne Angabe die letzte Nummer mit hochgezählter Endziffer (`RE-2026-009` → `RE-2026-010`, die erste ist `1`). Empfänger (Name und Anschrift), Steuersatz und Text unter der Rechnung werden beim Anlegen kopiert (Customer bzw. Settings), keine Live-Vererbung. Absender (Name, Anschrift, optional UID) kommt live aus den Settings.
+  - **Positionen:** Beschreibung, Menge in Hundertsteln, Einzelpreis. Betrag = `round(Menge × Einzelpreis)`, Zwischensumme = Summe der gerundeten Beträge, Rabatt in % auf die Zwischensumme, Steuer in % auf Zwischensumme minus Rabatt, jeder Schritt kaufmännisch gerundet. Prozente als Basispunkte (2000 = 20 %).
+  - **Import:** Beim Anlegen werden die nicht abgerechneten, gestoppten Time Entries des Customers (optional nur eines seiner Projects) im Zeitraum zu Positionen: je Project und Hourly Rate, zusätzlich je Beschreibung, oder je Time Entry; optional eine Position je Billable Ausgabe. Die Gruppierung (`draftItems` in `@dreck/shared/invoice-items`) teilen Server und UI-Vorschau, damit die Vorschau den Positionen entspricht. Menge = Stunden nach Rounding auf Hundertstel gerundet, Time Entries mit 0 nach Rounding bleiben draußen. Ohne Rounding kann die Rechnung daher um Cent vom Report abweichen.
+  - **Abgerechnet:** Ein übernommener Time Entry bzw. eine Ausgabe zeigt auf ihre Position und ist gesperrt: nicht änderbar, nicht löschbar, nicht fortsetzbar, keine neue Hourly Rate (`409 invoiced`). Wird die Position oder die Draft-Rechnung gelöscht, sind sie wieder frei.
+  - **Status:** Draft → Sent (`sentOn`) → Paid (`paidOn`, ein Betrag, keine Teilzahlungen). Late ist kein Status, sondern Sent mit Fälligkeit vor heute. Sent und Paid sperren den Inhalt (`409 invoice_locked`); zurück auf Draft setzt beide Daten auf `null`. Löschen nur als Draft.
 - **Zeit:** Der Server ermittelt die Zeit nur in JS (`Date.now()`), nie in SQL (`unixepoch()`, `CURRENT_TIMESTAMP`). Das hält Tests steuerbar.
 
 Quellen: [Datenmodell](wayfinder/tickets/04-datenmodell.md), [Time Entry als Datum und Dauer](wayfinder/tickets/12-time-entry-als-datum-und-dauer.md).
@@ -58,11 +63,13 @@ Quellen: [Datenmodell](wayfinder/tickets/04-datenmodell.md), [Time Entry als Dat
 
 | Tabelle | Spalten | Constraints |
 |---|---|---|
-| `settings` | `id`, `currency` (ISO 4217), `default_hourly_rate_minor`, `rounding_minutes`, `language`, `timezone` (IANA) | genau eine Zeile (`CHECK (id = 1)`), alle `NOT NULL`; Rate ≥ 0; `rounding_minutes` ∈ {0, 5, 6, 10, 15, 30, 60}; `language` ∈ {`de`, `en`} |
-| `customers` | `id`, `name`, `hourly_rate_minor`, `archived` | `name UNIQUE COLLATE NOCASE`; Rate `NOT NULL`, ≥ 0 |
+| `settings` | `id`, `currency` (ISO 4217), `default_hourly_rate_minor`, `rounding_minutes`, `language`, `timezone` (IANA), `sender_name`, `sender_address`, `sender_vat_id`, `default_tax_basis_points` (Default 0), `default_invoice_notes` | genau eine Zeile (`CHECK (id = 1)`), alle `NOT NULL`; Rate ≥ 0; `rounding_minutes` ∈ {0, 5, 6, 10, 15, 30, 60}; `language` ∈ {`de`, `en`} |
+| `customers` | `id`, `name`, `hourly_rate_minor`, `address`, `archived` | `name UNIQUE COLLATE NOCASE`; Rate `NOT NULL`, ≥ 0 |
 | `projects` | `id`, `customer_id`, `name`, `hourly_rate_minor`, `archived` | `customer_id NOT NULL` FK; `UNIQUE (customer_id, name COLLATE NOCASE)`; Rate `NOT NULL`, ≥ 0 |
-| `time_entries` | `id`, `project_id`, `date`, `duration_seconds`, `running_since`, `description`, `hourly_rate_minor`, `hourly_rate_overridden` | `project_id NOT NULL` FK; `duration_seconds NOT NULL`, ≥ 0, ohne Obergrenze; `running_since` nur gesetzt, solange er läuft; Unique-Index `ON time_entries ((1)) WHERE running_since IS NOT NULL`; Index auf `date` und `project_id`; `description` `NULL` statt Leerstring; Rate `NOT NULL`, ≥ 0 |
-| `expenses` | `id`, `project_id`, `date`, `amount_minor`, `description`, `billable` | `project_id NOT NULL` FK; `amount_minor > 0`; `CHECK (length(trim(description)) > 0)`; Index auf `date` und `project_id` |
+| `time_entries` | `id`, `project_id`, `date`, `duration_seconds`, `running_since`, `description`, `hourly_rate_minor`, `hourly_rate_overridden`, `invoice_item_id` | `project_id NOT NULL` FK; `duration_seconds NOT NULL`, ≥ 0, ohne Obergrenze; `running_since` nur gesetzt, solange er läuft; Unique-Index `ON time_entries ((1)) WHERE running_since IS NOT NULL`; Index auf `date` und `project_id`; `description` `NULL` statt Leerstring; Rate `NOT NULL`, ≥ 0 |
+| `expenses` | `id`, `project_id`, `date`, `amount_minor`, `description`, `billable`, `invoice_item_id` | `project_id NOT NULL` FK; `amount_minor > 0`; `CHECK (length(trim(description)) > 0)`; Index auf `date` und `project_id` |
+| `invoices` | `id`, `number`, `customer_id`, `recipient`, `issue_date`, `due_date`, `period_from`, `period_to`, `subject`, `notes`, `tax_basis_points`, `discount_basis_points`, `sent_on`, `paid_on` | Unique-Index auf `lower(number)`; `customer_id` FK; Basispunkte 0–10000; `due_date >= issue_date` |
+| `invoice_items` | `id`, `invoice_id`, `description`, `quantity_hundredths`, `unit_price_minor` | `invoice_id` FK; Menge und Preis ≥ 0; `time_entries.invoice_item_id` und `expenses.invoice_item_id` zeigen hierher (nullable FK) |
 
 - Angezeigte Dauer eines laufenden Time Entries = `duration_seconds + (jetzt − running_since)`.
 - Die erste Migration legt die Zeile in `settings` an: `EUR`, Rate 0, Rounding 0, `de`, `UTC`. Einen Zustand „nicht eingerichtet“ gibt es nicht.
@@ -76,7 +83,7 @@ Quellen: [Datenmodell](wayfinder/tickets/04-datenmodell.md), [Time Entry als Dat
 - `POST` legt an (`201` + Datensatz), `PATCH` ändert Teile (`200` + Datensatz), `DELETE` löscht (`204`). Kein `PUT`, kein `GET /:id`, keine Bulk-Endpunkte, keine Pagination, keine Sortier-Parameter.
 - JSON in camelCase, DB in snake_case, Drizzle übersetzt. Geld mit Suffix `Minor` (`hourlyRateMinor`, `defaultHourlyRateMinor`, `amountMinor`). Dauern in Sekunden.
 - Daten als `YYYY-MM-DD`. `from` und `to` sind überall Kalenderdaten, beide inklusive. Zeitpunkte gibt es nur in `at` (Eingabe, ISO 8601 mit Offset, ohne Offset `400`) und `runningSince` (Ausgabe, UTC mit `Z`).
-- Sortierung: Time Entries nach `date` absteigend, innerhalb eines Tages nach `id` aufsteigend; Expenses nach `date` absteigend; Customers und Projects nach `name` (NOCASE). Customers und Projects liefern auch Archived mit Flag `archived`, der Client filtert.
+- Sortierung: Time Entries nach `date` absteigend, innerhalb eines Tages nach `id` aufsteigend; Ausgaben nach `date` absteigend; Customers und Projects nach `name` (NOCASE). Customers und Projects liefern auch Archived mit Flag `archived`, der Client filtert.
 - Last-Write-Wins, keine Versionen, kein `If-Match`, auch nicht für das CLI.
 - Eine einzige Quelle für Validierung, Typen und Beschreibung: `createRoute` aus `@hono/zod-openapi`.
 
@@ -90,8 +97,9 @@ Quellen: [Datenmodell](wayfinder/tickets/04-datenmodell.md), [Time Entry als Dat
 | Projects | `GET /projects`, `POST /projects`, `PATCH /projects/:id`, `DELETE /projects/:id` |
 | Time Entries | `GET /time-entries[?from][&to][&projectId][&customerId]`, `POST /time-entries`, `PATCH /time-entries/:id`, `DELETE /time-entries/:id` |
 | Timer | `GET /timer`, `POST /timer/start`, `POST /timer/stop` |
-| Expenses | `GET /expenses[?from][&to][&projectId][&customerId]`, `POST /expenses`, `PATCH /expenses/:id`, `DELETE /expenses/:id` |
+| Ausgaben | `GET /expenses[?from][&to][&projectId][&customerId]`, `POST /expenses`, `PATCH /expenses/:id`, `DELETE /expenses/:id` |
 | Reports | `GET /reports?from&to[&customerId][&projectId][&format=csv]` |
+| Rechnungen | `GET /invoices`, `POST /invoices` (optional mit `import`), `PATCH /invoices/:id` (`items` ersetzt die Liste, Positionen mit `id` bleiben), `DELETE /invoices/:id` (nur Draft) |
 | Backup | `GET /backup` |
 | OpenAPI | `GET /openapi.json` (ohne Auth, keine Viewer-UI) |
 
@@ -106,8 +114,8 @@ Filter werden per UND kombiniert. Bei `GET /time-entries` und `GET /expenses` si
 - **Time Entry** `{ id, projectId, date, durationSeconds, runningSince, description, hourlyRateMinor, hourlyRateOverridden }`. `durationSeconds` ohne den laufenden Teil, den der Client dazurechnet.
   - `POST /time-entries` mit `{ projectId, date, durationSeconds, description? }`. Ein laufender Time Entry entsteht nur über den Timer.
   - `PATCH /time-entries/:id` ändert `projectId`, `date`, `durationSeconds`, `description`, `hourlyRateMinor`. Nur `projectId`: Rate des neuen Projects, `hourlyRateOverridden = false`. Nur `hourlyRateMinor`: `hourlyRateOverridden = true`. Beides: die mitgeschickte Rate gewinnt, `true`. Bei einem laufenden Time Entry setzt `durationSeconds` die angezeigte Gesamtdauer (`duration_seconds = Wert`, `running_since = jetzt`).
-- **Expense** `{ id, projectId, date, amountMinor, description, billable }`.
-- **Settings** `{ currency, defaultHourlyRateMinor, roundingMinutes, language, timezone }`. `PATCH` ändert alles jederzeit, außer `currency` nach dem ersten Customer oder der ersten Expense (`409 currency_locked`). `timezone` wird gegen `Intl.supportedValuesOf('timeZone')` geprüft.
+- **Ausgabe** `{ id, projectId, date, amountMinor, description, billable }`.
+- **Settings** `{ currency, defaultHourlyRateMinor, roundingMinutes, language, timezone }`. `PATCH` ändert alles jederzeit, außer `currency` nach dem ersten Customer oder der ersten Ausgabe (`409 currency_locked`). `timezone` wird gegen `Intl.supportedValuesOf('timeZone')` geprüft.
 
 ### Timer
 
@@ -126,8 +134,8 @@ Filter werden per UND kombiniert. Bei `GET /time-entries` und `GET /expenses` si
 
 ### Report und CSV
 
-- `GET /reports` liefert JSON mit Summen pro Customer und darunter pro Project: exakte und gerundete Sekunden, Betrag, Billable Expenses, eigene Kosten. Rechnung wie in Abschnitt 2.
-- `?format=csv` oder `Accept: text/csv`: Der Server erzeugt das CSV mit denselben Filtern. Eine Zeile pro Time Entry und Expense. Spalten: Typ, Customer, Project, Datum, Dauer (gerundet, Minuten), Beschreibung, Hourly Rate, Betrag, Billable.
+- `GET /reports` liefert JSON mit Summen pro Customer und darunter pro Project: exakte und gerundete Sekunden, Betrag, Billable Ausgaben, eigene Kosten. Berechnung wie in Abschnitt 2.
+- `?format=csv` oder `Accept: text/csv`: Der Server erzeugt das CSV mit denselben Filtern. Eine Zeile pro Time Entry und Ausgabe. Spalten: Typ, Customer, Project, Datum, Dauer (gerundet, Minuten), Beschreibung, Hourly Rate, Betrag, Billable.
   - Spaltennamen und Typ in `settings.language`. `de`: Trennzeichen `;`, Dezimalkomma. `en`: `,`, Dezimalpunkt. Beträge in der Haupteinheit.
   - UTF-8 mit BOM, Dateiname `dreck-report_<from>_<to>.csv`.
 
@@ -148,6 +156,9 @@ Format `{ "code": "…", "message": "…", "details": { … } }`. `code` stabil 
 | `name_taken` (Unique-Verletzung) | 409 |
 | `currency_locked` | 409 |
 | `no_running_timer` | 409 |
+| `invoiced` (Time Entry oder Ausgabe ist abgerechnet) | 409 |
+| `invoice_locked` (Rechnung ist Sent oder Paid) | 409 |
+| `number_taken` | 409 |
 | `rate_limited` (mit `Retry-After`) | 429 |
 
 ### Auth
@@ -219,11 +230,12 @@ Quelle: [Betrieb und Distribution](wayfinder/tickets/07-betrieb-und-distribution
 
 - **Aufbau, Screens und Abläufe wie Harvest.** Referenz sind die Screenshots in `design/` (lokal, per `.gitignore` ausgeschlossen, nie committen):
   - Zeit: `new-time-entry.png`
-  - Expenses: `expenses*.png`
+  - Ausgaben: `expenses*.png`
   - Projects: `projects.png`, `project*.png`
   - Reports: `report*.png`
-- Navigation: Zeit, Expenses, Projects, Reports, Einstellungen. Customers erscheinen auf dem Projects-Screen als Gruppen über ihren Projects und werden dort angelegt, bearbeitet und archiviert.
-- Aus Harvest entfällt, was es in Dreck nicht gibt: Tasks, Budget, Forecast, Team, Manager, Approval, Invoices, Estimates, Manage, Import, Wochenansicht, Uhrzeiten, Trial-Hinweise. Billable ist eine Eigenschaft der Expense, nicht der Arbeit.
+  - Rechnungen: `invoicing/harvest*`
+- Navigation: Zeit, Ausgaben, Projects, Reports, Rechnungen, Einstellungen. Customers erscheinen auf dem Projects-Screen als Gruppen über ihren Projects und werden dort angelegt, bearbeitet und archiviert.
+- Aus Harvest entfällt, was es in Dreck nicht gibt: Tasks, Budget, Forecast, Team, Manager, Approval, Estimates, Recurring und Retainer bei Rechnungen, Manage, Import, Wochenansicht, Uhrzeiten, Trial-Hinweise. Billable ist eine Eigenschaft der Ausgabe, nicht der Arbeit.
 - Mobile: dieselben Screens, als Web-App auf dem Home-Bildschirm.
 - Zeit-Screen: Tagesliste mit Summenleiste der Woche darüber, eine Zeile pro Time Entry in der Reihenfolge des Anlegens. ▶ auf Zeilen von heute.
 - Ziel: so wenige Klicks und Wege wie möglich. Der Zeit-Screen ist auf Tracken optimiert, die häufigen Aktionen liegen nah beieinander.
@@ -232,7 +244,7 @@ Quelle: [Betrieb und Distribution](wayfinder/tickets/07-betrieb-und-distribution
 
 Nur hier weicht Dreck von der Vorlage ab.
 
-- **Vorbelegung:** „Neuer Eintrag“ und „Timer starten“ mit dem Project des laufenden Timers, sonst dem zuletzt gestarteten der Woche, sonst dem einzigen wählbaren Project. Beschreibung mit Vorschlägen aus den Time Entries derselben Woche und desselben Projects. Expense mit Datum heute, Project der letzten Expense (falls noch wählbar), Billable wie zuletzt bei diesem Project. Project-Auswahl mit Tippen-zum-Filtern, zuerst „Heute verwendet“, Archived nicht wählbar.
+- **Vorbelegung:** „Neuer Eintrag“ und „Timer starten“ mit dem Project des laufenden Timers, sonst dem zuletzt gestarteten der Woche, sonst dem einzigen wählbaren Project. Beschreibung mit Vorschlägen aus den Time Entries derselben Woche und desselben Projects. Ausgabe mit Datum heute, Project der letzten Ausgabe (falls noch wählbar), Billable wie zuletzt bei diesem Project. Project-Auswahl mit Tippen-zum-Filtern, zuerst „Heute verwendet“, Archived nicht wählbar.
 - **Formular „Neuer Eintrag“:** Datum, Project, Beschreibung, Dauer. Heute ohne Dauer: „Timer starten“; mit Dauer: „Eintrag speichern“. An einem früheren Tag ist die Dauer Pflicht. Kein automatisches Zusammenführen mit bestehenden Time Entries.
 - **Dauer:** `h:mm` (`2:30`, `0:45`; `2` = 2:00, `:45` = 0:45) oder Dezimalstunden mit Komma oder Punkt (`2,5` = 2:30, `,5` = 0:30; auf ganze Minuten gerundet). Alles andere ist ein Fehler am Feld „Format h:mm oder Stunden, z. B. 2:30 oder 2,5“. Im Formular > 0:00 und ≤ 24:00.
 - **Betrag:** tolerant („12,50“, „12.5“, „1.234,50“).
@@ -247,14 +259,16 @@ Nur hier weicht Dreck von der Vorlage ab.
 - **Abgelaufene Session** (`401`): Login als Dialog über der Seite, die Eingabe bleibt erhalten, danach läuft derselbe Aufruf erneut.
 - **Fehler** stehen am Feld. Jeder `code` der API hat einen UI-Text in beiden Sprachen.
 - **Tastatur:** `N` = Neu, `Enter` = Speichern bzw. Timer starten (in jedem Feld des Dialogs), `Esc` = Schließen. Zeit-Screen: `↑`/`↓` markiert einen Time Entry, `Leertaste` startet/stoppt ihn, `E` bearbeitet ihn. Dialog: Fokus beim Öffnen auf Project (neu) bzw. Dauer (bearbeiten), Tab-Reihenfolge Project, Beschreibung, Dauer, Datum.
-- **Report:** Filter Zeitraum, Customer, Project. Kennzahl „Zu verrechnen“ = Betrag Zeit + Billable Expenses. Button für CSV mit denselben Filtern.
+- **Ausgaben:** gruppiert nach Kalendermonat statt Woche, neuester zuerst, mit Summe je Monat (Bezug für UVA und Abrechnung). Filter Customer, Project und Billable (alle, nur billable, nur nicht billable) im URL, gefiltert im Client. Die Monatssumme gilt für die gefilterten Ausgaben.
+- **Report:** Filter Zeitraum, Customer, Project. Kennzahl „Zu verrechnen“ = Betrag Zeit + Billable Ausgaben. Button für CSV mit denselben Filtern.
 - **Projects:** Löschen nur ohne Abhängigkeiten, sonst Hinweis „nur archivieren möglich“.
-- **Einstellungen:** Default Hourly Rate, Rounding (Hinweis: wirkt rückwirkend), Währung (gesperrt mit Begründung, sobald Customer oder Expense existieren), Sprache, Zeitzone mit „Zeitzone dieses Geräts übernehmen“, wenn sie abweicht. Button „Backup herunterladen“. Logout.
+- **Rechnungen:** Übersicht mit „Offen“ (Sent, davon überfällig, Entwürfe) und „Bezahlt <Jahr>“ (nach `paidOn`), Tabs Offen/Alle, Filter Customer. „Neue Rechnung“ legt sofort einen Draft an (Import mit Live-Vorschau der Positionen oder leer, Fälligkeit +14 Tage) und öffnet das Formular. „Verrechnen“ im Aktionsmenü eines Projects und auf seiner Detailseite öffnet `/invoices/new?projectId=` mit Customer und Project vorbelegt. Der Zeitraum ist immer mit 1. Jänner des laufenden Jahres bis heute vorbelegt. Ist ein Project gewählt, ist „Eine Position pro Project“ deaktiviert (Vorgabe dann: pro Beschreibung). Das PDF entsteht über die Druckansicht des Browsers; gedruckt wird nur das Dokument, immer hell.
+- **Einstellungen:** Default Hourly Rate, Rounding (Hinweis: wirkt rückwirkend), Währung (gesperrt mit Begründung, sobald Customer oder Ausgabe existieren), Sprache, Zeitzone mit „Zeitzone dieses Geräts übernehmen“, wenn sie abweicht. Button „Backup herunterladen“. Logout.
 
 ### Login und Onboarding
 
 - Login als Dialog über der Seite: „Füge das Passwort aus dem Log ein.“
-- Nach dem Login zeigt jede Seite das Onboarding, solange es keinen Customer gibt (ohne Customer gibt es auch keine Expense):
+- Nach dem Login zeigt jede Seite das Onboarding, solange es keinen Customer gibt (ohne Customer gibt es auch keine Ausgabe):
   - Währung, Default Hourly Rate;
   - „Für wen arbeitest du?“ (Customer), „Woran?“ (Project);
   - eingeklappt Sprache und Zeitzone, aus dem Browser vorbelegt.

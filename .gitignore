@@ -23,6 +23,8 @@ design/
 
 # Local data dir of the dev server (bun run dev)
 .data/
+# Test data of bun run dev:seed, recreated on every run
+.data-seed/
 
 
 # direnv (local DRECK_SECRET)

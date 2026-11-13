@@ -3,6 +3,7 @@ import { eq, isNotNull, sql } from 'drizzle-orm';
 import type { Db } from '@/db/db';
 import { requireProject } from '@/features/projects/projects.service';
 import { getSettings } from '@/features/settings/settings.service';
+import { requireNotInvoiced } from '@/features/time-entries/time-entries.service';
 import { type TimeEntry, timeEntries } from '@/features/time-entries/time-entries.table';
 import { ApiError, fieldError } from '@/http/api-error';
 
@@ -34,6 +35,7 @@ export function startTimer(db: Db, input: StartTimerInput): StartTimerResult {
         .where(eq(timeEntries.id, input.timeEntryId))
         .get();
       if (!entry) throw fieldError('timeEntryId', 'Time entry not found');
+      requireNotInvoiced(entry);
       if (entry.date !== today) {
         throw fieldError('timeEntryId', 'Only time entries of today can be continued');
       }

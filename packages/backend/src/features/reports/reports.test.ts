@@ -126,7 +126,7 @@ describe('reports', () => {
       expect(lines).toEqual([
         'Typ;Customer;Project;Datum;Dauer gerundet (Minuten);Beschreibung;Hourly Rate;Betrag;Billable',
         'Zeit;beta;Web;2026-03-02;15;;"90,00";"22,50";',
-        'Expense;beta;Web;2026-03-05;;"Hotel; ""Zentrum""";;"1234,56";ja',
+        'Ausgabe;beta;Web;2026-03-05;;"Hotel; ""Zentrum""";;"1234,56";ja',
       ]);
     });
 

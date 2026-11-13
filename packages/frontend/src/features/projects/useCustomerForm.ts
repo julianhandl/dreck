@@ -15,12 +15,14 @@ type Command = 'save' | 'archive' | 'restore' | 'delete';
 export type CustomerForm = {
   name: string;
   rate: string;
+  address: string;
   submit: Submit<Command>;
   /** Open while the user decides which Projects and Time Entries take over the rate. */
   rateQuestion: RateQuestion | null;
   rateSubmit: Submit<RateAnswer>;
   handleNameChange: (value: string) => void;
   handleRateChange: (value: string) => void;
+  handleAddressChange: (value: string) => void;
   handleCancelRateQuestion: () => void;
 };
 
@@ -38,12 +40,14 @@ export function useCustomerForm(catalog: Catalog, customer?: Customer): Customer
       language,
     ),
   );
+  const [address, setAddress] = useState(customer?.address ?? '');
   const [rateQuestion, setRateQuestion] = useState<RateQuestion | null>(null);
 
   function body(): UpdateCustomer {
     const changes: UpdateCustomer = {};
     const rateMinor = parseAmount(rate, currency) ?? 0;
     if (name.trim() !== customer?.name) changes.name = name.trim();
+    if (address.trim() !== (customer?.address ?? '')) changes.address = address.trim() || null;
     if (rateMinor !== customer?.hourlyRateMinor) changes.hourlyRateMinor = rateMinor;
     return changes;
   }
@@ -111,11 +115,13 @@ export function useCustomerForm(catalog: Catalog, customer?: Customer): Customer
   return {
     name,
     rate,
+    address,
     submit,
     rateQuestion,
     rateSubmit,
     handleNameChange: setName,
     handleRateChange: setRate,
+    handleAddressChange: setAddress,
     handleCancelRateQuestion: () => setRateQuestion(null),
   };
 }

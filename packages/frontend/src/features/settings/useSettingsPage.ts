@@ -6,6 +6,7 @@ import type { RoundingMinutes } from '@dreck/shared/report';
 import { useState } from 'react';
 import { api } from '@/api/api-client';
 import { useQuery } from '@/api/useQuery';
+import { formatPercentInput, parsePercent } from '@/format/decimal';
 import { formatAmountInput, parseAmount } from '@/format/money';
 import { type Submit, useSubmit } from '@/forms/useSubmit';
 import { useI18n } from '@/i18n/useI18n';
@@ -20,6 +21,7 @@ export type SettingsPage = {
   currencyLocked: boolean;
   defaultRate: string;
   rounding: string;
+  invoicing: Record<InvoicingField, string>;
   saved: boolean;
   submit: Submit<null>;
   logout: Submit<null>;
@@ -28,7 +30,16 @@ export type SettingsPage = {
   handleCurrencyChange: (value: string) => void;
   handleDefaultRateChange: (value: string) => void;
   handleRoundingChange: (value: string) => void;
+  handleInvoicingChange: (field: InvoicingField) => (value: string) => void;
 };
+
+/** Text settings for Invoices; the tax is edited as percent. */
+export type InvoicingField =
+  | 'senderName'
+  | 'senderAddress'
+  | 'senderVatId'
+  | 'defaultTax'
+  | 'defaultInvoiceNotes';
 
 /** Form state of the settings screen plus logout. */
 export function useSettingsPage(): SettingsPage {
@@ -47,6 +58,13 @@ export function useSettingsPage(): SettingsPage {
     formatAmountInput(settings.defaultHourlyRateMinor, settings.currency, settings.language),
   );
   const [rounding, setRounding] = useState(String(settings.roundingMinutes));
+  const [invoicing, setInvoicing] = useState<Record<InvoicingField, string>>(() => ({
+    senderName: settings.senderName ?? '',
+    senderAddress: settings.senderAddress ?? '',
+    senderVatId: settings.senderVatId ?? '',
+    defaultTax: formatPercentInput(settings.defaultTaxBasisPoints, settings.language),
+    defaultInvoiceNotes: settings.defaultInvoiceNotes ?? '',
+  }));
   const [saved, setSaved] = useState(false);
 
   function changes(): UpdateSettings {
@@ -60,6 +78,17 @@ export function useSettingsPage(): SettingsPage {
     }
     if (Number(rounding) !== settings.roundingMinutes)
       body.roundingMinutes = Number(rounding) as RoundingMinutes;
+    for (const key of [
+      'senderName',
+      'senderAddress',
+      'senderVatId',
+      'defaultInvoiceNotes',
+    ] as const) {
+      const value = invoicing[key].trim() || null;
+      if (value !== settings[key]) body[key] = value;
+    }
+    const tax = parsePercent(invoicing.defaultTax);
+    if (tax !== null && tax !== settings.defaultTaxBasisPoints) body.defaultTaxBasisPoints = tax;
     return body;
   }
 
@@ -70,10 +99,16 @@ export function useSettingsPage(): SettingsPage {
       setSaved(true);
     },
     {
-      validate: (): Record<string, string> =>
-        parseAmount(defaultRate, currency) === null
-          ? { defaultHourlyRateMinor: messages.expenses.errors.amount }
-          : {},
+      validate: (): Record<string, string> => {
+        const errors: Record<string, string> = {};
+        if (parseAmount(defaultRate, currency) === null) {
+          errors.defaultHourlyRateMinor = messages.expenses.errors.amount;
+        }
+        if (parsePercent(invoicing.defaultTax) === null) {
+          errors.defaultTax = messages.settings.percentError;
+        }
+        return errors;
+      },
       fields: { currency_locked: 'currency' },
     },
   );
@@ -99,6 +134,7 @@ export function useSettingsPage(): SettingsPage {
     currencyLocked,
     defaultRate,
     rounding,
+    invoicing,
     saved,
     submit,
     logout,
@@ -107,5 +143,7 @@ export function useSettingsPage(): SettingsPage {
     handleCurrencyChange: edit((value: string) => setCurrency(value.trim().toUpperCase())),
     handleDefaultRateChange: edit(setDefaultRate),
     handleRoundingChange: edit(setRounding),
+    handleInvoicingChange: (field) =>
+      edit((value: string) => setInvoicing((current) => ({ ...current, [field]: value }))),
   };
 }

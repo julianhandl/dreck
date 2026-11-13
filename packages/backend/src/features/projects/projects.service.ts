@@ -1,4 +1,4 @@
-import { and, eq, gte, lte, sql } from 'drizzle-orm';
+import { and, eq, gte, isNull, lte, sql } from 'drizzle-orm';
 import type { Db } from '@/db/db';
 import { customers } from '@/features/customers/customers.table';
 import { timeEntries } from '@/features/time-entries/time-entries.table';
@@ -68,7 +68,8 @@ export function updateProject(
 
 /**
  * Sets the Hourly Rate on the Project's Time Entries in the range. Entries corrected by hand stay
- * untouched unless `includeOverridden`; afterwards no entry counts as corrected.
+ * untouched unless `includeOverridden`; afterwards no entry counts as corrected. Invoiced entries
+ * never change.
  */
 export function applyRateToTimeEntries(
   db: Db,
@@ -84,6 +85,7 @@ export function applyRateToTimeEntries(
         from ? gte(timeEntries.date, from) : undefined,
         to ? lte(timeEntries.date, to) : undefined,
         includeOverridden ? undefined : eq(timeEntries.hourlyRateOverridden, false),
+        isNull(timeEntries.invoiceItemId),
       ),
     )
     .run();

@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { check, index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { invoiceItems } from '@/features/invoices/invoices.table';
 import { projects } from '@/features/projects/projects.table';
 
 export const timeEntries = sqliteTable(
@@ -18,10 +19,15 @@ export const timeEntries = sqliteTable(
     hourlyRateOverridden: integer('hourly_rate_overridden', { mode: 'boolean' })
       .notNull()
       .default(false),
+    /** Set while invoiced; the entry is locked then. */
+    invoiceItemId: integer('invoice_item_id').references(() => invoiceItems.id, {
+      onDelete: 'restrict',
+    }),
   },
   (t) => [
     index('time_entries_date').on(t.date),
     index('time_entries_project_id').on(t.projectId),
+    index('time_entries_invoice_item_id').on(t.invoiceItemId),
     // At most one running Time Entry
     uniqueIndex('time_entries_single_running').on(sql`(1)`).where(sql`running_since IS NOT NULL`),
     check('time_entries_duration_not_negative', sql`${t.durationSeconds} >= 0`),

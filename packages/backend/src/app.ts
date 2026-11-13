@@ -9,6 +9,7 @@ import { createLoginThrottle } from '@/features/auth/login-throttle';
 import { createBackupRouter } from '@/features/backup/backup.routes';
 import { createCustomersRouter } from '@/features/customers/customers.routes';
 import { createExpensesRouter } from '@/features/expenses/expenses.routes';
+import { createInvoicesRouter } from '@/features/invoices/invoices.routes';
 import { createProjectsRouter } from '@/features/projects/projects.routes';
 import { createReportsRouter } from '@/features/reports/reports.routes';
 import { createSettingsRouter } from '@/features/settings/settings.routes';
@@ -51,6 +52,7 @@ export function createApp({ db, secret, dataDir, staticDir }: AppConfig): OpenAP
   api.route('/timer', createTimerRouter(db));
   api.route('/expenses', createExpensesRouter(db));
   api.route('/reports', createReportsRouter(db));
+  api.route('/invoices', createInvoicesRouter(db));
   api.route('/backup', createBackupRouter(db, dataDir));
 
   api.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {

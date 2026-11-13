@@ -44,6 +44,8 @@ export type TimePage = {
   forgottenTimer: ForgottenTimer;
   /** Rounding of the instance; `0` = exact. */
   roundingMinutes: RoundingMinutes;
+  /** ▶ only for Time Entries of today that are not invoiced. */
+  isStartable: (entry: TimeEntry) => boolean;
   handleSelectDate: (date: string) => void;
   /** Starts or stops a timer; asks first while the running one was forgotten. */
   handleTimer: (command: TimerCommand) => void;
@@ -58,6 +60,8 @@ export function useTimePage(): TimePage {
   const [params, setParams] = useSearchParams();
   const date = params.get('date') ?? today;
   const week = weekDates(date);
+  const isStartable = (entry: TimeEntry): boolean =>
+    entry.date === today && entry.invoiceItemId === null;
   const [dialog, setDialog] = useState<DialogState>(null);
   const { roundingMinutes, timezone } = useSettings();
 
@@ -131,7 +135,7 @@ export function useTimePage(): TimePage {
       // Space on a button inside the row keeps its native click
       event.preventDefault();
       if (entry.runningSince !== null) handleTimer({ stop: entry });
-      else if (entry.date === today) handleTimer({ start: entry });
+      else if (isStartable(entry)) handleTimer({ start: entry });
     }
   });
 
@@ -155,6 +159,7 @@ export function useTimePage(): TimePage {
     forgottenTimer,
     handleTimer,
     roundingMinutes,
+    isStartable,
     handleSelectDate,
     handleOpenNew: () => setDialog({ mode: 'new' }),
     handleOpenEdit: (entry) => setDialog({ mode: 'edit', entry }),

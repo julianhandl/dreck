@@ -1,6 +1,10 @@
 import type { ReactElement } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { ExpensesPage } from '@/features/expenses/ExpensesPage';
+import { InvoiceDetailPage } from '@/features/invoices/InvoiceDetailPage';
+import { InvoiceFormPage } from '@/features/invoices/InvoiceFormPage';
+import { InvoicesPage } from '@/features/invoices/InvoicesPage';
+import { NewInvoicePage } from '@/features/invoices/NewInvoicePage';
 import { LoginDialog } from '@/features/login/LoginDialog';
 import { CustomerFormPage } from '@/features/projects/CustomerFormPage';
 import { ProjectDetailPage } from '@/features/projects/ProjectDetailPage';
@@ -35,6 +39,10 @@ export function App(): ReactElement {
               <Route path="projects/customers/new" element={<CustomerFormPage />} />
               <Route path="projects/customers/:customerId/edit" element={<CustomerFormPage />} />
               <Route path="reports" element={<ReportsPage />} />
+              <Route path="invoices" element={<InvoicesPage />} />
+              <Route path="invoices/new" element={<NewInvoicePage />} />
+              <Route path="invoices/:invoiceId" element={<InvoiceDetailPage />} />
+              <Route path="invoices/:invoiceId/edit" element={<InvoiceFormPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>

@@ -2,11 +2,14 @@ import { z } from '@hono/zod-openapi';
 import { NameSchema, nonEmpty, RateSchema } from './common';
 import { ApplyRateSchema } from './projects';
 
+const AddressSchema = z.string().trim().max(2000).nullable();
+
 export const CustomerSchema = z
   .object({
     id: z.number().int(),
     name: z.string(),
     hourlyRateMinor: RateSchema,
+    address: z.string().nullable().openapi({ description: 'Postal address for invoices' }),
     archived: z.boolean(),
   })
   .openapi('Customer');
@@ -18,6 +21,7 @@ export const CreateCustomerSchema = z.object({
   hourlyRateMinor: RateSchema.optional().openapi({
     description: 'Defaults to the Default Hourly Rate',
   }),
+  address: AddressSchema.optional(),
 });
 
 export type CreateCustomer = z.infer<typeof CreateCustomerSchema>;
@@ -26,6 +30,7 @@ export const UpdateCustomerSchema = z
   .object({
     name: NameSchema,
     hourlyRateMinor: RateSchema,
+    address: AddressSchema,
     archived: z.boolean(),
     applyToProjects: z
       .object({

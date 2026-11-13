@@ -104,6 +104,60 @@ export function SettingsPage(): ReactElement {
           />
           <p className="text-sm text-temp-ink-muted sm:pl-56">{t.roundingHint}</p>
         </div>
+        <h2 className="border-temp-divider border-t pt-6 font-medium text-xl">{t.invoicing}</h2>
+        <TextField
+          name="senderName"
+          layout="row"
+          label={t.senderName}
+          description={t.senderNameHint}
+          autoComplete="name"
+          value={page.invoicing.senderName}
+          onValueChange={page.handleInvoicingChange('senderName')}
+          inputClassName="max-w-md"
+        />
+        <TextField
+          name="senderAddress"
+          layout="row"
+          label={t.senderAddress}
+          multiline
+          autoComplete="street-address"
+          value={page.invoicing.senderAddress}
+          onValueChange={page.handleInvoicingChange('senderAddress')}
+          inputClassName="max-w-md"
+        />
+        <TextField
+          name="senderVatId"
+          layout="row"
+          label={t.senderVatId}
+          description={t.senderVatIdHint}
+          autoComplete="off"
+          value={page.invoicing.senderVatId}
+          onValueChange={page.handleInvoicingChange('senderVatId')}
+          inputClassName="max-w-60"
+        />
+        <TextField
+          name="defaultTax"
+          layout="row"
+          label={t.defaultTax}
+          description={t.defaultTaxHint}
+          inputMode="decimal"
+          autoComplete="off"
+          suffix={<span>%</span>}
+          value={page.invoicing.defaultTax}
+          onValueChange={page.handleInvoicingChange('defaultTax')}
+          inputClassName="max-w-24"
+        />
+        <TextField
+          name="defaultInvoiceNotes"
+          layout="row"
+          label={t.defaultInvoiceNotes}
+          description={t.defaultInvoiceNotesHint}
+          multiline
+          autoComplete="off"
+          value={page.invoicing.defaultInvoiceNotes}
+          onValueChange={page.handleInvoicingChange('defaultInvoiceNotes')}
+          inputClassName="max-w-md"
+        />
         <FormStatus submit={submit} />
         <p role="status" className="font-medium text-temp-success empty:sr-only">
           {page.saved ? t.saved : ''}

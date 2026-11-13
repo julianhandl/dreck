@@ -38,6 +38,10 @@
   --color-temp-backdrop: oklch(23% 0.035 258 / 0.45);
   --color-temp-focus: oklch(55% 0.18 258);
 
+  /* A4 page margins of a printed Invoice (DIN 5008: 25 mm binding edge, 20 mm elsewhere) */
+  --spacing-temp-print-page: 20mm;
+  --spacing-temp-print-binding: 25mm;
+
   --radius-temp-card: 1.5rem;
   --radius-temp-control: 0.875rem;
   --radius-temp-option: 0.625rem; /* entry inside a popup: control radius minus its 4px padding */
@@ -70,7 +74,8 @@
   --temp-project-chroma: 0.14;
 }
 
-@media (prefers-color-scheme: dark) {
+/* Screen only: a printed Invoice always uses the light tokens */
+@media screen and (prefers-color-scheme: dark) {
   :root {
     --color-temp-canvas: oklch(17% 0.022 258);
     --color-temp-surface: oklch(21.5% 0.026 258);
@@ -107,9 +112,30 @@
   }
 }
 
+/*
+ * A4 without page margins: no room for the browser's date, title and URL header/footer.
+ * The printed Invoice brings its own margins and repeats them on every page.
+ */
+@page {
+  size: A4;
+  margin: 0;
+}
+
 @layer base {
   :root {
     color-scheme: light dark;
+  }
+
+  @media print {
+    :root {
+      color-scheme: light;
+      /* Print scale: 1rem = 10pt, so text and spacing shrink to letter size on paper */
+      font-size: 10pt;
+    }
+
+    body {
+      background-color: var(--color-temp-surface);
+    }
   }
 
   body {

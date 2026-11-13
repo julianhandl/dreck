@@ -77,6 +77,17 @@ function CustomerFormContent({ catalog, customerId }: CustomerFormContentProps):
           onValueChange={form.handleRateChange}
           inputClassName="max-w-40"
         />
+        <TextField
+          name="address"
+          layout="row"
+          label={t.address}
+          description={t.addressHint}
+          multiline
+          autoComplete="off"
+          value={form.address}
+          onValueChange={form.handleAddressChange}
+          inputClassName="max-w-md"
+        />
         <FormStatus submit={submit} />
         <div className="flex flex-wrap gap-3 border-temp-divider border-t pt-6">
           <Button variant="primary" type="submit" aria-disabled={submit.pending}>

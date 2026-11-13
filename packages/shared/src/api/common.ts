@@ -7,6 +7,13 @@ export const DateSchema = z.iso.date().openapi({ example: '2026-11-09' });
 /** Non-negative amount of money in minor units. */
 export const RateSchema = z.number().int().min(0).openapi({ example: 9000 });
 
+/** Invoice item a Time Entry or Expense was invoiced with; it cannot change while set. */
+export const InvoiceItemIdSchema = z
+  .number()
+  .int()
+  .nullable()
+  .openapi({ description: 'Set while invoiced; the entry is locked then (409 invoiced)' });
+
 /** Name of a Customer or Project. */
 export const NameSchema = z.string().trim().min(1).max(200);
 

@@ -68,10 +68,15 @@ export function ProjectDetailPage(): ReactElement {
                     {project.archived && <Pill>{messages.common.archived}</Pill>}
                   </div>
                 </div>
-                <Button as={Link} to={`/projects/${project.id}/edit`} className="ml-auto">
-                  <PencilIcon />
-                  {t.edit}
-                </Button>
+                <div className="ml-auto flex flex-wrap gap-3">
+                  <Button as={Link} to={`/invoices/new?projectId=${project.id}`}>
+                    {messages.common.invoice}
+                  </Button>
+                  <Button as={Link} to={`/projects/${project.id}/edit`}>
+                    <PencilIcon />
+                    {t.edit}
+                  </Button>
+                </div>
               </div>
 
               <section

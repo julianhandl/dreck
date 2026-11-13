@@ -7,6 +7,9 @@ export const API_ERROR_CODES = [
   'name_taken',
   'currency_locked',
   'no_running_timer',
+  'invoiced',
+  'invoice_locked',
+  'number_taken',
   'rate_limited',
   'internal_error',
 ] as const;

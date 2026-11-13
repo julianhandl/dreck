@@ -24,6 +24,11 @@ export function addDays(date: string, days: number): string {
   return fromMs(toMs(date) + days * DAY_MS);
 }
 
+/** Whole days from `from` to `to`, negative when `to` is earlier. */
+export function daysBetween(from: string, to: string): number {
+  return Math.round((toMs(to) - toMs(from)) / DAY_MS);
+}
+
 /** Monday of the week of `date` (ISO week). */
 export function startOfWeek(date: string): string {
   const weekday = (new Date(toMs(date)).getUTCDay() + 6) % 7;

@@ -24,7 +24,7 @@ export function MainNav(): ReactElement {
   const currentLabel = current?.label ?? messages.nav.menu;
 
   return (
-    <header className="bg-temp-nav py-3">
+    <header className="bg-temp-nav py-3 print:hidden">
       <nav
         aria-label={messages.nav.label}
         className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-2 px-4 sm:gap-x-4 sm:px-8"

@@ -84,7 +84,7 @@ export function TimePage(): ReactElement {
                                 customer={project && catalog.customerOf(project)}
                                 now={page.now}
                                 roundingMinutes={page.roundingMinutes}
-                                startable={entry.date === page.today}
+                                startable={page.isStartable(entry)}
                                 pending={page.timer.pending}
                                 onStart={() => page.handleTimer({ start: entry })}
                                 onStop={() => page.handleTimer({ stop: entry })}

@@ -8,6 +8,7 @@ import { formatDuration } from '@/format/duration';
 import { useI18n } from '@/i18n/useI18n';
 import { Button } from '@/ui/Button';
 import { PlayIcon, StopIcon } from '@/ui/icons';
+import { Pill } from '@/ui/Pill';
 import { projectColorStyle } from '@/ui/project-color';
 
 type TimeEntryRowProps = {
@@ -20,7 +21,7 @@ type TimeEntryRowProps = {
   now: number;
   /** Rounding of the instance; shows the rounded duration below unless `0`. */
   roundingMinutes: RoundingMinutes;
-  /** ▶ only on rows of today. */
+  /** ▶ only on rows of today that are not invoiced. */
   startable: boolean;
   /** A timer call runs; the buttons ignore clicks meanwhile. */
   pending: boolean;
@@ -77,6 +78,7 @@ export function TimeEntryRow({
             {customer && <span> ({customer.name})</span>}
           </p>
           {entry.description && <p className="text-temp-ink-muted">{entry.description}</p>}
+          {entry.invoiceItemId !== null && <Pill>{messages.common.invoiced}</Pill>}
         </div>
       </div>
       {/* Mobile: ▶/■ in the top right corner of the card, the rounded duration below */}

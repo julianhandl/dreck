@@ -21,7 +21,9 @@ export function Page({ toolbar, children }: PageProps): ReactElement {
           <div className={`${CONTAINER} flex flex-wrap items-center gap-3 py-4`}>{toolbar}</div>
         </div>
       )}
-      <div className={`${CONTAINER} flex flex-col gap-6 pt-8`}>{children}</div>
+      <div className={`${CONTAINER} flex flex-col gap-6 pt-8 print:px-0 print:pt-0`}>
+        {children}
+      </div>
     </>
   );
 }

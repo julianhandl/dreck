@@ -24,6 +24,7 @@ export function useNavItems(): NavItems {
     { to: '/expenses', label: messages.nav.expenses, end: false },
     { to: '/projects', label: messages.nav.projects, end: false },
     { to: '/reports', label: messages.nav.reports, end: false },
+    { to: '/invoices', label: messages.nav.invoices, end: false },
     { to: '/settings', label: messages.nav.settings, end: false },
   ];
   const current = items.find((item) =>

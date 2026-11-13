@@ -1,6 +1,3 @@
-
-<!-- ix-development-advantage:agents:start -->
-
 # Agent Instructions
 
 ## Communication Style
@@ -65,28 +62,6 @@ Never simplify away input validation, error handling, security, accessibility, o
 
 Use `bun` if not specified otherwise.
 
-## Platform configuration (detect once, persist, reuse)
-
-The project's issue tracker, git provider, and DevOps platform are recorded in a
-self-managed block in `AGENTS.md`, delimited by:
-
-This block lives **outside** the `ix-development-advantage:agents` managed block
-so `setup` never overwrites it. Rules for every agent and skill:
-
-1. **Read first.** Before detecting the tracker/git provider, read this block. If
-   it answers the question, use it — do not re-run detection or ask the user.
-2. **Detect only on a miss.** If the block is absent or missing the needed key,
-   detect it (issue key/URL shape, `git remote get-url origin`, lockfile, etc.),
-   confirm with the user when ambiguous, then **persist** it.
-3. **Persist by editing the block in place.** Create it if missing (insert after
-   the `ix-development-advantage:agents:end` marker). Update a single key without
-   touching the rest. Never duplicate the markers.
-4. **Keep it declarative** — platform names, remotes, CLIs, and stable ids only.
-   No secrets/tokens. Reviewer ids and project ids are allowed; API tokens are not.
-5. **Repo override.** If the repo designates another location for this config
-   (e.g. a note in the agent system prompt pointing at another file), read and
-   persist there instead of `AGENTS.md`. Follow the redirect when present.
-
 ## Planning Documents
 
 Keep planning compact. Single file preferred over multiple documents.
@@ -102,12 +77,22 @@ Always fetch current docs before implementation.
 
 Never rely on training data for library APIs.
 
+Update the project documentation in ./docs when new features are added.
+
 ## Runtime Debugging
 
 After implementing frontend features, use the configured Chrome DevTools MCP server to:
 
 Verify feature works in an actual browser and check the console for errors.
 If it fails to connect, tell the user to check the local Chrome and Node.js installation manually.
+
+## Testing
+
+All hooks (which contain the logic) should be covered by unittests.
+
+All features should be covered by end to end tests with playwright.
+
+Run unittests at anytime. Once a new feature or refactor is done, run the end to end tests as well.
 
 ## TypeScript Styleguide
 

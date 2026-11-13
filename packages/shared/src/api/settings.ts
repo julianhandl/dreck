@@ -2,6 +2,9 @@ import { LANGUAGES } from '@dreck/shared/i18n';
 import { ROUNDING_MINUTES } from '@dreck/shared/report';
 import { z } from '@hono/zod-openapi';
 import { nonEmpty, RateSchema } from './common';
+import { BasisPointsSchema } from './invoices';
+
+const OptionalTextSchema = z.string().trim().max(5000).nullable();
 
 const CURRENCIES = new Set(Intl.supportedValuesOf('currency'));
 const TIME_ZONES = new Set([...Intl.supportedValuesOf('timeZone'), 'UTC']);
@@ -19,6 +22,13 @@ export const SettingsSchema = z
       .string()
       .refine((tz) => TIME_ZONES.has(tz), 'Unknown IANA time zone')
       .openapi({ example: 'Europe/Vienna' }),
+    senderName: OptionalTextSchema.openapi({ description: 'Your name on invoices' }),
+    senderAddress: OptionalTextSchema.openapi({ description: 'Your address on invoices' }),
+    senderVatId: OptionalTextSchema.openapi({ description: 'Your VAT ID (UID) on invoices' }),
+    defaultTaxBasisPoints: BasisPointsSchema.openapi({ description: 'Tax of new invoices' }),
+    defaultInvoiceNotes: OptionalTextSchema.openapi({
+      description: 'Text below the items of new invoices, e.g. bank details',
+    }),
   })
   .openapi('Settings');
 

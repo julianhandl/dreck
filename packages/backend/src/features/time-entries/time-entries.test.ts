@@ -20,6 +20,7 @@ type TimeEntry = {
   description: string | null;
   hourlyRateMinor: number;
   hourlyRateOverridden: boolean;
+  invoiceItemId: number | null;
 };
 
 async function create(body: Record<string, unknown>): Promise<TimeEntry> {
@@ -45,6 +46,7 @@ describe('time entries', () => {
       description: null,
       hourlyRateMinor: 9000,
       hourlyRateOverridden: false,
+      invoiceItemId: null,
     });
   });
 

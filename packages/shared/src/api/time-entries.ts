@@ -1,5 +1,5 @@
 import { z } from '@hono/zod-openapi';
-import { DateSchema, InstantSchema, nonEmpty, RateSchema } from './common';
+import { DateSchema, InstantSchema, InvoiceItemIdSchema, nonEmpty, RateSchema } from './common';
 
 const DescriptionSchema = z.string().trim().max(2000);
 const DurationSchema = z.number().int().min(0).openapi({ example: 5400 });
@@ -16,6 +16,7 @@ export const TimeEntrySchema = z
     description: z.string().nullable(),
     hourlyRateMinor: RateSchema,
     hourlyRateOverridden: z.boolean().openapi({ description: 'Hourly Rate corrected by hand' }),
+    invoiceItemId: InvoiceItemIdSchema,
   })
   .openapi('TimeEntry');
 

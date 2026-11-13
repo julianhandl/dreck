@@ -9,6 +9,9 @@ const STATUS: Record<ApiErrorCode, ContentfulStatusCode> = {
   name_taken: 409,
   currency_locked: 409,
   no_running_timer: 409,
+  invoiced: 409,
+  invoice_locked: 409,
+  number_taken: 409,
   rate_limited: 429,
   internal_error: 500,
 };

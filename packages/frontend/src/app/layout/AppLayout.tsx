@@ -13,7 +13,7 @@ export function AppLayout(): ReactElement {
   return (
     <div className="isolate flex min-h-dvh flex-col">
       <MainNav />
-      <main className="flex-1 pb-16">
+      <main className="flex-1 pb-16 print:pb-0">
         <PageOutlet />
       </main>
     </div>

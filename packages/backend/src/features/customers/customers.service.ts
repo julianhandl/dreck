@@ -9,7 +9,7 @@ import { getSettings } from '@/features/settings/settings.service';
 import { ApiError, fieldError } from '@/http/api-error';
 import { type Customer, customers } from './customers.table';
 
-type CustomerInput = { name: string; hourlyRateMinor?: number };
+type CustomerInput = { name: string; hourlyRateMinor?: number; address?: string | null };
 
 type CustomerChanges = Partial<Omit<Customer, 'id'>> & {
   applyToProjects?: { projectIds: number[]; applyToTimeEntries?: ApplyToTimeEntries };
@@ -29,7 +29,7 @@ export function createCustomer(db: Db, input: CustomerInput): Customer {
   const hourlyRateMinor = input.hourlyRateMinor ?? getSettings(db).defaultHourlyRateMinor;
   return db
     .insert(customers)
-    .values({ ...input, hourlyRateMinor })
+    .values({ ...input, hourlyRateMinor, address: input.address || null })
     .returning()
     .get();
 }
@@ -44,6 +44,7 @@ export function updateCustomer(
   id: number,
   { applyToProjects, ...changes }: CustomerChanges,
 ): Customer {
+  if (changes.address !== undefined) changes.address = changes.address || null;
   return db.transaction((tx) => {
     const customer =
       Object.keys(changes).length > 0

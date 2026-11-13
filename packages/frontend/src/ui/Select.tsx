@@ -3,7 +3,12 @@ import { Select as BaseSelect } from '@base-ui/react/select';
 import type { ReactElement } from 'react';
 import { CheckIcon, ChevronDownIcon } from './icons';
 
-export type SelectOption<V extends string> = { value: V; label: string };
+export type SelectOption<V extends string> = {
+  value: V;
+  label: string;
+  /** Visible but not selectable. */
+  disabled?: boolean;
+};
 
 type SelectProps<V extends string> = {
   /** Accessible name; visible above the trigger unless `hideLabel`. */
@@ -74,7 +79,8 @@ export function Select<V extends string>({
                   <BaseSelect.Item
                     key={option.value}
                     value={option.value}
-                    className="grid cursor-default grid-cols-[1.25rem_1fr] items-center gap-2 rounded-temp-option py-2 pr-4 pl-3 outline-hidden select-none data-highlighted:bg-temp-selected data-highlighted:text-temp-on-selected"
+                    disabled={option.disabled}
+                    className="grid cursor-default grid-cols-[1.25rem_1fr] items-center gap-2 rounded-temp-option py-2 pr-4 pl-3 outline-hidden select-none data-highlighted:bg-temp-selected data-highlighted:text-temp-on-selected data-disabled:text-temp-ink-muted"
                   >
                     <BaseSelect.ItemIndicator className="col-start-1">
                       <CheckIcon />

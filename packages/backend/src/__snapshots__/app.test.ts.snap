@@ -7,6 +7,13 @@ exports[`openapi.json snapshot 1`] = `
     "schemas": {
       "Customer": {
         "properties": {
+          "address": {
+            "description": "Postal address for invoices",
+            "type": [
+              "string",
+              "null",
+            ],
+          },
           "archived": {
             "type": "boolean",
           },
@@ -26,6 +33,7 @@ exports[`openapi.json snapshot 1`] = `
           "id",
           "name",
           "hourlyRateMinor",
+          "address",
           "archived",
         ],
         "type": "object",
@@ -41,6 +49,9 @@ exports[`openapi.json snapshot 1`] = `
               "name_taken",
               "currency_locked",
               "no_running_timer",
+              "invoiced",
+              "invoice_locked",
+              "number_taken",
               "rate_limited",
               "internal_error",
             ],
@@ -84,6 +95,13 @@ exports[`openapi.json snapshot 1`] = `
           "id": {
             "type": "integer",
           },
+          "invoiceItemId": {
+            "description": "Set while invoiced; the entry is locked then (409 invoiced)",
+            "type": [
+              "integer",
+              "null",
+            ],
+          },
           "projectId": {
             "exclusiveMinimum": 0,
             "type": "integer",
@@ -96,6 +114,178 @@ exports[`openapi.json snapshot 1`] = `
           "description",
           "billable",
           "id",
+          "invoiceItemId",
+        ],
+        "type": "object",
+      },
+      "Invoice": {
+        "properties": {
+          "customerId": {
+            "type": "integer",
+          },
+          "discountBasisPoints": {
+            "example": 2000,
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "integer",
+          },
+          "discountMinor": {
+            "type": "integer",
+          },
+          "dueDate": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": "string",
+          },
+          "id": {
+            "type": "integer",
+          },
+          "issueDate": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": "string",
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/InvoiceItem",
+            },
+            "type": "array",
+          },
+          "notes": {
+            "description": "Text below the items",
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "number": {
+            "type": "string",
+          },
+          "paidOn": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "periodFrom": {
+            "description": "Start of the service period",
+            "example": "2026-11-09",
+            "format": "date",
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "periodTo": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "recipient": {
+            "description": "Name and address as printed on the invoice",
+            "type": "string",
+          },
+          "sentOn": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "status": {
+            "description": "From paidOn and sentOn",
+            "enum": [
+              "draft",
+              "sent",
+              "paid",
+            ],
+            "type": "string",
+          },
+          "subject": {
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "subtotalMinor": {
+            "type": "integer",
+          },
+          "taxBasisPoints": {
+            "example": 2000,
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "integer",
+          },
+          "taxMinor": {
+            "type": "integer",
+          },
+          "totalMinor": {
+            "type": "integer",
+          },
+        },
+        "required": [
+          "id",
+          "number",
+          "customerId",
+          "recipient",
+          "issueDate",
+          "dueDate",
+          "periodFrom",
+          "periodTo",
+          "subject",
+          "notes",
+          "taxBasisPoints",
+          "discountBasisPoints",
+          "sentOn",
+          "paidOn",
+          "status",
+          "items",
+          "subtotalMinor",
+          "discountMinor",
+          "taxMinor",
+          "totalMinor",
+        ],
+        "type": "object",
+      },
+      "InvoiceItem": {
+        "properties": {
+          "amountMinor": {
+            "description": "round(quantity × unit price)",
+            "type": "integer",
+          },
+          "description": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string",
+          },
+          "id": {
+            "type": "integer",
+          },
+          "quantityHundredths": {
+            "description": "Quantity × 100, e.g. 1917 = 19.17 hours",
+            "example": 1917,
+            "maximum": 100000000,
+            "minimum": 0,
+            "type": "integer",
+          },
+          "unitPriceMinor": {
+            "example": 9000,
+            "minimum": 0,
+            "type": "integer",
+          },
+        },
+        "required": [
+          "description",
+          "quantityHundredths",
+          "unitPriceMinor",
+          "id",
+          "amountMinor",
         ],
         "type": "object",
       },
@@ -298,6 +488,21 @@ exports[`openapi.json snapshot 1`] = `
             "minimum": 0,
             "type": "integer",
           },
+          "defaultInvoiceNotes": {
+            "description": "Text below the items of new invoices, e.g. bank details",
+            "maxLength": 5000,
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "defaultTaxBasisPoints": {
+            "description": "Tax of new invoices",
+            "example": 2000,
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "integer",
+          },
           "language": {
             "enum": [
               "de",
@@ -311,6 +516,30 @@ exports[`openapi.json snapshot 1`] = `
             ],
             "type": "number",
           },
+          "senderAddress": {
+            "description": "Your address on invoices",
+            "maxLength": 5000,
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "senderName": {
+            "description": "Your name on invoices",
+            "maxLength": 5000,
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "senderVatId": {
+            "description": "Your VAT ID (UID) on invoices",
+            "maxLength": 5000,
+            "type": [
+              "string",
+              "null",
+            ],
+          },
           "timezone": {
             "example": "Europe/Vienna",
             "type": "string",
@@ -322,6 +551,11 @@ exports[`openapi.json snapshot 1`] = `
           "roundingMinutes",
           "language",
           "timezone",
+          "senderName",
+          "senderAddress",
+          "senderVatId",
+          "defaultTaxBasisPoints",
+          "defaultInvoiceNotes",
         ],
         "type": "object",
       },
@@ -356,6 +590,13 @@ exports[`openapi.json snapshot 1`] = `
           "id": {
             "type": "integer",
           },
+          "invoiceItemId": {
+            "description": "Set while invoiced; the entry is locked then (409 invoiced)",
+            "type": [
+              "integer",
+              "null",
+            ],
+          },
           "projectId": {
             "type": "integer",
           },
@@ -377,6 +618,7 @@ exports[`openapi.json snapshot 1`] = `
           "description",
           "hourlyRateMinor",
           "hourlyRateOverridden",
+          "invoiceItemId",
         ],
         "type": "object",
       },
@@ -503,6 +745,13 @@ exports[`openapi.json snapshot 1`] = `
             "application/json": {
               "schema": {
                 "properties": {
+                  "address": {
+                    "maxLength": 2000,
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
                   "hourlyRateMinor": {
                     "description": "Defaults to the Default Hourly Rate",
                     "example": 9000,
@@ -618,6 +867,13 @@ exports[`openapi.json snapshot 1`] = `
             "application/json": {
               "schema": {
                 "properties": {
+                  "address": {
+                    "maxLength": 2000,
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
                   "applyToProjects": {
                     "description": "Projects of this customer that take over the new Hourly Rate; their Time Entries only with applyToTimeEntries",
                     "properties": {
@@ -969,6 +1225,443 @@ exports[`openapi.json snapshot 1`] = `
           },
         },
         "summary": "Change an expense",
+      },
+    },
+    "/invoices": {
+      "get": {
+        "description": "With items and totals, sorted by issue date descending.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Invoice",
+                  },
+                  "type": "array",
+                },
+              },
+            },
+            "description": "Invoices",
+          },
+        },
+        "summary": "List invoices",
+      },
+      "post": {
+        "description": "With \`import\` the uninvoiced Time Entries and Billable Expenses of the Customer become items; they are locked while their item exists.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "customerId": {
+                    "exclusiveMinimum": 0,
+                    "type": "integer",
+                  },
+                  "discountBasisPoints": {
+                    "example": 2000,
+                    "maximum": 10000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "dueDate": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "import": {
+                    "description": "Turns the uninvoiced, stopped Time Entries (and Billable Expenses) of the Customer in the range into items. They stay locked while their item exists.",
+                    "properties": {
+                      "expenses": {
+                        "description": "Also one item per Billable Expense",
+                        "type": "boolean",
+                      },
+                      "from": {
+                        "example": "2026-11-09",
+                        "format": "date",
+                        "type": "string",
+                      },
+                      "grouping": {
+                        "description": "One item per Project and Hourly Rate, additionally per description, or one per Time Entry",
+                        "enum": [
+                          "project",
+                          "description",
+                          "timeEntry",
+                        ],
+                        "type": "string",
+                      },
+                      "projectId": {
+                        "description": "Only this Project of the Customer",
+                        "exclusiveMinimum": 0,
+                        "type": "integer",
+                      },
+                      "to": {
+                        "example": "2026-11-09",
+                        "format": "date",
+                        "type": "string",
+                      },
+                    },
+                    "required": [
+                      "from",
+                      "to",
+                      "grouping",
+                      "expenses",
+                    ],
+                    "type": "object",
+                  },
+                  "issueDate": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "items": {
+                    "items": {
+                      "properties": {
+                        "description": {
+                          "maxLength": 2000,
+                          "minLength": 1,
+                          "type": "string",
+                        },
+                        "quantityHundredths": {
+                          "description": "Quantity × 100, e.g. 1917 = 19.17 hours",
+                          "example": 1917,
+                          "maximum": 100000000,
+                          "minimum": 0,
+                          "type": "integer",
+                        },
+                        "unitPriceMinor": {
+                          "example": 9000,
+                          "minimum": 0,
+                          "type": "integer",
+                        },
+                      },
+                      "required": [
+                        "description",
+                        "quantityHundredths",
+                        "unitPriceMinor",
+                      ],
+                      "type": "object",
+                    },
+                    "maxItems": 1000,
+                    "type": "array",
+                  },
+                  "notes": {
+                    "description": "Defaults to the default invoice notes",
+                    "maxLength": 5000,
+                    "type": "string",
+                  },
+                  "number": {
+                    "description": "Defaults to the next number",
+                    "example": "RE-2026-001",
+                    "maxLength": 50,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                  "periodFrom": {
+                    "description": "Defaults to import.from",
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "periodTo": {
+                    "description": "Defaults to import.to",
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "recipient": {
+                    "description": "Defaults to name and address of the Customer",
+                    "maxLength": 5000,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                  "subject": {
+                    "maxLength": 5000,
+                    "type": "string",
+                  },
+                  "taxBasisPoints": {
+                    "description": "Defaults to the default tax",
+                    "example": 2000,
+                    "maximum": 10000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                },
+                "required": [
+                  "customerId",
+                  "issueDate",
+                  "dueDate",
+                ],
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice",
+                },
+              },
+            },
+            "description": "The created invoice",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "number_taken",
+          },
+        },
+        "summary": "Create a draft invoice",
+      },
+    },
+    "/invoices/{id}": {
+      "delete": {
+        "description": "Releases its Time Entries and Expenses.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": 1,
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "not_found",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "invoice_locked",
+          },
+        },
+        "summary": "Delete a draft invoice",
+      },
+      "patch": {
+        "description": "Content changes only while it is a draft or in the same call that sets \`sentOn\` and \`paidOn\` to null (409 invoice_locked).",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": 1,
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "discountBasisPoints": {
+                    "example": 2000,
+                    "maximum": 10000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "dueDate": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "issueDate": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "items": {
+                    "description": "The complete list. Existing items missing here are removed and release their Time Entries and Expenses.",
+                    "items": {
+                      "properties": {
+                        "description": {
+                          "maxLength": 2000,
+                          "minLength": 1,
+                          "type": "string",
+                        },
+                        "id": {
+                          "description": "Existing item to keep; without a new one",
+                          "exclusiveMinimum": 0,
+                          "type": "integer",
+                        },
+                        "quantityHundredths": {
+                          "description": "Quantity × 100, e.g. 1917 = 19.17 hours",
+                          "example": 1917,
+                          "maximum": 100000000,
+                          "minimum": 0,
+                          "type": "integer",
+                        },
+                        "unitPriceMinor": {
+                          "example": 9000,
+                          "minimum": 0,
+                          "type": "integer",
+                        },
+                      },
+                      "required": [
+                        "description",
+                        "quantityHundredths",
+                        "unitPriceMinor",
+                      ],
+                      "type": "object",
+                    },
+                    "maxItems": 1000,
+                    "type": "array",
+                  },
+                  "notes": {
+                    "maxLength": 5000,
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "number": {
+                    "example": "RE-2026-001",
+                    "maxLength": 50,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                  "paidOn": {
+                    "description": "Set = paid; locks the content",
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "periodFrom": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "periodTo": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "recipient": {
+                    "maxLength": 5000,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                  "sentOn": {
+                    "description": "Set = sent; locks the content",
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "subject": {
+                    "maxLength": 5000,
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "taxBasisPoints": {
+                    "example": 2000,
+                    "maximum": 10000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice",
+                },
+              },
+            },
+            "description": "The changed invoice",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "not_found",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "invoice_locked or number_taken",
+          },
+        },
+        "summary": "Change an invoice",
       },
     },
     "/projects": {
@@ -1325,6 +2018,21 @@ exports[`openapi.json snapshot 1`] = `
                     "minimum": 0,
                     "type": "integer",
                   },
+                  "defaultInvoiceNotes": {
+                    "description": "Text below the items of new invoices, e.g. bank details",
+                    "maxLength": 5000,
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "defaultTaxBasisPoints": {
+                    "description": "Tax of new invoices",
+                    "example": 2000,
+                    "maximum": 10000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
                   "language": {
                     "enum": [
                       "de",
@@ -1337,6 +2045,30 @@ exports[`openapi.json snapshot 1`] = `
                       0,
                     ],
                     "type": "number",
+                  },
+                  "senderAddress": {
+                    "description": "Your address on invoices",
+                    "maxLength": 5000,
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "senderName": {
+                    "description": "Your name on invoices",
+                    "maxLength": 5000,
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "senderVatId": {
+                    "description": "Your VAT ID (UID) on invoices",
+                    "maxLength": 5000,
+                    "type": [
+                      "string",
+                      "null",
+                    ],
                   },
                   "timezone": {
                     "example": "Europe/Vienna",

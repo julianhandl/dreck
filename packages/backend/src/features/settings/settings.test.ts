@@ -15,7 +15,18 @@ describe('settings', () => {
       roundingMinutes: 0,
       language: 'de',
       timezone: 'UTC',
+      senderName: null,
+      senderAddress: null,
+      senderVatId: null,
+      defaultTaxBasisPoints: 0,
+      defaultInvoiceNotes: null,
     });
+  });
+
+  test('emptied invoice texts become null', async () => {
+    await api.call('PATCH', '/settings', { senderName: 'Julia Muster', senderVatId: 'ATU1' });
+    const res = await api.call('PATCH', '/settings', { senderVatId: '  ' });
+    expect(res.body).toMatchObject({ senderName: 'Julia Muster', senderVatId: null });
   });
 
   test('PATCH changes single fields', async () => {

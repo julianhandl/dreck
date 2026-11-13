@@ -136,6 +136,10 @@ export function ProjectsPage(): ReactElement {
                             label: messages.common.edit,
                             onSelect: () => navigate(`/projects/${project.id}/edit`),
                           },
+                          {
+                            label: messages.common.invoice,
+                            onSelect: () => navigate(`/invoices/new?projectId=${project.id}`),
+                          },
                           project.archived
                             ? {
                                 label: messages.common.restore,

@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "dev": "bun run --filter '*' dev",
+    "dev:seed": "bun run --filter @dreck/backend seed && DRECK_DATA_DIR=.data-seed bun run dev",
     "build": "bun run --filter @dreck/frontend build && bun run --filter @dreck/backend build",
     "start": "bun packages/backend/dist/server.js",
     "check": "biome check . && bun run typecheck",
