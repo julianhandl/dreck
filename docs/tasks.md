@@ -9,6 +9,8 @@ A task splits a project into kinds of work, e.g. *Design*, *Development* and *Pr
 - A **new project** starts with a copy of the default tasks. On **New project** they are already listed and can be changed, removed or extended before saving.
 - Changing the default tasks later affects only projects created afterwards. Existing projects keep their tasks.
 
+![Default tasks in Settings](img/settings-tasks.png)
+
 ## Tasks of a project
 
 **Edit project → Tasks** lists the project's tasks.
@@ -19,9 +21,13 @@ A task splits a project into kinds of work, e.g. *Design*, *Development* and *Pr
 - **Remove:** a task without time entries is deleted. A task with time entries is archived instead: it disappears from the task selection, keeps its time entries and shows up again with **Restore**.
 - Task names are unique within a project, ignoring case.
 
+![Tasks of a project](img/project-edit-tasks.png)
+
 ## Time entries with a task
 
 The time entry dialog shows a **Task** field once the chosen project has tasks. The task is optional; **No task** is billable and uses the project's rate.
+
+![Time entry with a task](img/time-dialog-task.png)
 
 - The entry takes over the task's own rate, otherwise the project's, see [Hourly rates](hourly-rates.md).
 - Moving an entry to another project removes its task, because tasks belong to their project.

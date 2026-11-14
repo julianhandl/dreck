@@ -16,6 +16,7 @@
     "typecheck": "bun run --filter '*' typecheck && tsc -p e2e",
     "test": "bun run --filter '*' test",
     "test:e2e": "playwright test",
+    "docs:screenshots": "playwright test -c playwright.docs.config.ts",
     "test:e2e:headed": "E2E_SLOW_MO=500 playwright test --headed --project=desktop"
   },
   "devDependencies": {

@@ -6,6 +6,8 @@ This guide walks you from a fresh instance to your first tracked hour. It assume
 
 Open Dreck in the browser and paste the secret from the container log as the password. The session lasts 90 days. When it expires, Dreck shows the sign-in dialog on top of the current page; whatever you were typing stays, and the action runs again after you sign in.
 
+![Sign-in dialog](img/login.png)
+
 After 10 failed attempts within a minute, Dreck blocks further attempts for a short time. The limit is global, not per device.
 
 Dreck only works over HTTPS, except on `localhost` and `127.0.0.1`. Over plain HTTP on any other address, the sign-in dialog says so instead of asking for the password.
@@ -18,7 +20,15 @@ Dreck only works over HTTPS, except on `localhost` and `127.0.0.1`. Over plain H
 - **Rounding** applies retroactively, see [Reports and rounding](reports.md#rounding).
 - If your device uses another **time zone** than the instance, Settings offers to take it over.
 
+![Settings](img/settings.png)
+
+![Settings, page Tasks with the default tasks](img/settings-tasks.png)
+
 More customers and projects are created under **Projects**: **New customer** prefills the default hourly rate, and after saving Dreck opens **New project** for that customer with the customer's rate prefilled.
+
+![New customer](img/customer-new.png)
+
+![New project](img/project-new.png)
 
 Rates are copied, not linked. How that works and what happens when you change a rate later is described in [Hourly rates](hourly-rates.md).
 
@@ -28,6 +38,8 @@ Open **Time** and choose **Track time** (or press `N`).
 
 - **Today, without a duration:** the button reads **Start timer**. The new timer stops the one that is running.
 - **With a duration**, or on an earlier day: the button reads **Save entry**.
+
+![Dialog for a new time entry](img/time-dialog-new.png)
 
 Details on the timer, durations and editing are in [Tracking time](time-tracking.md). For the keyboard, see [Keyboard and gestures](keyboard.md).
 
@@ -40,13 +52,21 @@ Open **Expenses** and choose **Track expense**. An expense has a date, a project
 - Amounts are read tolerantly: `12,50`, `12.5`, `1.234,50` and `1,234.50` all work. A single separator followed by exactly three digits groups thousands (`1.234` is 1234).
 - There are no negative amounts or credits.
 
+![Track expense](img/expense-form.png)
+
 ## 5. Look at the numbers
 
 **Reports** shows hours, amounts and expenses for a period, grouped by customer and project, and exports them as CSV. See [Reports and rounding](reports.md).
 
+![Report of the month](img/report.png)
+
 Each project also has a detail page (click it under **Projects**) with its hours per week, totals, time entries and expenses over all time.
 
+![Project detail page](img/project-detail.png)
+
 ## Archiving and deleting
+
+![Actions menu of a project](img/projects-actions.png)
 
 | | Archive | Delete |
 |---|---|---|
@@ -61,3 +81,5 @@ Names are unique, ignoring case: two customers cannot share a name, and neither 
 ## Using Dreck on the phone
 
 Dreck has the same screens on mobile. Add it to the home screen from the browser's share menu to open it like an app. Swipe left or right to switch between screens, see [Keyboard and gestures](keyboard.md#touch-gestures).
+
+![Time screen on the phone](img/mobile-time.png)

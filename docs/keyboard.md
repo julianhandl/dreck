@@ -14,6 +14,8 @@ These shortcuts work on the **Time** screen while no dialog is open and the curs
 
 `Space` acts on the selected row itself. If a button inside the row has the focus (for example after pressing `Tab`), `Space` presses that button as usual.
 
+![Selected time entry](img/time-selected.png)
+
 ## Time entry dialog
 
 | Key | Action |
@@ -26,6 +28,8 @@ When the dialog opens, the focus is on the project picker for a new entry and on
 
 In the project picker, type to filter and use `↑`/`↓` to choose.
 
+![Project picker](img/project-picker.png)
+
 ## Other dialogs
 
 `Esc` closes any dialog. Clicking outside closes it too.
@@ -35,3 +39,5 @@ In the project picker, type to filter and use `↑`/`↓` to choose.
 On a touch screen, swipe left or right to switch to the next or previous screen in the navigation order: Time, Expenses, Projects, Reports, Settings.
 
 A swipe is ignored inside text fields, dialogs, open pickers and areas that scroll sideways (wide tables), and when the movement is slow or mostly vertical.
+
+![Navigation on the phone](img/mobile-menu.png)

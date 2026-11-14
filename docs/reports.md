@@ -23,6 +23,8 @@ Rounded durations appear on the **Time** screen below the exact duration, on pro
 
 ## The Report screen
 
+![Report of the month](img/report.png)
+
 - **Period:** week, month (default), quarter, year or custom. The arrows move to the previous or next period. Both the first and the last day are included.
 - **Filters:** customer and project. Period and filters are part of the URL, so a bookmark brings back the same report.
 - **Grouping:** by customer, and below each customer by project.

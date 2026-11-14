@@ -7,6 +7,8 @@
 
 Sender data is read live: changing your address also changes how older invoices print. Recipient, tax and notes are copied when the invoice is created and stay as they are.
 
+![Invoice settings](img/settings-invoicing.png)
+
 ## Creating an invoice
 
 **Invoices → New invoice**, pick the customer and either
@@ -16,15 +18,21 @@ Sender data is read live: changing your address also changes how older invoices 
 
 **Invoice** in the actions menu of a project (Projects) or on its page starts the same form with the project's customer and the project selected.
 
+![New invoice with the preview of its items](img/invoice-new.png)
+
 The period always starts as January 1 of the current year until today. With a single project selected, "one item per project" is disabled and the grouping defaults to one item per description.
 
 Dreck creates a draft right away, numbered after the last invoice (`RE-2026-009` → `RE-2026-010`), dated today and due in 14 days, and opens it for editing.
+
+![Editing a draft](img/invoice-edit.png)
 
 Quantities are hours after [rounding](reports.md#rounding), rounded to two decimals. Without rounding the invoice can therefore differ from the report by a cent.
 
 ## Invoiced time entries and expenses
 
 Everything taken over is **invoiced** and locked: it cannot be edited, deleted, continued with ▶ or given a new hourly rate. Time and Expenses mark it as "Invoiced".
+
+![Invoiced time entries on the Time screen](img/time-invoiced.png)
 
 To unlock, remove its item from the draft, or delete the draft. A second invoice for the same period only finds what is not invoiced yet.
 
@@ -53,15 +61,23 @@ Every step rounds half up to the smallest unit of the currency.
 
 **Back to draft** (in Actions) unlocks a sent or paid invoice and clears both dates. Dreck does not send emails; "Mark as sent" only records the date.
 
+![Invoice with its actions](img/invoice-detail.png)
+
+![Actions of a sent invoice](img/invoice-actions.png)
+
 ## PDF and printing
 
 **Print / PDF** opens the browser's print dialog, which only prints the invoice itself. Choose "Save as PDF" as the printer to get a file. The page is A4 with its own margins, so leave paper size and margins on their defaults; the file name suggested is "Rechnung <number>" (in German).
+
+![Print view of the invoice](img/invoice-print.png)
 
 ## Overview
 
 - **Open:** sent invoices not yet paid, with the overdue part and the total of drafts.
 - **Paid in <year>:** invoices paid this year, by payment date.
 - Tabs **Open** (drafts and sent) and **All**, filter by customer. Tab and filter are part of the URL.
+
+![Invoice overview](img/invoices.png)
 
 ## API
 

@@ -6,6 +6,8 @@ A time entry is worked time on one project on one calendar day: a date, a durati
 
 The **Time** screen shows one day at a time, with the week (Monday to Sunday) above it. Entries of a day appear in the order you created them. If rounding is on, each entry shows its rounded duration below the exact one.
 
+![Time screen with the entries of a day](img/time-screen.png)
+
 ## The timer
 
 A timer is a time entry that is running. Its duration grows until you stop it.
@@ -18,9 +20,15 @@ A timer is a time entry that is running. Its duration grows until you stop it.
 - **"Today"** is the day in the instance time zone from **Settings**, not the device's.
 - A timer stopped after a few seconds stays as a 0:00 entry. Delete it if you do not need it.
 
+![A running timer](img/time-screen-timer.png)
+
+![Starting a new timer stops the running one](img/time-dialog-running.png)
+
 ## Forgotten timers
 
 A timer counts as forgotten when it has run for more than 10 hours or was started on an earlier day. Today's list then shows it on top with a notice, even if it started last week, so you can stop it.
+
+![Notice for a forgotten timer](img/forgotten-notice.png)
 
 While a timer is forgotten, every start or stop asks **When did you stop?** first:
 
@@ -28,6 +36,8 @@ While a timer is forgotten, every start or stop asks **When did you stop?** firs
 - **No, I worked until now** keeps the full duration.
 - After either answer, the start you asked for (▶ on a row, or **Start timer** in the dialog) runs as usual.
 - **Cancel** changes nothing; the timer keeps running.
+
+![When did you stop?](img/forgotten-dialog.png)
 
 Dreck does not store the time you enter anywhere else. It only uses it to calculate the duration.
 
@@ -50,6 +60,8 @@ A plain number means hours, so `90` is 90 hours, not 90 minutes. Decimal hours a
 
 The same dialog creates and edits time entries.
 
+![Time entry dialog](img/time-dialog-new.png)
+
 | Situation | Main button | Duration |
 |---|---|---|
 | New, today, duration empty | **Start timer** | – |
@@ -59,8 +71,14 @@ The same dialog creates and edits time entries.
 
 - **Prefill:** a new entry starts with the project of the running timer, otherwise the project you used last this week, otherwise your only project if there is just one.
 - **Project picker:** type to filter. Projects used today come first. Archived projects cannot be picked.
+
+![Project picker](img/project-picker.png)
 - **Task:** appears once the project has [tasks](tasks.md); optional. Archived tasks cannot be picked.
+
+![Task field with a duration entered](img/time-dialog-task.png)
 - **Description suggestions** come from this week's entries of the same project.
 - **Editing a running entry:** a new duration sets the total so far, and the timer keeps running from there. Leave the duration as it is to change only project, date or description.
 - **Moving an entry to another project** gives it that project's hourly rate, see [Hourly rates](hourly-rates.md#moving-a-time-entry).
 - **Hourly rate** (edit only, folded away) corrects the rate of this one entry, see [Hourly rates](hourly-rates.md#time-entries-corrected-by-hand).
+
+![Editing an entry with the hourly rate opened](img/time-dialog-edit.png)

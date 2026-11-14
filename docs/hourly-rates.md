@@ -29,6 +29,8 @@ When you change a project's hourly rate and the project has time entries, Dreck 
 
 Everything happens in one step: either the rate and all affected entries change, or nothing does.
 
+![Apply the new rate to existing time entries?](img/rate-change-project.png)
+
 If the project has no time entries yet, the new rate is saved without the question.
 
 Time entries of a task with an own rate keep their rate when the project rate changes, because their rate comes from the task.
@@ -49,6 +51,8 @@ When you change a customer's hourly rate and the customer has active projects, D
 
 Archived projects are not in the list and never change with the customer. Time entries of tasks with an own rate stay unchanged.
 
+![Rate question for a customer, with its projects](img/rate-change-customer.png)
+
 ## Changing the default hourly rate
 
 Changing the default hourly rate in Settings affects only customers created afterwards. Existing customers, projects and time entries stay as they are.
@@ -56,6 +60,8 @@ Changing the default hourly rate in Settings affects only customers created afte
 ## Time entries corrected by hand
 
 **Edit time entry** has a folded **Hourly rate** section below the date; click it to open the field. Changing the rate marks the entry as **corrected by hand**, and the section says so the next time you open the entry. When a project or customer rate is applied to existing entries, these entries are protected:
+
+![Time entry corrected by hand](img/time-dialog-edit.png)
 
 - The dialog lists them separately: "N time entries corrected by hand stay unchanged."
 - **Overwrite them too** includes them. Afterwards they no longer count as corrected.
