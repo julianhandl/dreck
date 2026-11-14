@@ -11,6 +11,7 @@ import { useI18n } from '@/i18n/useI18n';
 import { useSettings } from '@/settings/useSettings';
 import { Button } from '@/ui/Button';
 import { Modal } from '@/ui/Modal';
+import { Select } from '@/ui/Select';
 import type { NewTimer } from './forgotten/useForgottenTimer';
 import { useTimeEntryDialog } from './useTimeEntryDialog';
 
@@ -35,8 +36,9 @@ type TimeEntryDialogProps = {
 };
 
 /**
- * Dialog "Neuer Time Entry" / "Time Entry bearbeiten": Project, notes, duration, date; when
- * editing also the Hourly Rate, folded away; it follows a new Project until corrected by hand.
+ * Dialog "Neuer Time Entry" / "Time Entry bearbeiten": Project, Task (if the Project has
+ * some), notes, duration, date; when editing also the Hourly Rate, folded away; it follows a
+ * new Project or Task until corrected by hand.
  * Today without a duration the main button starts the timer; Enter triggers it from every
  * field. Focus starts on the Project when new, on the duration when editing.
  * @example <TimeEntryDialog catalog={catalog} entries={entries} date={date} today={today} now={now} onClose={close} />
@@ -78,6 +80,16 @@ export function TimeEntryDialog(props: TimeEntryDialogProps): ReactElement {
           value={dialog.projectId}
           onValueChange={dialog.handleProjectChange}
         />
+        {dialog.taskOptions.length > 0 && (
+          <Select
+            name="taskId"
+            label={t.task}
+            value={dialog.task}
+            options={dialog.taskOptions}
+            onValueChange={dialog.handleTaskChange}
+            className="w-full"
+          />
+        )}
         <TextField
           name="description"
           label={t.description}

@@ -6,6 +6,7 @@ import { entryFilter } from '@/features/entry-filter';
 import { expenses } from '@/features/expenses/expenses.table';
 import { projects } from '@/features/projects/projects.table';
 import { getSettings, type Settings } from '@/features/settings/settings.service';
+import { tasks } from '@/features/tasks/tasks.table';
 import { timeEntries } from '@/features/time-entries/time-entries.table';
 
 export type ReportFilter = { from: string; to: string; customerId?: number; projectId?: number };
@@ -18,20 +19,26 @@ export type ReportLine = {
   date: string;
   customer: Named;
   project: Named;
+  /** Name of the Task of a Time Entry. */
+  task: string | null;
   description: string | null;
   /** Exact seconds; a running Time Entry counts until now. 0 for an Expense. */
   seconds: number;
   roundedSeconds: number;
+  /** `null` for an Expense and for non-billable time. */
   hourlyRateMinor: number | null;
-  /** Time: round(rate × rounded seconds / 3600). Expense: its amount. */
+  /** Time: round(rate × rounded seconds / 3600), 0 if not billable. Expense: its amount. */
   amountMinor: number;
-  billable: boolean | null;
+  /** Time: its Task is billable (without Task: yes). */
+  billable: boolean;
 };
 
 type Sums = {
   seconds: number;
   roundedSeconds: number;
   amountMinor: number;
+  /** Rounded seconds of non-billable Tasks, part of `roundedSeconds`. */
+  nonBillableSeconds: number;
   billableExpensesMinor: number;
   ownExpensesMinor: number;
 };
@@ -52,27 +59,30 @@ export function loadReportLines(db: Db, filter: ReportFilter, settings: Settings
   const project = { id: projects.id, name: projects.name, archived: projects.archived };
 
   const timeLines = db
-    .select({ entry: timeEntries, customer, project })
+    .select({ entry: timeEntries, customer, project, task: tasks })
     .from(timeEntries)
     .innerJoin(projects, eq(timeEntries.projectId, projects.id))
     .innerJoin(customers, eq(projects.customerId, customers.id))
+    .leftJoin(tasks, eq(timeEntries.taskId, tasks.id))
     .where(entryFilter(db, timeEntries, filter))
     .orderBy(asc(timeEntries.date), asc(timeEntries.id))
     .all()
-    .map(({ entry, ...rest }): ReportLine => {
+    .map(({ entry, task, ...rest }): ReportLine => {
       const running = entry.runningSince === null ? 0 : nowSeconds - entry.runningSince;
       const seconds = entry.durationSeconds + Math.max(0, running);
       const roundedSeconds = roundSeconds(seconds, settings.roundingMinutes);
+      const billable = task?.billable ?? true;
       return {
         ...rest,
         type: 'timeEntry',
         date: entry.date,
+        task: task?.name ?? null,
         description: entry.description,
         seconds,
         roundedSeconds,
-        hourlyRateMinor: entry.hourlyRateMinor,
-        amountMinor: amountMinor(entry.hourlyRateMinor, roundedSeconds),
-        billable: null,
+        hourlyRateMinor: billable ? entry.hourlyRateMinor : null,
+        amountMinor: billable ? amountMinor(entry.hourlyRateMinor, roundedSeconds) : 0,
+        billable,
       };
     });
 
@@ -89,6 +99,7 @@ export function loadReportLines(db: Db, filter: ReportFilter, settings: Settings
         ...rest,
         type: 'expense',
         date: expense.date,
+        task: null,
         description: expense.description,
         seconds: 0,
         roundedSeconds: 0,
@@ -139,6 +150,7 @@ function zeroSums(): Sums {
     seconds: 0,
     roundedSeconds: 0,
     amountMinor: 0,
+    nonBillableSeconds: 0,
     billableExpensesMinor: 0,
     ownExpensesMinor: 0,
   };
@@ -149,6 +161,7 @@ function add(sums: Sums, line: ReportLine): void {
     sums.seconds += line.seconds;
     sums.roundedSeconds += line.roundedSeconds;
     sums.amountMinor += line.amountMinor;
+    if (!line.billable) sums.nonBillableSeconds += line.roundedSeconds;
   } else if (line.billable) {
     sums.billableExpensesMinor += line.amountMinor;
   } else {

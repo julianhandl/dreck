@@ -59,6 +59,7 @@ The same dialog creates and edits time entries.
 
 - **Prefill:** a new entry starts with the project of the running timer, otherwise the project you used last this week, otherwise your only project if there is just one.
 - **Project picker:** type to filter. Projects used today come first. Archived projects cannot be picked.
+- **Task:** appears once the project has [tasks](tasks.md); optional. Archived tasks cannot be picked.
 - **Description suggestions** come from this week's entries of the same project.
 - **Editing a running entry:** a new duration sets the total so far, and the timer keeps running from there. Leave the duration as it is to change only project, date or description.
 - **Moving an entry to another project** gives it that project's hourly rate, see [Hourly rates](hourly-rates.md#moving-a-time-entry).

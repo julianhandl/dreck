@@ -24,10 +24,12 @@ Remove it again with `docker rm -f dreck && docker volume rm dreck-data`.
 
 - [Getting started](docs/getting-started.md): onboarding, settings, customers and projects, expenses, archiving
 - [Tracking time](docs/time-tracking.md): time entries, the timer, forgotten timers, durations
+- [Tasks](docs/tasks.md): default tasks, tasks per project, billable and own hourly rates
 - [Hourly rates](docs/hourly-rates.md): how rates are copied, what changing a rate does, how amounts are calculated
 - [Reports and rounding](docs/reports.md): rounding rules, report figures, CSV format
 - [Invoicing](docs/invoicing.md): invoices from tracked time, locking, status, printing
 - [Keyboard and gestures](docs/keyboard.md): shortcuts and touch gestures
+- [Self-hosting](docs/self-hosting.md): configuration, own reverse proxy, several instances, Kubernetes
 
 ## Setup with Docker Compose
 
@@ -78,7 +80,7 @@ Caddy fetches the HTTPS certificate for `DOMAIN` automatically. On the first sta
 docker compose pull && docker compose up -d
 ```
 
-`latest` follows `main`. Every build is also tagged `sha-<short commit>`.
+`latest` follows `main`. Releases are tagged `1.2.3`, `1.2` and `1`, every build also `sha-<short commit>`; see [Self-hosting](docs/self-hosting.md#image-tags).
 
 Before Dreck applies database migrations it writes `backup-before-<last migration>.db` to the data volume and keeps the last three. There are no down migrations. To roll back: stop the container, copy that backup over `/data/dreck.db`, set the image in `compose.yaml` to the older `ghcr.io/julianhandl/dreck:sha-<commit>` and start it again. If the database is newer than the image, Dreck refuses to start and changes nothing.
 
@@ -92,7 +94,7 @@ Before Dreck applies database migrations it writes `backup-before-<last migratio
 
 - Show it: `docker compose exec app cat /data/secret`
 - Change it: delete `/data/secret` (`docker compose exec app rm /data/secret`) and restart. All sessions end.
-- Or set your own with `DRECK_SECRET` in `.env` (at least 32 characters); it takes precedence over the file.
+- Or set your own with `DRECK_SECRET` in `.env` (at least 32 characters), or point `DRECK_SECRET_FILE` at a file; either takes precedence over `/data/secret`.
 
 ## API
 

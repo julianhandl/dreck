@@ -5,13 +5,15 @@
 An hourly rate is copied once, when something is created, along this chain:
 
 ```
-Default hourly rate  →  Customer  →  Project  →  Time entry
-   (Settings)          on create    on create    on create / new timer
+Default hourly rate  →  Customer  →  Project  →  Task (optional)  →  Time entry
+   (Settings)          on create    on create    own rate or         on create / new timer
+                                                 "as project"
 ```
 
 - A new **customer** starts with the default hourly rate from Settings.
 - A new **project** starts with its customer's rate.
-- A new **time entry** takes its project's rate when you save it or start a new timer for it.
+- A **task** can have an own rate. Without one it uses its project's current rate, see [Tasks](tasks.md).
+- A new **time entry** takes its task's own rate, otherwise its project's rate, when you save it or start a new timer for it.
 - A **continued** time entry (▶ on a row) keeps the rate it already has.
 
 Each level can be changed freely afterwards. There is no live link: changing a rate never silently changes anything below it. Instead, Dreck asks.
@@ -29,6 +31,12 @@ Everything happens in one step: either the rate and all affected entries change,
 
 If the project has no time entries yet, the new rate is saved without the question.
 
+Time entries of a task with an own rate keep their rate when the project rate changes, because their rate comes from the task.
+
+## Changing the rate of a task
+
+Setting, changing or clearing a task's own rate in **Edit project** asks the same question for the time entries of that task. If the project rate and task rates change at once, the dialog covers all affected entries together, each with its new rate.
+
 ## Changing the rate of a customer
 
 When you change a customer's hourly rate and the customer has active projects, Dreck asks the same question with one addition: a list of the customer's projects with their current rates. It asks even if those projects have no time entries yet, because you still choose which projects get the new rate. Without active projects, only the customer's rate changes.
@@ -39,7 +47,7 @@ When you change a customer's hourly rate and the customer has active projects, D
 - **Only for new time entries** leaves all existing time entries as they are. New time entries on the selected projects get the new rate.
 - Unselected projects and their time entries stay unchanged. New projects of the customer start with the new rate.
 
-Archived projects are not in the list and never change with the customer.
+Archived projects are not in the list and never change with the customer. Time entries of tasks with an own rate stay unchanged.
 
 ## Changing the default hourly rate
 
@@ -56,7 +64,7 @@ Through the API the same correction is `PATCH /api/v1/time-entries/:id` with `ho
 
 ## Moving a time entry
 
-Moving a time entry to another project gives it the new project's current rate and clears its "corrected by hand" mark. In the dialog, the rate in the folded section follows the project you pick, so you see the new rate before saving.
+Moving a time entry to another project gives it the new project's current rate and clears its "corrected by hand" mark. Choosing another task does the same with the task's rate. In the dialog, the rate in the folded section follows the project you pick, so you see the new rate before saving.
 
 If you change the rate field yourself, it no longer follows the project: the entry moves with the rate you entered and counts as corrected. Through the API, sending `projectId` and `hourlyRateMinor` together does the same.
 

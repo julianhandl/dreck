@@ -8,6 +8,7 @@ export const TimeEntrySchema = z
   .object({
     id: z.number().int(),
     projectId: z.number().int(),
+    taskId: z.number().int().nullable(),
     date: DateSchema,
     durationSeconds: DurationSchema.openapi({
       description: 'Without the running part; clients add `now − runningSince` while it runs',
@@ -22,8 +23,13 @@ export const TimeEntrySchema = z
 
 export type TimeEntry = z.infer<typeof TimeEntrySchema>;
 
+const TaskIdSchema = z.number().int().positive().openapi({
+  description: 'Task of the Project; its own Hourly Rate wins over the rate of the Project',
+});
+
 export const CreateTimeEntrySchema = z.object({
   projectId: z.number().int().positive(),
+  taskId: TaskIdSchema.optional(),
   date: DateSchema,
   durationSeconds: DurationSchema,
   description: DescriptionSchema.optional(),
@@ -34,7 +40,11 @@ export type CreateTimeEntry = z.infer<typeof CreateTimeEntrySchema>;
 export const UpdateTimeEntrySchema = z
   .object({
     projectId: z.number().int().positive().openapi({
-      description: 'Takes over the rate of the new project unless hourlyRateMinor is sent along',
+      description:
+        'Takes over the rate of the new project unless hourlyRateMinor is sent along; without taskId the Task is removed',
+    }),
+    taskId: TaskIdSchema.nullable().openapi({
+      description: 'Takes over the rate of the Task unless hourlyRateMinor is sent along',
     }),
     date: DateSchema,
     durationSeconds: DurationSchema.openapi({
@@ -55,6 +65,7 @@ const AtSchema = InstantSchema.optional().openapi({
 export const StartTimerSchema = z.union([
   z.strictObject({
     projectId: z.number().int().positive(),
+    taskId: TaskIdSchema.optional(),
     description: DescriptionSchema.optional(),
     at: AtSchema,
   }),

@@ -7,6 +7,7 @@ import { FormStatus } from '@/forms/FormStatus';
 import { TextField } from '@/forms/TextField';
 import { useI18n } from '@/i18n/useI18n';
 import { useSettings } from '@/settings/useSettings';
+import { TaskListEditor } from '@/tasks/TaskListEditor';
 import { Button } from '@/ui/Button';
 import { Page, PageTitle } from '@/ui/Page';
 import { QueryView } from '@/ui/QueryView';
@@ -16,8 +17,8 @@ import { useProjectForm } from './useProjectForm';
 import { useProjectRoute } from './useProjectRoute';
 
 /**
- * "Neues Project" / "Project bearbeiten": Customer, name and Hourly Rate in the two-column
- * form layout, for an existing Project also archive and delete.
+ * "Neues Project" / "Project bearbeiten": Customer, name, Hourly Rate and Tasks in the
+ * two-column form layout, for an existing Project also archive and delete.
  * @example <Route path="projects/:projectId/edit" element={<ProjectFormPage />} />
  */
 export function ProjectFormPage(): ReactElement {
@@ -118,6 +119,13 @@ function ProjectFormContent({
                 onValueChange={form.handleRateChange}
               />
             </div>
+          </div>
+        </div>
+        <div className="grid gap-x-8 gap-y-3 border-temp-divider border-t pt-6 sm:grid-cols-[12rem_1fr]">
+          <h2 className="font-medium">{t.tasks}</h2>
+          <div className="flex max-w-4xl flex-col gap-4">
+            <p className="text-temp-ink-muted">{t.tasksHint}</p>
+            <TaskListEditor list={form.tasks} withRates error={submit.errors.tasks} />
           </div>
         </div>
         <FormStatus submit={submit} />

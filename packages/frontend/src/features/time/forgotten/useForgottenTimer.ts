@@ -7,7 +7,7 @@ import { useI18n } from '@/i18n/useI18n';
 import { useSettings } from '@/settings/useSettings';
 
 /** A new timer on a Project, as started from the dialog "Neuer Time Entry". */
-export type NewTimer = { projectId: number; description?: string };
+export type NewTimer = { projectId: number; taskId?: number; description?: string };
 
 /** What the user wanted to do with the timer before the question came up. */
 export type TimerCommand = { start: TimeEntry } | { stop: TimeEntry } | { startNew: NewTimer };

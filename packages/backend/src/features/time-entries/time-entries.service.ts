@@ -1,12 +1,15 @@
+import { taskRateMinor } from '@dreck/shared/api/tasks';
 import { asc, desc, eq } from 'drizzle-orm';
 import type { Db } from '@/db/db';
 import { type EntryFilter, entryFilter } from '@/features/entry-filter';
 import { requireProject } from '@/features/projects/projects.service';
+import { requireTask } from '@/features/tasks/tasks.service';
 import { ApiError } from '@/http/api-error';
 import { type TimeEntry, timeEntries } from './time-entries.table';
 
 type TimeEntryInput = {
   projectId: number;
+  taskId?: number;
   date: string;
   durationSeconds: number;
   description?: string;
@@ -14,6 +17,7 @@ type TimeEntryInput = {
 
 type TimeEntryChanges = {
   projectId?: number;
+  taskId?: number | null;
   date?: string;
   durationSeconds?: number;
   description?: string | null;
@@ -30,24 +34,38 @@ export function listTimeEntries(db: Db, filter: EntryFilter): TimeEntry[] {
     .all();
 }
 
-/** Creates a stopped Time Entry with the Hourly Rate of its Project. */
+/**
+ * Project, Task and Hourly Rate of a new or moved Time Entry: the Task must belong to the Project,
+ * its own rate wins over the Project's.
+ */
+export function entryRate(
+  db: Db,
+  projectId: number,
+  taskId: number | null | undefined,
+): { projectId: number; taskId: number | null; hourlyRateMinor: number } {
+  const project = requireProject(db, projectId);
+  const task = taskId == null ? undefined : requireTask(db, projectId, taskId);
+  return { projectId, taskId: task?.id ?? null, hourlyRateMinor: taskRateMinor(task, project) };
+}
+
+/** Creates a stopped Time Entry with the Hourly Rate of its Task or Project. */
 export function createTimeEntry(db: Db, input: TimeEntryInput): TimeEntry {
-  const project = requireProject(db, input.projectId);
   return db
     .insert(timeEntries)
     .values({
       ...input,
+      ...entryRate(db, input.projectId, input.taskId),
       description: input.description || null,
-      hourlyRateMinor: project.hourlyRateMinor,
     })
     .returning()
     .get();
 }
 
 /**
- * Changes a Time Entry. A new Project brings its rate and clears the "corrected by hand" mark;
- * a rate sent along wins and marks the entry as corrected. On a running entry the duration sets
- * the displayed total and restarts the running part now.
+ * Changes a Time Entry. A new Project or Task brings its rate and clears the "corrected by hand"
+ * mark; a new Project without `taskId` drops the Task. A rate sent along wins and marks the
+ * entry as corrected. On a running entry the duration sets the displayed total and restarts the
+ * running part now.
  */
 export function updateTimeEntry(db: Db, id: number, input: TimeEntryChanges): TimeEntry {
   return db.transaction((tx) => {
@@ -57,8 +75,10 @@ export function updateTimeEntry(db: Db, id: number, input: TimeEntryChanges): Ti
 
     const changes: Partial<TimeEntry> = { ...input };
     if (input.description !== undefined) changes.description = input.description || null;
-    if (input.projectId !== undefined) {
-      changes.hourlyRateMinor = requireProject(tx, input.projectId).hourlyRateMinor;
+    const moved = input.projectId !== undefined && input.projectId !== current.projectId;
+    if (moved || input.taskId !== undefined) {
+      const taskId = input.taskId === undefined ? null : input.taskId;
+      Object.assign(changes, entryRate(tx, input.projectId ?? current.projectId, taskId));
       changes.hourlyRateOverridden = false;
     }
     if (input.hourlyRateMinor !== undefined) {

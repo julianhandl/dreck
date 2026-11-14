@@ -8,6 +8,7 @@ import { formatAmountInput, parseAmount } from '@/format/money';
 import { type Submit, useSubmit } from '@/forms/useSubmit';
 import { useI18n } from '@/i18n/useI18n';
 import { useSettings } from '@/settings/useSettings';
+import { followsProjectRate } from '@/tasks/task-rows';
 import type { RateAnswer, RateQuestion } from './rate-change/useRateChange';
 
 type Command = 'save' | 'archive' | 'restore' | 'delete';
@@ -80,9 +81,11 @@ export function useCustomerForm(catalog: Catalog, customer?: Customer): Customer
       const changes = body();
       const projects = catalog.projects.filter((p) => p.customerId === customer.id && !p.archived);
       if (changes.hourlyRateMinor !== undefined && projects.length > 0) {
-        const entries = await api.get<TimeEntry[]>('/time-entries', { customerId: customer.id });
+        const all = await api.get<TimeEntry[]>('/time-entries', { customerId: customer.id });
+        const tasks = projects.flatMap((p) => p.tasks);
         setRateQuestion({
-          entries,
+          // Tasks with an own rate keep it, so do their Time Entries
+          entries: all.filter((e) => followsProjectRate(e, tasks)),
           newRateMinor: changes.hourlyRateMinor,
           projects: projects.map((project) => ({
             project,

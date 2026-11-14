@@ -14,7 +14,7 @@ import { statCard } from './support/ui';
 /** Opens "Project bearbeiten", enters the new rate and saves; returns the rate question. */
 async function changeProjectRate(page: Page, projectId: number, rate: string): Promise<Locator> {
   await page.goto(`/projects/${projectId}/edit`);
-  await page.getByLabel('Hourly Rate').fill(rate);
+  await page.getByLabel('Hourly Rate', { exact: true }).fill(rate);
   await page.getByRole('button', { name: 'Project aktualisieren' }).click();
   const dialog = page.getByRole('dialog', { name: 'Bestehende Time Entries übernehmen?' });
   await expect(dialog).toBeVisible();
@@ -107,7 +107,7 @@ test.describe('Hourly Rate ändern', () => {
     await createTimeEntry(page.request, ownProject.id, '2026-02-02', 1);
 
     await page.goto(`/projects/customers/${customer.id}/edit`);
-    await page.getByLabel('Hourly Rate').fill('110,00');
+    await page.getByLabel('Hourly Rate', { exact: true }).fill('110,00');
     await page.getByRole('button', { name: 'Customer aktualisieren' }).click();
     const dialog = page.getByRole('dialog', { name: 'Bestehende Time Entries übernehmen?' });
 
@@ -137,7 +137,7 @@ test.describe('Hourly Rate ändern', () => {
     await createTimeEntry(page.request, project.id, '2026-02-02', 1);
 
     await page.goto(`/projects/customers/${customer.id}/edit`);
-    await page.getByLabel('Hourly Rate').fill('110,00');
+    await page.getByLabel('Hourly Rate', { exact: true }).fill('110,00');
     await page.getByRole('button', { name: 'Customer aktualisieren' }).click();
     const dialog = page.getByRole('dialog', { name: 'Bestehende Time Entries übernehmen?' });
     await dialog.getByRole('button', { name: 'Nur für neue Time Entries' }).click();
@@ -163,9 +163,9 @@ test.describe('Hourly Rate ändern', () => {
       .click();
     const edit = page.getByRole('dialog', { name: 'Time Entry bearbeiten' });
     // Folded away by default
-    await expect(edit.getByLabel('Hourly Rate')).toBeHidden();
+    await expect(edit.getByLabel('Hourly Rate', { exact: true })).toBeHidden();
     await edit.getByText(/^Hourly Rate:/).click();
-    await edit.getByLabel('Hourly Rate').fill('150,00');
+    await edit.getByLabel('Hourly Rate', { exact: true }).fill('150,00');
     await edit.getByRole('button', { name: 'Eintrag aktualisieren' }).click();
     await expect(edit).toBeHidden();
 

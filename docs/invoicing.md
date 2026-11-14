@@ -11,7 +11,7 @@ Sender data is read live: changing your address also changes how older invoices 
 
 **Invoices → New invoice**, pick the customer and either
 
-- **From tracked time and expenses:** choose all projects or one, the period, the grouping and whether billable expenses are included. Grouping is one item per project (and hourly rate), one per description (time entries with the same text are added up) or one per time entry. The preview lists the items exactly as they will appear on the invoice and updates with every change. Running timers and entries that round to 0:00 are skipped.
+- **From tracked time and expenses:** choose all projects or one, the period, the grouping and whether billable expenses are included. Grouping is one item per project (and hourly rate), one per task (named "Project – Task"), one per description within a task (time entries with the same text are added up) or one per time entry. Time on non-billable [tasks](tasks.md) is never imported. The preview lists the items exactly as they will appear on the invoice and updates with every change. Running timers and entries that round to 0:00 are skipped.
 - **Empty invoice:** items are added by hand.
 
 **Invoice** in the actions menu of a project (Projects) or on its page starts the same form with the project's customer and the project selected.

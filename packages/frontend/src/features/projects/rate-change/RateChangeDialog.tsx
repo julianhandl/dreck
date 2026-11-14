@@ -38,7 +38,9 @@ export function RateChangeDialog({
   return (
     <Modal title={t.title} open onOpenChange={(open) => !open && onCancel()}>
       <div className="flex flex-col gap-5">
-        <p>{t.intro(money(question.newRateMinor))}</p>
+        <p>
+          {question.newRateMinor === null ? t.introTasks : t.intro(money(question.newRateMinor))}
+        </p>
         {question.projects && (
           <fieldset className="flex flex-col">
             <legend className="mb-1 font-medium">{t.projects}</legend>

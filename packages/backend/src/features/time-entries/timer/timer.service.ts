@@ -1,14 +1,13 @@
 import { dateInTimeZone } from '@dreck/shared/time';
 import { eq, isNotNull, sql } from 'drizzle-orm';
 import type { Db } from '@/db/db';
-import { requireProject } from '@/features/projects/projects.service';
 import { getSettings } from '@/features/settings/settings.service';
-import { requireNotInvoiced } from '@/features/time-entries/time-entries.service';
+import { entryRate, requireNotInvoiced } from '@/features/time-entries/time-entries.service';
 import { type TimeEntry, timeEntries } from '@/features/time-entries/time-entries.table';
 import { ApiError, fieldError } from '@/http/api-error';
 
 export type StartTimerInput =
-  | { projectId: number; description?: string; at?: string }
+  | { projectId: number; taskId?: number; description?: string; at?: string }
   | { timeEntryId: number; at?: string };
 
 type StartTimerResult = { started: TimeEntry; stopped: TimeEntry | null };
@@ -19,7 +18,7 @@ export function getRunningTimeEntry(db: Db): TimeEntry | undefined {
 }
 
 /**
- * Starts a new Timer on a Project or continues a Time Entry of today. Stops the running Timer in
+ * Starts a new Timer on a Project (optionally with a Task) or continues a Time Entry of today. Stops the running Timer in
  * the same transaction. `at` is the moment of the click; the server takes min(at, now).
  */
 export function startTimer(db: Db, input: StartTimerInput): StartTimerResult {
@@ -50,17 +49,16 @@ export function startTimer(db: Db, input: StartTimerInput): StartTimerResult {
       return { started: started ?? entry, stopped };
     }
 
-    const project = requireProject(tx, input.projectId);
+    const rate = entryRate(tx, input.projectId, input.taskId);
     const stopped = running ? stop(tx, running, atMs) : null;
     const started = tx
       .insert(timeEntries)
       .values({
-        projectId: project.id,
+        ...rate,
         date: today,
         durationSeconds: 0,
         runningSince: toSeconds(atMs),
         description: input.description || null,
-        hourlyRateMinor: project.hourlyRateMinor,
       })
       .returning()
       .get();

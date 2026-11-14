@@ -5,7 +5,11 @@ import { DateSchema } from './common';
 const SumsSchema = z.object({
   seconds: z.number().int().openapi({ description: 'Exact seconds' }),
   roundedSeconds: z.number().int().openapi({ description: 'Seconds after Rounding' }),
-  amountMinor: z.number().int().openapi({ description: 'Amount of the time' }),
+  amountMinor: z.number().int().openapi({ description: 'Amount of the billable time' }),
+  nonBillableSeconds: z
+    .number()
+    .int()
+    .openapi({ description: 'Rounded seconds of non-billable Tasks, part of roundedSeconds' }),
   billableExpensesMinor: z.number().int(),
   ownExpensesMinor: z.number().int(),
 });

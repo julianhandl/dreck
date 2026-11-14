@@ -1,7 +1,10 @@
+import type { Settings as SettingsResponse } from '@dreck/shared/api/settings';
+import type { DefaultTask } from '@dreck/shared/api/tasks';
 import { eq } from 'drizzle-orm';
 import type { Db } from '@/db/db';
 import { customers } from '@/features/customers/customers.table';
 import { expenses } from '@/features/expenses/expenses.table';
+import { listDefaultTasks, replaceDefaultTasks } from '@/features/tasks/tasks.service';
 import { ApiError } from '@/http/api-error';
 import { settings } from './settings.table';
 
@@ -22,8 +25,19 @@ export function getSettings(db: Db): Settings {
   return rest;
 }
 
-/** Updates settings; the currency is locked once a Customer or an Expense exists. */
-export function updateSettings(db: Db, changes: Partial<Settings>): Settings {
+/** The settings with the Default Tasks, as the API returns them. */
+export function getSettingsResponse(db: Db): SettingsResponse {
+  return { ...getSettings(db), defaultTasks: listDefaultTasks(db) };
+}
+
+/**
+ * Updates settings and replaces the Default Tasks if given; the currency is locked once a
+ * Customer or an Expense exists.
+ */
+export function updateSettings(
+  db: Db,
+  { defaultTasks, ...changes }: Partial<Settings> & { defaultTasks?: DefaultTask[] },
+): SettingsResponse {
   // An emptied text field is stored as NULL
   for (const key of OPTIONAL_TEXTS) {
     if (changes[key] !== undefined) changes[key] = changes[key] || null;
@@ -40,7 +54,10 @@ export function updateSettings(db: Db, changes: Partial<Settings>): Settings {
         );
       }
     }
-    tx.update(settings).set(changes).where(eq(settings.id, 1)).run();
-    return getSettings(tx);
+    if (Object.keys(changes).length > 0) {
+      tx.update(settings).set(changes).where(eq(settings.id, 1)).run();
+    }
+    if (defaultTasks) replaceDefaultTasks(tx, defaultTasks);
+    return getSettingsResponse(tx);
   });
 }

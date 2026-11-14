@@ -17,7 +17,7 @@ type ProjectSeed = {
   to: number;
   /** Relative share of the working days while active. */
   weight: number;
-  tasks: readonly string[];
+  descriptions: readonly string[];
   archived?: boolean;
 };
 
@@ -94,9 +94,15 @@ export const SETTINGS: UpdateSettings = {
   defaultTaxBasisPoints: 2000,
   defaultInvoiceNotes:
     'Zahlbar innerhalb von 14 Tagen ohne Abzug.\nIBAN: AT00 1234 5678 9012 3456 · BIC: MUSTATXXXXX\nVielen Dank für die gute Zusammenarbeit!',
+  defaultTasks: [
+    { name: 'Design', billable: true },
+    { name: 'Entwicklung', billable: true },
+    { name: 'Projektmanagement', billable: true },
+    { name: 'Akquise', billable: false },
+  ],
 };
 
-const WEBSITE_TASKS = [
+const WEBSITE_DESCRIPTIONS = [
   'Abstimmung Sitemap und Inhalte',
   'Layout Startseite umsetzen',
   'Komponenten für Unterseiten',
@@ -109,7 +115,7 @@ const WEBSITE_TASKS = [
   'Go-live und DNS-Umstellung',
 ] as const;
 
-const SHOP_TASKS = [
+const SHOP_DESCRIPTIONS = [
   'Produktimport aus CSV',
   'Warenkorb und Checkout anpassen',
   'Versandkostenregeln',
@@ -120,7 +126,7 @@ const SHOP_TASKS = [
   'Testbestellungen und Bugfixing',
 ] as const;
 
-const BACKEND_TASKS = [
+const BACKEND_DESCRIPTIONS = [
   'Datenmodell und Migrationen',
   'REST-Endpunkte implementieren',
   'Authentifizierung und Rollen',
@@ -132,7 +138,7 @@ const BACKEND_TASKS = [
   'Abstimmung mit dem Team',
 ] as const;
 
-const INTERFACE_TASKS = [
+const INTERFACE_DESCRIPTIONS = [
   'Schnittstellen-Spezifikation abstimmen',
   'Mapping der Datenfelder',
   'Import-Job mit Wiederholungslogik',
@@ -143,7 +149,7 @@ const INTERFACE_TASKS = [
   'Deployment und Übergabe',
 ] as const;
 
-const SERVER_TASKS = [
+const SERVER_DESCRIPTIONS = [
   'Server aufsetzen und härten',
   'Reverse Proxy und TLS',
   'Docker-Compose-Setup',
@@ -154,7 +160,7 @@ const SERVER_TASKS = [
   'Dokumentation für den Betrieb',
 ] as const;
 
-const MAINTENANCE_TASKS = [
+const MAINTENANCE_DESCRIPTIONS = [
   'Updates und Sicherheitspatches',
   'Backup-Kontrolle',
   'Kleine Textänderungen',
@@ -163,7 +169,7 @@ const MAINTENANCE_TASKS = [
   'Support per Telefon',
 ] as const;
 
-const OPS_TASKS = [
+const OPS_DESCRIPTIONS = [
   'Störung analysiert und behoben',
   'Updates eingespielt',
   'Speicherplatz bereinigt',
@@ -183,9 +189,16 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 365,
         to: 250,
         weight: 3,
-        tasks: WEBSITE_TASKS,
+        descriptions: WEBSITE_DESCRIPTIONS,
       },
-      { key: 'lechner-shop', name: 'Online-Shop', from: 240, to: 90, weight: 3, tasks: SHOP_TASKS },
+      {
+        key: 'lechner-shop',
+        name: 'Online-Shop',
+        from: 240,
+        to: 90,
+        weight: 3,
+        descriptions: SHOP_DESCRIPTIONS,
+      },
       {
         key: 'lechner-maintenance',
         name: 'Wartung & Hosting',
@@ -193,7 +206,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 250,
         to: 0,
         weight: 0.5,
-        tasks: MAINTENANCE_TASKS,
+        descriptions: MAINTENANCE_DESCRIPTIONS,
       },
       {
         key: 'lechner-newsletter',
@@ -201,7 +214,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 30,
         to: 0,
         weight: 2,
-        tasks: INTERFACE_TASKS,
+        descriptions: INTERFACE_DESCRIPTIONS,
       },
     ],
   },
@@ -216,7 +229,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 340,
         to: 270,
         weight: 3,
-        tasks: WEBSITE_TASKS,
+        descriptions: WEBSITE_DESCRIPTIONS,
         archived: true,
       },
       {
@@ -225,7 +238,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 190,
         to: 0,
         weight: 3,
-        tasks: BACKEND_TASKS,
+        descriptions: BACKEND_DESCRIPTIONS,
       },
       {
         key: 'huber-gdpr',
@@ -233,7 +246,11 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 120,
         to: 105,
         weight: 2,
-        tasks: ['Cookie-Banner prüfen', 'Datenschutzerklärung abgleichen', 'Tracking entfernen'],
+        descriptions: [
+          'Cookie-Banner prüfen',
+          'Datenschutzerklärung abgleichen',
+          'Tracking entfernen',
+        ],
       },
       {
         key: 'huber-maintenance',
@@ -241,7 +258,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 270,
         to: 0,
         weight: 0.4,
-        tasks: MAINTENANCE_TASKS,
+        descriptions: MAINTENANCE_DESCRIPTIONS,
       },
     ],
   },
@@ -256,7 +273,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 300,
         to: 260,
         weight: 3,
-        tasks: SERVER_TASKS,
+        descriptions: SERVER_DESCRIPTIONS,
       },
       {
         key: 'alpen-erp',
@@ -264,7 +281,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 290,
         to: 160,
         weight: 3,
-        tasks: INTERFACE_TASKS,
+        descriptions: INTERFACE_DESCRIPTIONS,
       },
       {
         key: 'alpen-tracking',
@@ -272,7 +289,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 160,
         to: 0,
         weight: 3,
-        tasks: BACKEND_TASKS,
+        descriptions: BACKEND_DESCRIPTIONS,
       },
       {
         key: 'alpen-ops',
@@ -281,7 +298,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 260,
         to: 0,
         weight: 0.6,
-        tasks: OPS_TASKS,
+        descriptions: OPS_DESCRIPTIONS,
       },
     ],
   },
@@ -297,9 +314,16 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 365,
         to: 300,
         weight: 2,
-        tasks: WEBSITE_TASKS,
+        descriptions: WEBSITE_DESCRIPTIONS,
       },
-      { key: 'steiner-shop', name: 'Weinshop', from: 310, to: 215, weight: 2, tasks: SHOP_TASKS },
+      {
+        key: 'steiner-shop',
+        name: 'Weinshop',
+        from: 310,
+        to: 215,
+        weight: 2,
+        descriptions: SHOP_DESCRIPTIONS,
+      },
     ],
   },
   {
@@ -313,7 +337,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 215,
         to: 195,
         weight: 2,
-        tasks: SERVER_TASKS,
+        descriptions: SERVER_DESCRIPTIONS,
       },
       {
         key: 'fitwerk-booking',
@@ -321,7 +345,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 210,
         to: 0,
         weight: 3,
-        tasks: BACKEND_TASKS,
+        descriptions: BACKEND_DESCRIPTIONS,
       },
       {
         key: 'fitwerk-payments',
@@ -329,7 +353,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 130,
         to: 60,
         weight: 2,
-        tasks: INTERFACE_TASKS,
+        descriptions: INTERFACE_DESCRIPTIONS,
       },
       {
         key: 'fitwerk-website',
@@ -337,7 +361,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 75,
         to: 20,
         weight: 2,
-        tasks: WEBSITE_TASKS,
+        descriptions: WEBSITE_DESCRIPTIONS,
       },
     ],
   },
@@ -353,7 +377,7 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 365,
         to: 0,
         weight: 0.08,
-        tasks: ['Fachartikel und Doku lesen', 'Online-Kurs', 'Prototyp mit neuem Framework'],
+        descriptions: ['Fachartikel und Doku lesen', 'Online-Kurs', 'Prototyp mit neuem Framework'],
       },
       {
         key: 'intern-admin',
@@ -361,7 +385,12 @@ export const CUSTOMERS: readonly CustomerSeed[] = [
         from: 365,
         to: 0,
         weight: 0.3,
-        tasks: ['Buchhaltung', 'Angebot schreiben', 'E-Mails und Telefonate', 'Akquise-Termin'],
+        descriptions: [
+          'Buchhaltung',
+          'Angebot schreiben',
+          'E-Mails und Telefonate',
+          'Akquise-Termin',
+        ],
       },
     ],
   },

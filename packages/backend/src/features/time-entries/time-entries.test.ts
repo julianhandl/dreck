@@ -14,6 +14,7 @@ afterEach(() => {
 type TimeEntry = {
   id: number;
   projectId: number;
+  taskId: number | null;
   date: string;
   durationSeconds: number;
   runningSince: string | null;
@@ -40,6 +41,7 @@ describe('time entries', () => {
     expect(entry).toEqual({
       id: 1,
       projectId: project.id,
+      taskId: null,
       date: '2026-03-02',
       durationSeconds: 1800,
       runningSince: null,

@@ -11,6 +11,7 @@ import { ProjectDetailPage } from '@/features/projects/ProjectDetailPage';
 import { ProjectFormPage } from '@/features/projects/ProjectFormPage';
 import { ProjectsPage } from '@/features/projects/ProjectsPage';
 import { ReportsPage } from '@/features/reports/ReportsPage';
+import { DefaultTasksPage } from '@/features/settings/DefaultTasksPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
 import { TimePage } from '@/features/time/TimePage';
 import { I18nProvider } from '@/i18n/I18nProvider';
@@ -44,6 +45,7 @@ export function App(): ReactElement {
               <Route path="invoices/:invoiceId" element={<InvoiceDetailPage />} />
               <Route path="invoices/:invoiceId/edit" element={<InvoiceFormPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="settings/tasks" element={<DefaultTasksPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>

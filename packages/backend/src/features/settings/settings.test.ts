@@ -20,6 +20,7 @@ describe('settings', () => {
       senderVatId: null,
       defaultTaxBasisPoints: 0,
       defaultInvoiceNotes: null,
+      defaultTasks: [],
     });
   });
 

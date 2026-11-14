@@ -1,8 +1,8 @@
 import { mkdir } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
-import { parseArgs } from 'node:util';
+import { join } from 'node:path';
 import { version } from '@root/package.json';
 import { createApp } from '@/app';
+import { loadConfig } from '@/config';
 import { openDatabase } from '@/db/db';
 import { runMigrations } from '@/db/migrations/run-migrations';
 import { loadSecret } from '@/features/auth/secret/load-secret';
@@ -11,20 +11,12 @@ import { loadSecret } from '@/features/auth/secret/load-secret';
 const MIGRATIONS_DIR = join(import.meta.dir, '..', 'drizzle');
 const STATIC_DIR = join(import.meta.dir, '..', '..', 'frontend', 'dist');
 
-const { values } = parseArgs({
-  options: {
-    'data-dir': { type: 'string', default: '/data' },
-    port: { type: 'string', default: '3000' },
-  },
-});
-const dataDir = resolve(values['data-dir']);
-const port = Number(values.port);
-
 try {
   console.log(`Dreck ${version}`);
+  const { port, dataDir, ...secretSource } = loadConfig(process.argv.slice(2), process.env);
   await mkdir(dataDir, { recursive: true });
 
-  const { secret, generated } = await loadSecret(process.env.DRECK_SECRET, dataDir);
+  const { secret, generated } = await loadSecret(secretSource, dataDir);
   if (generated) {
     console.log(`Generated a new secret (shown only now, stored in ${join(dataDir, 'secret')}):`);
     console.log(secret);

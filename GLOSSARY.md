@@ -12,8 +12,16 @@ _Avoid_: Kunde, Client, Account
 Eine Arbeit, die zu genau einem Customer gehört.
 _Avoid_: Projekt, Auftrag, Job
 
+**Task**:
+Eine Art von Arbeit innerhalb genau eines Projects, z. B. Design oder Entwicklung. Ein Task ist billable oder nicht und hat optional eine eigene Hourly Rate, die statt der des Projects gilt. Ein Task mit Time Entries wird beim Entfernen archiviert.
+_Avoid_: Aufgabe, Tätigkeit, Leistung, Activity, Todo
+
+**Default Task**:
+Ein Task, den ein neues Project beim Anlegen übernimmt (Name und Billable, keine Rate). Spätere Änderungen betreffen nur neue Projects.
+_Avoid_: Standard-Task, Vorlage, globaler Task
+
 **Time Entry**:
-Gearbeitete Zeit für ein Project an einem Kalendertag: Datum und Dauer, optional mit Beschreibung, ohne Uhrzeiten. Solange er läuft, wächst seine Dauer; es läuft höchstens einer gleichzeitig. Er trägt die Hourly Rate, die beim Anlegen an seinem Project galt.
+Gearbeitete Zeit für ein Project an einem Kalendertag: Datum und Dauer, optional mit Task und Beschreibung, ohne Uhrzeiten. Solange er läuft, wächst seine Dauer; es läuft höchstens einer gleichzeitig. Er trägt die Hourly Rate, die beim Anlegen an seinem Task oder Project galt.
 _Avoid_: Buchung, Timesheet, Log, Timer-Eintrag
 
 **Timer**:
@@ -25,7 +33,7 @@ Ein für genau ein Project ausgegebener Betrag mit Datum und Beschreibung. Eine 
 _Avoid_: Expense (im deutschen Text), Kosten, Spesen, Auslage
 
 **Billable**:
-Eigenschaft einer Ausgabe, die an den Customer weiterverrechnet wird.
+Eigenschaft einer Ausgabe oder eines Tasks, die an den Customer weiterverrechnet wird. Ein Time Entry ist billable, wenn sein Task es ist oder er keinen Task hat; das gilt live, nicht kopiert.
 _Avoid_: verrechenbar, durchlaufend, Pass-through
 
 **Rounding**:
@@ -33,7 +41,7 @@ Die pro Instanz einstellbare Taktung, auf die jeder Time Entry für Reports einz
 _Avoid_: Taktung, Abrundung, Intervall
 
 **Hourly Rate**:
-Der Geldwert einer Arbeitsstunde. Ein neues Project übernimmt ihn von seinem Customer, ein neuer Time Entry von seinem Project. Ändert er sich an Customer oder Project, entscheidet der User, ob bestehende Time Entries ihn übernehmen; von Hand korrigierte bleiben dabei unberührt, außer er überschreibt sie ausdrücklich.
+Der Geldwert einer Arbeitsstunde. Ein neues Project übernimmt ihn von seinem Customer, ein neuer Time Entry von seinem Task, falls der eine eigene hat, sonst von seinem Project. Ändert er sich an Customer oder Project, entscheidet der User, ob bestehende Time Entries ihn übernehmen; von Hand korrigierte bleiben dabei unberührt, außer er überschreibt sie ausdrücklich.
 _Avoid_: Stundensatz, Tarif, Preis
 
 **Default Hourly Rate**:
@@ -57,5 +65,5 @@ Zustand eines Time Entries oder einer Ausgabe, die zu einer Position gehört. Er
 _Avoid_: verrechnet, gebucht, Billed (verwechselbar mit Billable)
 
 **Archived**:
-Der Zustand eines Customers oder Projects, der aus Auswahllisten verschwindet und in Reports erhalten bleibt.
+Der Zustand eines Customers, Projects oder Tasks, der aus Auswahllisten verschwindet und in Reports erhalten bleibt.
 _Avoid_: Inaktiv, gelöscht

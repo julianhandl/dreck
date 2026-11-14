@@ -113,11 +113,18 @@ export function useNewInvoice(catalog: Catalog, start: InvoiceStart): NewInvoice
   if (state.status !== 'ready') preview = state;
   else {
     const projectName = (id: number): string => catalog.project(id)?.name ?? '';
+    // Like the import: time of non-billable Tasks stays out
     const time = state.data[0]
-      .filter((e) => e.invoiceItemId === null && e.runningSince === null)
+      .filter(
+        (e) =>
+          e.invoiceItemId === null &&
+          e.runningSince === null &&
+          (catalog.task(e.taskId)?.billable ?? true),
+      )
       .map((e) => ({
         ...e,
         project: projectName(e.projectId),
+        task: catalog.task(e.taskId)?.name ?? null,
         seconds: roundSeconds(e.durationSeconds, roundingMinutes),
       }));
     const expenses = withExpenses

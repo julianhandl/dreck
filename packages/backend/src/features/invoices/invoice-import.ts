@@ -1,17 +1,18 @@
 import type { InvoiceImport } from '@dreck/shared/api/invoices';
 import { draftItems } from '@dreck/shared/invoice-items';
 import { roundSeconds } from '@dreck/shared/report';
-import { and, eq, gte, inArray, isNull, lte } from 'drizzle-orm';
+import { and, eq, gte, inArray, isNull, lte, or } from 'drizzle-orm';
 import type { Db } from '@/db/db';
 import { expenses } from '@/features/expenses/expenses.table';
 import { projects } from '@/features/projects/projects.table';
 import type { Settings } from '@/features/settings/settings.service';
+import { tasks } from '@/features/tasks/tasks.table';
 import { timeEntries } from '@/features/time-entries/time-entries.table';
 import { fieldError } from '@/http/api-error';
 import { type Invoice, invoiceItems } from './invoices.table';
 
 /**
- * Turns the uninvoiced, stopped Time Entries of the Customer (or of one of its Projects) in the
+ * Turns the uninvoiced, stopped, billable Time Entries of the Customer (or of one of its Projects) in the
  * range into items as `draftItems` groups them, optionally plus the Billable Expenses, and locks
  * them. Durations count after Rounding; entries that round to zero stay uninvoiced.
  */
@@ -33,9 +34,10 @@ export function importItems(
   );
 
   const time = db
-    .select({ entry: timeEntries, project: projects.name })
+    .select({ entry: timeEntries, project: projects.name, task: tasks.name })
     .from(timeEntries)
     .innerJoin(projects, eq(projects.id, timeEntries.projectId))
+    .leftJoin(tasks, eq(tasks.id, timeEntries.taskId))
     .where(
       and(
         scope,
@@ -43,12 +45,15 @@ export function importItems(
         lte(timeEntries.date, to),
         isNull(timeEntries.runningSince),
         isNull(timeEntries.invoiceItemId),
+        // Time of non-billable Tasks stays out of invoices
+        or(isNull(timeEntries.taskId), eq(tasks.billable, true)),
       ),
     )
     .all()
-    .map(({ entry, project }) => ({
+    .map(({ entry, project, task }) => ({
       ...entry,
       project,
+      task,
       seconds: roundSeconds(entry.durationSeconds, roundingMinutes),
     }));
 

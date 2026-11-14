@@ -1,4 +1,4 @@
-export const INVOICE_GROUPINGS = ['project', 'description', 'timeEntry'] as const;
+export const INVOICE_GROUPINGS = ['project', 'task', 'description', 'timeEntry'] as const;
 
 export type InvoiceGrouping = (typeof INVOICE_GROUPINGS)[number];
 
@@ -8,6 +8,9 @@ export type BillableTime = {
   projectId: number;
   /** Name of the Project. */
   project: string;
+  taskId: number | null;
+  /** Name of the Task. */
+  task: string | null;
   date: string;
   description: string | null;
   hourlyRateMinor: number;
@@ -34,8 +37,9 @@ export type ItemDraft = {
 
 /**
  * Items of an import, in the order they appear on the Invoice: Time Entries sorted by Project,
- * date and id, grouped per Project and Hourly Rate, additionally per description, or one per
- * Time Entry; then one item per Billable Expense. Entries of 0 seconds are left out.
+ * Task (when grouped by it), date and id, grouped per Project and Hourly Rate, additionally per Task, additionally per
+ * description, or one per Time Entry; then one item per Billable Expense. Entries of 0 seconds
+ * are left out. The caller passes only billable time.
  * @example draftItems(time, expenses, 'project', 'de') // [{ description: 'Web (2.–30. März 2026)', … }]
  */
 export function draftItems(
@@ -53,6 +57,8 @@ export function draftItems(
   };
   const label = (project: string, text: string | null, when: string): string =>
     `${project}${text ? `: ${text}` : ''} (${when})`;
+  const withTask = (t: BillableTime): string => (t.task ? `${t.project} – ${t.task}` : t.project);
+  const byTask = grouping !== 'project';
 
   const entries = time
     .filter((t) => t.seconds > 0)
@@ -60,6 +66,9 @@ export function draftItems(
       (a, b) =>
         a.project.localeCompare(b.project, language, { sensitivity: 'base' }) ||
         a.projectId - b.projectId ||
+        (grouping === 'task' || grouping === 'description'
+          ? (a.task ?? '').localeCompare(b.task ?? '', language, { sensitivity: 'base' })
+          : 0) ||
         a.date.localeCompare(b.date) ||
         a.id - b.id,
     );
@@ -68,7 +77,7 @@ export function draftItems(
   if (grouping === 'timeEntry') {
     for (const t of entries) {
       drafts.push({
-        description: label(t.project, t.description, date(t.date)),
+        description: label(withTask(t), t.description, date(t.date)),
         quantityHundredths: toHundredths(t.seconds),
         unitPriceMinor: t.hourlyRateMinor,
         timeEntryIds: [t.id],
@@ -79,7 +88,7 @@ export function draftItems(
     const groups = new Map<string, BillableTime[]>();
     for (const t of entries) {
       const text = grouping === 'description' ? (t.description?.trim() ?? '') : '';
-      const key = JSON.stringify([t.projectId, t.hourlyRateMinor, text]);
+      const key = JSON.stringify([t.projectId, byTask ? t.taskId : null, t.hourlyRateMinor, text]);
       groups.set(key, [...(groups.get(key) ?? []), t]);
     }
     for (const rows of groups.values()) {
@@ -87,7 +96,11 @@ export function draftItems(
       if (!first) continue;
       const text = grouping === 'description' ? (first.description?.trim() ?? '') : null;
       drafts.push({
-        description: label(first.project, text, range(rows.map((r) => r.date))),
+        description: label(
+          byTask ? withTask(first) : first.project,
+          text,
+          range(rows.map((r) => r.date)),
+        ),
         quantityHundredths: toHundredths(rows.reduce((sum, r) => sum + r.seconds, 0)),
         unitPriceMinor: first.hourlyRateMinor,
         timeEntryIds: rows.map((r) => r.id),

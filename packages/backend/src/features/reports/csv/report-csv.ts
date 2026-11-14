@@ -27,22 +27,17 @@ export function reportCsv(
     t.types[line.type],
     line.customer.name,
     line.project.name,
+    line.task ?? '',
     line.date,
     line.type === 'timeEntry' ? minutes.format(line.roundedSeconds / 60) : '',
     line.description ?? '',
     line.hourlyRateMinor === null ? '' : major(line.hourlyRateMinor),
     major(line.amountMinor),
-    billableLabel(line.billable, t),
+    line.billable ? t.yes : t.no,
   ]);
 
   const csv = [header, ...rows].map((row) => row.map(quoteField).join(separator)).join('\r\n');
   return `﻿${csv}\r\n`;
-}
-
-/** Empty for Time Entries, yes/no for Expenses. */
-function billableLabel(billable: boolean | null, t: { yes: string; no: string }): string {
-  if (billable === null) return '';
-  return billable ? t.yes : t.no;
 }
 
 function quoteField(value: string): string {

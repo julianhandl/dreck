@@ -12,7 +12,7 @@ Dreck only works over HTTPS, except on `localhost` and `127.0.0.1`. Over plain H
 
 ## 2. Settings, more customers and projects
 
-**Settings** holds the default hourly rate, rounding, time zone and language, all changeable at any time:
+**Settings** holds the default hourly rate, rounding, time zone and language, all changeable at any time. Its second page, **Tasks**, holds the [default tasks](tasks.md) new projects start with:
 
 - Changing the **default hourly rate** affects only customers created afterwards.
 - **Rounding** applies retroactively, see [Reports and rounding](reports.md#rounding).

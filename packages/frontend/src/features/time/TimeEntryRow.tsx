@@ -34,7 +34,7 @@ type TimeEntryRowProps = {
 };
 
 /**
- * One Time Entry: Project (Customer), description, duration with the rounded one below,
+ * One Time Entry: Project · Task (Customer), description, duration with the rounded one below,
  * Start/Stopp and Bearbeiten; a running entry is highlighted. The row takes focus from ↑/↓
  * for Space and `E`.
  * @example <TimeEntryRow entry={entry} project={p} customer={c} now={now} roundingMinutes={15} startable … />
@@ -54,6 +54,7 @@ export function TimeEntryRow({
   const { messages } = useI18n();
   const running = entry.runningSince !== null;
   const name = project?.name ?? '';
+  const task = project?.tasks.find((t) => t.id === entry.taskId)?.name;
   const seconds = elapsedSeconds(entry, now);
   const duration = formatDuration(seconds);
 
@@ -75,6 +76,7 @@ export function TimeEntryRow({
         <div className="min-w-0">
           <p>
             <span className="font-medium">{name}</span>
+            {task && <span className="font-medium"> · {task}</span>}
             {customer && <span> ({customer.name})</span>}
           </p>
           {entry.description && <p className="text-temp-ink-muted">{entry.description}</p>}

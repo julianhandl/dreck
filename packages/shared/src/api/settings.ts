@@ -3,6 +3,7 @@ import { ROUNDING_MINUTES } from '@dreck/shared/report';
 import { z } from '@hono/zod-openapi';
 import { nonEmpty, RateSchema } from './common';
 import { BasisPointsSchema } from './invoices';
+import { DefaultTaskListSchema } from './tasks';
 
 const OptionalTextSchema = z.string().trim().max(5000).nullable();
 
@@ -28,6 +29,9 @@ export const SettingsSchema = z
     defaultTaxBasisPoints: BasisPointsSchema.openapi({ description: 'Tax of new invoices' }),
     defaultInvoiceNotes: OptionalTextSchema.openapi({
       description: 'Text below the items of new invoices, e.g. bank details',
+    }),
+    defaultTasks: DefaultTaskListSchema.openapi({
+      description: 'Tasks a new Project copies, sorted by name; PATCH replaces the list',
     }),
   })
   .openapi('Settings');

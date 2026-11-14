@@ -23,8 +23,10 @@ test('Vergessener Timer: Stopp fragt, wann du aufgehört hast', async ({ page })
   const customer = await createCustomer(page.request, uniqueName('Kunde'), 10000);
   const name = uniqueName('Vergessen');
   const project = await createProject(page.request, customer.id, name);
-  // 11 h ago on a full minute, so the entered stop time gives an exact duration
-  const startedAt = new Date(Math.floor((Date.now() - 11 * HOUR_MS) / 60_000) * 60_000);
+  // 08:00 UTC (09:00 or 10:00 in Vienna) three days ago: always long enough to be forgotten, and
+  // start and stop stay on the same day whatever time the test runs
+  const startedAt = new Date(Date.now() - 3 * 24 * HOUR_MS);
+  startedAt.setUTCHours(8, 0, 0, 0);
   const entry = await startTimer(page.request, project.id, startedAt);
 
   await page.goto('/');

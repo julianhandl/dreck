@@ -162,6 +162,7 @@ export function ProjectDetailPage(): ReactElement {
                   <DataTable
                     head={[
                       messages.common.date,
+                      t.task,
                       messages.common.description,
                       t.rate,
                       messages.common.hours,
@@ -176,6 +177,9 @@ export function ProjectDetailPage(): ReactElement {
                       <tr key={e.id} className="border-temp-divider border-b">
                         <td className="px-4 py-4 whitespace-nowrap">
                           {formatDate(e.date, language)}
+                        </td>
+                        <td className="px-4 py-4">
+                          {project.tasks.find((task) => task.id === e.taskId)?.name}
                         </td>
                         <td className="px-4 py-4">{e.description}</td>
                         <td className={NUM}>{money(e.hourlyRateMinor)}</td>

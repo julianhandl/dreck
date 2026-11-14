@@ -3,7 +3,7 @@ import { createRoute, type OpenAPIHono } from '@hono/zod-openapi';
 import type { Db } from '@/db/db';
 import { createRouter } from '@/http/router';
 import { error, json, jsonBody } from '@/http/schemas';
-import { getSettings, updateSettings } from './settings.service';
+import { getSettingsResponse, updateSettings } from './settings.service';
 
 const getRoute = createRoute({
   method: 'get',
@@ -27,7 +27,7 @@ const patchRoute = createRoute({
 
 export function createSettingsRouter(db: Db): OpenAPIHono {
   const router = createRouter();
-  router.openapi(getRoute, (c) => c.json(getSettings(db), 200));
+  router.openapi(getRoute, (c) => c.json(getSettingsResponse(db), 200));
   router.openapi(patchRoute, (c) => c.json(updateSettings(db, c.req.valid('json')), 200));
   return router;
 }

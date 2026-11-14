@@ -31,8 +31,8 @@ Rounded durations appear on the **Time** screen below the exact duration, on pro
 
 | Figure | Meaning |
 |---|---|
-| **Hours (rounded)** | Sum of rounded durations. **Exact** shows the sum of the exact durations next to it. |
-| **Time** | Sum of the amounts of all time entries. |
+| **Hours (rounded)** | Sum of rounded durations. **Exact** shows the sum of the exact durations next to it, **Of which not billable** the hours on non-billable [tasks](tasks.md). |
+| **Time** | Sum of the amounts of all billable time entries. Time on non-billable tasks has no amount. |
 | **Billable expenses** | Expenses marked billable. |
 | **Own costs** | Expenses not marked billable. They are not part of "To invoice". |
 | **To invoice** | Time + billable expenses. |
@@ -42,8 +42,8 @@ Rounded durations appear on the **Time** screen below the exact duration, on pro
 **Export CSV** downloads the report with the same period and filters as `dreck-report_<from>_<to>.csv`.
 
 - One row per time entry and per expense, not per project.
-- Columns: Type, Customer, Project, Date, Rounded duration (minutes), Description, Hourly rate, Amount, Billable.
-- Duration, hourly rate and billable are empty where they do not apply (duration and rate for expenses, billable for time entries).
+- Columns: Type, Customer, Project, Task, Date, Rounded duration (minutes), Description, Hourly rate, Amount, Billable.
+- Duration and hourly rate are empty for expenses; task is empty for expenses and time entries without task. Time entries of non-billable tasks have no rate, amount 0 and Billable "no".
 - Amounts are in the main unit of the currency (`12.50`, not `1250`).
 - The format follows the language in Settings:
 

@@ -1,3 +1,4 @@
+import { taskRateMinor } from '@dreck/shared/api/tasks';
 import type { TimeEntry, UpdateTimeEntry } from '@dreck/shared/api/time-entries';
 import { type KeyboardEvent, type RefObject, useRef, useState } from 'react';
 import { api } from '@/api/api-client';
@@ -8,12 +9,16 @@ import { formatAmountInput, parseAmount } from '@/format/money';
 import { type Submit, useSubmit } from '@/forms/useSubmit';
 import { useI18n } from '@/i18n/useI18n';
 import { useSettings } from '@/settings/useSettings';
+import type { SelectOption } from '@/ui/Select';
 import type { NewTimer } from './forgotten/useForgottenTimer';
 
 const MAX_SECONDS = 24 * 3600;
 
 /** The Combobox trigger of the ProjectPicker; the form's other buttons keep their Enter. */
 const PICKER_TRIGGER = 'button[aria-haspopup]';
+
+/** Select value for "Ohne Task". */
+const NO_TASK = 'none';
 
 type Command = 'save' | 'delete';
 
@@ -39,6 +44,10 @@ type DialogOptions = {
 
 export type TimeEntryDialog = {
   projectId: number | null;
+  /** Select value: Task id or `none`. */
+  task: string;
+  /** Tasks of the chosen Project that can be picked; empty = no Task field. */
+  taskOptions: SelectOption<string>[];
   description: string;
   date: string;
   duration: string;
@@ -59,6 +68,7 @@ export type TimeEntryDialog = {
   /** Enter on the Project picker submits like in the inputs instead of opening the popup. */
   handleKeyDownCapture: (event: KeyboardEvent<HTMLFormElement>) => void;
   handleProjectChange: (projectId: number) => void;
+  handleTaskChange: (value: string) => void;
   handleDescriptionChange: (value: string) => void;
   handleDateChange: (value: string) => void;
   handleDurationChange: (value: string) => void;
@@ -85,6 +95,7 @@ export function useTimeEntryDialog(options: DialogOptions): TimeEntryDialog {
   const [projectId, setProjectId] = useState<number | null>(
     entry?.projectId ?? running?.projectId ?? lastProjectId(entries, catalog),
   );
+  const [taskId, setTaskId] = useState<number | null>(entry?.taskId ?? null);
   const [description, setDescription] = useState(entry?.description ?? '');
   const [date, setDate] = useState(entry?.date ?? options.date);
   const [duration, setDuration] = useState(initialDuration);
@@ -125,12 +136,17 @@ export function useTimeEntryDialog(options: DialogOptions): TimeEntryDialog {
       } else if (entry) {
         await api.patch(`/time-entries/${entry.id}`, changes(entry));
       } else if (startsTimer && projectId !== null) {
-        const start = { projectId, description: description.trim() || undefined };
+        const start = {
+          projectId,
+          taskId: taskId ?? undefined,
+          description: description.trim() || undefined,
+        };
         if (options.forgotten) options.onStartForgotten(start);
         else await api.post('/timer/start', { ...start, at: new Date().toISOString() });
       } else {
         await api.post('/time-entries', {
           projectId,
+          taskId: taskId ?? undefined,
           date,
           durationSeconds: parseDuration(duration),
           description: description.trim() || undefined,
@@ -146,9 +162,15 @@ export function useTimeEntryDialog(options: DialogOptions): TimeEntryDialog {
     const body: UpdateTimeEntry = {};
     const moved = projectId !== null && projectId !== current.projectId;
     if (moved) body.projectId = projectId;
-    // Sent along with a move it wins over the new Project's rate
+    const retasked = taskId !== current.taskId;
+    if (moved || retasked) body.taskId = taskId;
+    // Sent along with a move it wins over the rate of the new Project or Task
     const rateMinor = parseAmount(rate, currency);
-    if (rateEdited && rateMinor !== null && (moved || rateMinor !== current.hourlyRateMinor))
+    if (
+      rateEdited &&
+      rateMinor !== null &&
+      (moved || retasked || rateMinor !== current.hourlyRateMinor)
+    )
       body.hourlyRateMinor = rateMinor;
     if (date !== current.date) body.date = date;
     if (description.trim() !== (current.description ?? ''))
@@ -165,9 +187,29 @@ export function useTimeEntryDialog(options: DialogOptions): TimeEntryDialog {
     ),
   ];
   const usedToday = [...new Set(entries.filter((e) => e.date === today).map((e) => e.projectId))];
+  const project = projectId === null ? undefined : catalog.project(projectId);
+  // Archived Tasks are not offered, except the one the entry already has
+  const tasks = project?.tasks.filter((t) => !t.archived || t.id === entry?.taskId) ?? [];
+  const taskOptions =
+    tasks.length === 0
+      ? []
+      : [
+          { value: NO_TASK, label: messages.time.dialog.noTask },
+          ...tasks.map((t) => ({ value: String(t.id), label: t.name })),
+        ];
+
+  // Preview of the move: the entry takes over the rate of the new Project or Task
+  function previewRate(nextProjectId: number, nextTaskId: number | null): void {
+    const next = catalog.project(nextProjectId);
+    if (!entry || rateEdited || !next) return;
+    const task = next.tasks.find((t) => t.id === nextTaskId);
+    setRate(rateText(taskRateMinor(task, next)));
+  }
 
   return {
     projectId,
+    task: taskId === null ? NO_TASK : String(taskId),
+    taskOptions,
     description,
     date,
     duration,
@@ -193,10 +235,16 @@ export function useTimeEntryDialog(options: DialogOptions): TimeEntryDialog {
       event.currentTarget.requestSubmit();
     },
     handleProjectChange: (id) => {
+      if (id === projectId) return;
+      // Tasks belong to their Project
       setProjectId(id);
-      // Preview of the move: the entry takes over the rate of the new Project
-      const project = catalog.project(id);
-      if (entry && !rateEdited && project) setRate(rateText(project.hourlyRateMinor));
+      setTaskId(null);
+      previewRate(id, null);
+    },
+    handleTaskChange: (value) => {
+      const id = value === NO_TASK ? null : Number(value);
+      setTaskId(id);
+      if (projectId !== null) previewRate(projectId, id);
     },
     handleDescriptionChange: setDescription,
     handleDateChange: setDate,

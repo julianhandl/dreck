@@ -35,7 +35,7 @@ import {
 const MIGRATIONS_DIR = join(import.meta.dir, '..', '..', 'drizzle');
 const RANDOM_SEED = 20261113;
 
-type SeedProject = Project & { weight: number; tasks: readonly string[]; internal: boolean };
+type SeedProject = Project & { weight: number; descriptions: readonly string[]; internal: boolean };
 type Call = <T>(method: string, path: string, body?: unknown) => Promise<T>;
 
 const { values } = parseArgs({
@@ -56,7 +56,10 @@ async function seed(dir: string): Promise<void> {
     throw new Error(`${dbFile} already exists. Seed only fills a new data dir; remove it first.`);
   }
   await mkdir(dir, { recursive: true });
-  const { secret, generated } = await loadSecret(process.env.DRECK_SECRET, dir);
+  const { secret, generated } = await loadSecret(
+    { secret: process.env.DRECK_SECRET || undefined },
+    dir,
+  );
   const db = openDatabase(dbFile);
   await runMigrations(db, { migrationsFolder: MIGRATIONS_DIR });
   const call = apiClient(createApp({ db, secret, dataDir: dir }), secret);
@@ -72,13 +75,13 @@ async function seed(dir: string): Promise<void> {
   for (const { projects: projectSeeds, archived: _, internal = false, ...input } of CUSTOMERS) {
     const customer = await call<Customer>('POST', '/customers', input);
     customers.set(customer.name, customer);
-    for (const { key, name, hourlyRateMinor, weight, tasks } of projectSeeds) {
+    for (const { key, name, hourlyRateMinor, weight, descriptions } of projectSeeds) {
       const project = await call<Project>('POST', '/projects', {
         customerId: customer.id,
         name,
         hourlyRateMinor,
       });
-      projects.set(key, { ...project, weight, tasks, internal });
+      projects.set(key, { ...project, weight, descriptions, internal });
     }
   }
   const projectSeed = (key: string): SeedProject => required(projects.get(key), key);
@@ -91,9 +94,13 @@ async function seed(dir: string): Promise<void> {
   // Time Entries, day by day so rate changes only reach later entries
   let timeEntryCount = 0;
   const book = async (project: SeedProject, date: string, minutes: number): Promise<number> => {
-    const description = random() < 0.1 ? undefined : pick(random, project.tasks);
+    const description = random() < 0.1 ? undefined : pick(random, project.descriptions);
+    // Mostly billable Tasks; a few entries without Task
+    const tasks = project.tasks.filter((t) => t.billable || random() < 0.2);
+    const task = random() < 0.15 || tasks.length === 0 ? undefined : pick(random, tasks);
     const entry = await call<TimeEntry>('POST', '/time-entries', {
       projectId: project.id,
+      taskId: task?.id,
       date,
       durationSeconds: durationSeconds(random, minutes),
       description,

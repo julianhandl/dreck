@@ -15,7 +15,7 @@ Stand 2026-11-12. Zusammengeführt aus der [Wayfinder-Map](wayfinder/map.md). Di
 - Cloud-Version und Hosting vieler Instanzen (später als eigener Fork, heute kein Tenant-Konzept).
 - CLI und MCP-Server (später, die API ist dafür ausgelegt).
 - Offline-Editing und Sync, Service Worker.
-- Estimates, wiederkehrende Rechnungen, Retainer, Teilzahlungen, Versand von Rechnungen per E-Mail, PDF vom Server, mehrere Steuersätze pro Rechnung, Budgets, Tasks, Tags, Approval, Team und Multi-User, wiederkehrende oder duplizierte Ausgaben, Belege an Ausgaben, automatische Kostenaufteilung, native Apps.
+- Estimates, wiederkehrende Rechnungen, Retainer, Teilzahlungen, Versand von Rechnungen per E-Mail, PDF vom Server, mehrere Steuersätze pro Rechnung, Budgets, Tags, Approval, Team und Multi-User, wiederkehrende oder duplizierte Ausgaben, Belege an Ausgaben, automatische Kostenaufteilung, native Apps.
 - Uhrzeiten an Time Entries, Overlap, Wochenansicht.
 
 Quellen: [Produktumfang und Grundregeln](wayfinder/tickets/00-produktumfang-und-grundregeln.md), [Offline-Sync-Modell](wayfinder/tickets/03-offline-sync-modell.md), [Wochenansicht](wayfinder/tickets/08-wochenansicht.md).
@@ -23,26 +23,28 @@ Quellen: [Produktumfang und Grundregeln](wayfinder/tickets/00-produktumfang-und-
 ## 2. Domänenregeln
 
 - Jedes Project gehört zu genau einem Customer. Interne Arbeit läuft über einen Customer wie „Intern“ (Hourly Rate 0). Kein Seed, der User legt ihn selbst an.
-- **Time Entry:** Datum, Dauer, optionale Beschreibung, Hourly Rate. Keine Uhrzeiten. Höchstens einer läuft (der Timer).
+- **Task:** gehört zu genau einem Project, Name eindeutig pro Project (NOCASE), Billable ja/nein, optional eine eigene Hourly Rate (nur billable). Ein neues Project kopiert die Default Tasks aus den Settings (Name, Billable), außer es bringt eine eigene Liste mit. Entfernen löscht einen Task ohne Time Entries, sonst wird er archiviert.
+- **Time Entry:** Datum, Dauer, optionaler Task des Projects, optionale Beschreibung, Hourly Rate. Keine Uhrzeiten. Höchstens einer läuft (der Timer).
 - **Timer:** Ein neuer Timer legt einen Time Entry mit dem heutigen Datum an oder setzt einen Time Entry von heute fort. Ein neuer oder fortgesetzter Timer stoppt den laufenden. Time Entries früherer Tage lassen sich nur bearbeiten, nicht starten. Ein Timer über Mitternacht behält die ganze Dauer am Starttag. „Heute“ ist der Tag in der Zeitzone der Instanz.
 - **Ausgabe:** Datum, Betrag > 0, Pflicht-Beschreibung, Billable ja/nein, genau ein Project. Keine Gutschriften.
 - **Währung:** eine pro Instanz. Änderbar nur, solange es weder Customer noch Ausgabe gibt.
-- **Hourly Rate**, Kopierkette beim Anlegen, keine Live-Vererbung: Default Hourly Rate → Customer → Project → Time Entry.
-  - Ein Time Entry übernimmt beim Anlegen und beim Start eines neuen Timers die Rate seines Projects. Ein fortgesetzter Time Entry behält seine Rate.
+- **Hourly Rate**, Kopierkette beim Anlegen, keine Live-Vererbung: Default Hourly Rate → Customer → Project → Time Entry. Dazwischen optional der Task: Seine eigene Rate gilt statt der des Projects; ohne eigene Rate gilt live die des Projects.
+  - Ein Time Entry übernimmt beim Anlegen und beim Start eines neuen Timers die eigene Rate seines Tasks, sonst die seines Projects. Ein fortgesetzter Time Entry behält seine Rate.
   - Korrektur von Hand am Time Entry (Feld „Hourly Rate“ im Dialog „Time Entry bearbeiten“) markiert ihn als „von Hand korrigiert“.
-  - Verschieben auf ein anderes Project übernimmt dessen Rate und hebt die Markierung auf. Wird zugleich eine Rate mitgeschickt, gewinnt sie, und der Time Entry gilt als korrigiert.
-  - Änderung am Project: Der User entscheidet, ob bestehende Time Entries die neue Rate übernehmen, optional nur in einem Zeitraum (Kalendertage, beide inklusive). Von Hand korrigierte bleiben unberührt, außer er überschreibt sie ausdrücklich; danach gelten sie nicht mehr als korrigiert.
-  - Änderung am Customer: Der User wählt, welche seiner Projects die neue Rate bekommen (vorausgewählt: die mit der alten Rate des Customers). Die gewählten Projects bekommen sie immer, auch bei „Nur für neue Time Entries“. Für ihre bestehenden Time Entries gilt die Regel am Project mit einem gemeinsamen Zeitraum.
+  - Verschieben auf ein anderes Project übernimmt dessen Rate, entfernt den Task und hebt die Markierung auf; ein neuer Task übernimmt seine Rate ebenso. Wird zugleich eine Rate mitgeschickt, gewinnt sie, und der Time Entry gilt als korrigiert.
+  - Änderung am Project oder an seinen Tasks: Betroffen sind nur Time Entries, deren Rate-Quelle sich ändert (ohne Task oder Task ohne eigene Rate bei der Project-Rate; die Time Entries des Tasks bei einer Task-Rate). Der User entscheidet, ob sie die neue Rate übernehmen, optional nur in einem Zeitraum (Kalendertage, beide inklusive). Von Hand korrigierte bleiben unberührt, außer er überschreibt sie ausdrücklich; danach gelten sie nicht mehr als korrigiert.
+  - Änderung am Customer: Der User wählt, welche seiner Projects die neue Rate bekommen (vorausgewählt: die mit der alten Rate des Customers). Die gewählten Projects bekommen sie immer, auch bei „Nur für neue Time Entries“. Für ihre bestehenden Time Entries gilt die Regel am Project mit einem gemeinsamen Zeitraum; Time Entries von Tasks mit eigener Rate bleiben.
   - Rate und betroffene Time Entries ändern sich in einem Aufruf und einer Transaktion.
   - Eine Änderung der Default Hourly Rate betrifft nur neue Customers.
 - **Rounding:** pro Instanz 0 (exakt), 5, 6, 10, 15, 30 oder 60 Minuten. Jeder Time Entry wird für den Report einzeln aufgerundet (3 × 7 min bei 15 = 45 min); dabei zählen nur volle Minuten, Sekunden einer angefangenen Minute fallen weg. Eine Dauer auf einem Vielfachen des Rounding-Schritts bleibt dort, bis die nächste volle Minute erreicht ist (bei 15: 15:59 = 15 min, 16:00 = 30 min; bei 6: 6:59 = 6 min, 7:00 = 12 min). Gespeichert wird immer die exakte Dauer, Rounding wirkt also rückwirkend.
-- **Archived:** Customer und Project lassen sich archivieren und wiederherstellen. Archived verschwindet aus Auswahllisten und bleibt in Reports. Ein archivierter Customer blendet auch seine Projects aus; nach dem Aufheben gilt wieder der Zustand der Projects (keine Kaskade).
-- **Löschen:** Customer und Project nur ohne Abhängigkeiten, sonst nur archivieren. Time Entries und Ausgaben lassen sich direkt löschen.
+- **Billable bei Zeit:** Ein Time Entry ist billable, wenn sein Task billable ist oder er keinen hat; gelesen live vom Task, nicht kopiert. Nicht billable Zeit zählt im Report als Stunden (`nonBillableSeconds`) ohne Betrag und kommt nie auf eine Rechnung.
+- **Archived:** Customer, Project und Task lassen sich archivieren und wiederherstellen. Archived verschwindet aus Auswahllisten und bleibt in Reports. Ein archivierter Customer blendet auch seine Projects aus; nach dem Aufheben gilt wieder der Zustand der Projects (keine Kaskade).
+- **Löschen:** Customer und Project nur ohne Abhängigkeiten, sonst nur archivieren. Ein Project ohne Time Entries und Ausgaben wird samt Tasks gelöscht. Time Entries und Ausgaben lassen sich direkt löschen.
 - **Report:** frei wählbarer Zeitraum (Kalendertage, inklusive), gegliedert nach Customer und darunter Project. Zeigt Stunden (exakt und nach Rounding), Beträge, Billable Ausgaben und eigene Kosten getrennt. Archived ist enthalten. Ein laufender Timer zählt bis jetzt. Export als CSV.
 - **Berechnung im Report:** Betrag pro Time Entry = `round(hourlyRateMinor × Sekunden nach Rounding / 3600)`, kaufmännisch auf die kleinste Einheit. Summen pro Project und Customer addieren diese gerundeten Beträge, damit CSV und Report übereinstimmen.
 - **Rechnung:** gehört zu genau einem Customer. Nummer frei wählbar und eindeutig (NOCASE); ohne Angabe die letzte Nummer mit hochgezählter Endziffer (`RE-2026-009` → `RE-2026-010`, die erste ist `1`). Empfänger (Name und Anschrift), Steuersatz und Text unter der Rechnung werden beim Anlegen kopiert (Customer bzw. Settings), keine Live-Vererbung. Absender (Name, Anschrift, optional UID) kommt live aus den Settings.
   - **Positionen:** Beschreibung, Menge in Hundertsteln, Einzelpreis. Betrag = `round(Menge × Einzelpreis)`, Zwischensumme = Summe der gerundeten Beträge, Rabatt in % auf die Zwischensumme, Steuer in % auf Zwischensumme minus Rabatt, jeder Schritt kaufmännisch gerundet. Prozente als Basispunkte (2000 = 20 %).
-  - **Import:** Beim Anlegen werden die nicht abgerechneten, gestoppten Time Entries des Customers (optional nur eines seiner Projects) im Zeitraum zu Positionen: je Project und Hourly Rate, zusätzlich je Beschreibung, oder je Time Entry; optional eine Position je Billable Ausgabe. Die Gruppierung (`draftItems` in `@dreck/shared/invoice-items`) teilen Server und UI-Vorschau, damit die Vorschau den Positionen entspricht. Menge = Stunden nach Rounding auf Hundertstel gerundet, Time Entries mit 0 nach Rounding bleiben draußen. Ohne Rounding kann die Rechnung daher um Cent vom Report abweichen.
+  - **Import:** Beim Anlegen werden die nicht abgerechneten, gestoppten, billable Time Entries des Customers (optional nur eines seiner Projects) im Zeitraum zu Positionen: je Project und Hourly Rate, zusätzlich je Task („Project – Task“), zusätzlich je Beschreibung, oder je Time Entry; optional eine Position je Billable Ausgabe. Die Gruppierung (`draftItems` in `@dreck/shared/invoice-items`) teilen Server und UI-Vorschau, damit die Vorschau den Positionen entspricht. Menge = Stunden nach Rounding auf Hundertstel gerundet, Time Entries mit 0 nach Rounding bleiben draußen. Ohne Rounding kann die Rechnung daher um Cent vom Report abweichen.
   - **Abgerechnet:** Ein übernommener Time Entry bzw. eine Ausgabe zeigt auf ihre Position und ist gesperrt: nicht änderbar, nicht löschbar, nicht fortsetzbar, keine neue Hourly Rate (`409 invoiced`). Wird die Position oder die Draft-Rechnung gelöscht, sind sie wieder frei.
   - **Status:** Draft → Sent (`sentOn`) → Paid (`paidOn`, ein Betrag, keine Teilzahlungen). Late ist kein Status, sondern Sent mit Fälligkeit vor heute. Sent und Paid sperren den Inhalt (`409 invoice_locked`); zurück auf Draft setzt beide Daten auf `null`. Löschen nur als Draft.
 - **Zeit:** Der Server ermittelt die Zeit nur in JS (`Date.now()`), nie in SQL (`unixepoch()`, `CURRENT_TIMESTAMP`). Das hält Tests steuerbar.
@@ -66,7 +68,9 @@ Quellen: [Datenmodell](wayfinder/tickets/04-datenmodell.md), [Time Entry als Dat
 | `settings` | `id`, `currency` (ISO 4217), `default_hourly_rate_minor`, `rounding_minutes`, `language`, `timezone` (IANA), `sender_name`, `sender_address`, `sender_vat_id`, `default_tax_basis_points` (Default 0), `default_invoice_notes` | genau eine Zeile (`CHECK (id = 1)`), alle `NOT NULL`; Rate ≥ 0; `rounding_minutes` ∈ {0, 5, 6, 10, 15, 30, 60}; `language` ∈ {`de`, `en`} |
 | `customers` | `id`, `name`, `hourly_rate_minor`, `address`, `archived` | `name UNIQUE COLLATE NOCASE`; Rate `NOT NULL`, ≥ 0 |
 | `projects` | `id`, `customer_id`, `name`, `hourly_rate_minor`, `archived` | `customer_id NOT NULL` FK; `UNIQUE (customer_id, name COLLATE NOCASE)`; Rate `NOT NULL`, ≥ 0 |
-| `time_entries` | `id`, `project_id`, `date`, `duration_seconds`, `running_since`, `description`, `hourly_rate_minor`, `hourly_rate_overridden`, `invoice_item_id` | `project_id NOT NULL` FK; `duration_seconds NOT NULL`, ≥ 0, ohne Obergrenze; `running_since` nur gesetzt, solange er läuft; Unique-Index `ON time_entries ((1)) WHERE running_since IS NOT NULL`; Index auf `date` und `project_id`; `description` `NULL` statt Leerstring; Rate `NOT NULL`, ≥ 0 |
+| `tasks` | `id`, `project_id`, `name`, `billable`, `hourly_rate_minor`, `archived` | `project_id NOT NULL` FK; Unique-Index auf `(project_id, lower(name))`; Rate nullable (`NULL` = Rate des Projects), ≥ 0, nur bei `billable = 1` |
+| `default_tasks` | `id`, `name`, `billable` | Unique-Index auf `lower(name)` |
+| `time_entries` | `id`, `project_id`, `task_id`, `date`, `duration_seconds`, `running_since`, `description`, `hourly_rate_minor`, `hourly_rate_overridden`, `invoice_item_id` | `project_id NOT NULL` FK; `task_id` nullable FK, Task desselben Projects (prüft der Service); `duration_seconds NOT NULL`, ≥ 0, ohne Obergrenze; `running_since` nur gesetzt, solange er läuft; Unique-Index `ON time_entries ((1)) WHERE running_since IS NOT NULL`; Index auf `date` und `project_id`; `description` `NULL` statt Leerstring; Rate `NOT NULL`, ≥ 0 |
 | `expenses` | `id`, `project_id`, `date`, `amount_minor`, `description`, `billable`, `invoice_item_id` | `project_id NOT NULL` FK; `amount_minor > 0`; `CHECK (length(trim(description)) > 0)`; Index auf `date` und `project_id` |
 | `invoices` | `id`, `number`, `customer_id`, `recipient`, `issue_date`, `due_date`, `period_from`, `period_to`, `subject`, `notes`, `tax_basis_points`, `discount_basis_points`, `sent_on`, `paid_on` | Unique-Index auf `lower(number)`; `customer_id` FK; Basispunkte 0–10000; `due_date >= issue_date` |
 | `invoice_items` | `id`, `invoice_id`, `description`, `quantity_hundredths`, `unit_price_minor` | `invoice_id` FK; Menge und Preis ≥ 0; `time_entries.invoice_item_id` und `expenses.invoice_item_id` zeigen hierher (nullable FK) |
@@ -110,32 +114,33 @@ Filter werden per UND kombiniert. Bei `GET /time-entries` und `GET /expenses` si
 ### Ressourcen
 
 - **Customer** `{ id, name, hourlyRateMinor, archived }`. `POST` ohne Rate übernimmt die Default Hourly Rate.
-- **Project** `{ id, customerId, name, hourlyRateMinor, archived }`. `POST` ohne Rate übernimmt die Rate des Customers.
-- **Time Entry** `{ id, projectId, date, durationSeconds, runningSince, description, hourlyRateMinor, hourlyRateOverridden }`. `durationSeconds` ohne den laufenden Teil, den der Client dazurechnet.
-  - `POST /time-entries` mit `{ projectId, date, durationSeconds, description? }`. Ein laufender Time Entry entsteht nur über den Timer.
-  - `PATCH /time-entries/:id` ändert `projectId`, `date`, `durationSeconds`, `description`, `hourlyRateMinor`. Nur `projectId`: Rate des neuen Projects, `hourlyRateOverridden = false`. Nur `hourlyRateMinor`: `hourlyRateOverridden = true`. Beides: die mitgeschickte Rate gewinnt, `true`. Bei einem laufenden Time Entry setzt `durationSeconds` die angezeigte Gesamtdauer (`duration_seconds = Wert`, `running_since = jetzt`).
+- **Project** `{ id, customerId, name, hourlyRateMinor, archived, tasks }`. `POST` ohne Rate übernimmt die Rate des Customers, ohne `tasks` die Default Tasks. `PATCH` mit `tasks` ersetzt die Liste wie `items` bei Rechnungen: mit `id` geändert, ohne `id` neu, fehlende gelöscht oder (mit Time Entries) archiviert.
+- **Task** `{ id, name, billable, hourlyRateMinor | null, archived }`, nur eingebettet im Project.
+- **Time Entry** `{ id, projectId, taskId, date, durationSeconds, runningSince, description, hourlyRateMinor, hourlyRateOverridden }`. `durationSeconds` ohne den laufenden Teil, den der Client dazurechnet.
+  - `POST /time-entries` mit `{ projectId, taskId?, date, durationSeconds, description? }`. Ein Task eines anderen Projects ergibt `400` an `taskId`. Ein laufender Time Entry entsteht nur über den Timer.
+  - `PATCH /time-entries/:id` ändert `projectId`, `taskId` (Rate des Tasks wie bei `projectId`; ein neues Project ohne `taskId` entfernt den Task), `date`, `durationSeconds`, `description`, `hourlyRateMinor`. Nur `projectId`: Rate des neuen Projects, `hourlyRateOverridden = false`. Nur `hourlyRateMinor`: `hourlyRateOverridden = true`. Beides: die mitgeschickte Rate gewinnt, `true`. Bei einem laufenden Time Entry setzt `durationSeconds` die angezeigte Gesamtdauer (`duration_seconds = Wert`, `running_since = jetzt`).
 - **Ausgabe** `{ id, projectId, date, amountMinor, description, billable }`.
-- **Settings** `{ currency, defaultHourlyRateMinor, roundingMinutes, language, timezone }`. `PATCH` ändert alles jederzeit, außer `currency` nach dem ersten Customer oder der ersten Ausgabe (`409 currency_locked`). `timezone` wird gegen `Intl.supportedValuesOf('timeZone')` geprüft.
+- **Settings** `{ currency, defaultHourlyRateMinor, roundingMinutes, language, timezone, …, defaultTasks }`. `defaultTasks` `[{ name, billable }]`, `PATCH` ersetzt die Liste. `PATCH` ändert alles jederzeit, außer `currency` nach dem ersten Customer oder der ersten Ausgabe (`409 currency_locked`). `timezone` wird gegen `Intl.supportedValuesOf('timeZone')` geprüft.
 
 ### Timer
 
 - `GET /timer`: der laufende Time Entry oder `null`.
-- `POST /timer/start` mit genau einem von `{ projectId, description?, at? }` (neu) oder `{ timeEntryId, at? }` (fortsetzen). Antwort `200 { started, stopped }`, `stopped` ist der in derselben Transaktion gestoppte Time Entry oder `null`.
-  - Neu: `date` = heute in `settings.timezone`, Rate des Projects.
+- `POST /timer/start` mit genau einem von `{ projectId, taskId?, description?, at? }` (neu) oder `{ timeEntryId, at? }` (fortsetzen). Antwort `200 { started, stopped }`, `stopped` ist der in derselben Transaktion gestoppte Time Entry oder `null`.
+  - Neu: `date` = heute in `settings.timezone`, Rate des Tasks oder Projects.
   - Fortsetzen nur für Time Entries von heute, sonst `400 validation_failed`. Die Rate bleibt.
 - `POST /timer/stop` mit `{ at? }`. Antwort `200` + Time Entry. Läuft keiner: `409 no_running_timer`.
 - `at` ist der Zeitpunkt des Klicks. Der Server nimmt `min(at, Serverzeit)`. Start setzt `running_since`, Stopp rechnet `duration_seconds += t − running_since` und setzt `running_since = NULL`. `at` vor `running_since` des laufenden Timers ergibt `400 validation_failed`. `at` hat keine Untergrenze.
 
 ### Hourly Rate übernehmen
 
-- `PATCH /projects/:id` mit `{ hourlyRateMinor, applyToTimeEntries?: { from?, to?, includeOverridden? } }`.
+- `PATCH /projects/:id` mit `{ hourlyRateMinor?, tasks?, applyToTimeEntries?: { from?, to?, includeOverridden? } }`. `applyToTimeEntries` braucht `hourlyRateMinor` oder `tasks` und setzt bei den Time Entries, deren Rate-Quelle sich geändert hat, die neue Rate.
 - `PATCH /customers/:id` mit `{ hourlyRateMinor, applyToProjects?: { projectIds, applyToTimeEntries?: { from?, to?, includeOverridden? } } }`. Ohne `applyToTimeEntries` ändern sich nur die Projects.
 - Eine Transaktion. Kein Preview-Endpunkt: Die UI holt die betroffenen Time Entries über `GET /time-entries?projectId&from&to` und rechnet die Vorschau selbst.
 
 ### Report und CSV
 
-- `GET /reports` liefert JSON mit Summen pro Customer und darunter pro Project: exakte und gerundete Sekunden, Betrag, Billable Ausgaben, eigene Kosten. Berechnung wie in Abschnitt 2.
-- `?format=csv` oder `Accept: text/csv`: Der Server erzeugt das CSV mit denselben Filtern. Eine Zeile pro Time Entry und Ausgabe. Spalten: Typ, Customer, Project, Datum, Dauer (gerundet, Minuten), Beschreibung, Hourly Rate, Betrag, Billable.
+- `GET /reports` liefert JSON mit Summen pro Customer und darunter pro Project: exakte und gerundete Sekunden, davon nicht billable (`nonBillableSeconds`, gerundet), Betrag der billable Zeit, Billable Ausgaben, eigene Kosten. Berechnung wie in Abschnitt 2.
+- `?format=csv` oder `Accept: text/csv`: Der Server erzeugt das CSV mit denselben Filtern. Eine Zeile pro Time Entry und Ausgabe. Spalten: Typ, Customer, Project, Task, Datum, Dauer (gerundet, Minuten), Beschreibung, Hourly Rate, Betrag, Billable. Billable ist auch bei Zeit gefüllt; nicht billable Zeit hat keine Rate und Betrag 0.
   - Spaltennamen und Typ in `settings.language`. `de`: Trennzeichen `;`, Dezimalkomma. `en`: `,`, Dezimalpunkt. Beträge in der Haupteinheit.
   - UTF-8 mit BOM, Dateiname `dreck-report_<from>_<to>.csv`.
 
@@ -280,6 +285,11 @@ Nur hier weicht Dreck von der Vorlage ab.
 - Kein Service Worker. Statisches `manifest.webmanifest` mit `name`, Icons 192 und 512 px, `start_url`, `display: standalone`, dazu `apple-touch-icon`.
 
 Quellen: [UI-Richtung](wayfinder/tickets/06-ui-richtung.md), [Time Entry als Datum und Dauer](wayfinder/tickets/12-time-entry-als-datum-und-dauer.md), [Betrieb und Distribution](wayfinder/tickets/07-betrieb-und-distribution.md), [Offline-Sync-Modell](wayfinder/tickets/03-offline-sync-modell.md).
+
+### Einstellungen
+
+- Zwei Seiten mit eigener URL statt Tabs: `/settings` (Allgemein, mit Rechnungsdaten, Backup und Abmelden) und `/settings/tasks` (Default Tasks). Jede Seite speichert für sich.
+- Die Task-Liste (Name, Billable, im Project zusätzlich eigene Hourly Rate) ist dieselbe Komponente in den Settings und im Project-Formular.
 
 ## 8. Visuelles Design
 

@@ -1,5 +1,6 @@
 import { z } from '@hono/zod-openapi';
 import { DateSchema, NameSchema, nonEmpty, RateSchema } from './common';
+import { TaskListSchema, TaskSchema } from './tasks';
 
 export const ProjectSchema = z
   .object({
@@ -8,6 +9,7 @@ export const ProjectSchema = z
     name: z.string(),
     hourlyRateMinor: RateSchema,
     archived: z.boolean(),
+    tasks: z.array(TaskSchema).openapi({ description: 'Including Archived, sorted by name' }),
   })
   .openapi('Project');
 
@@ -29,6 +31,7 @@ export const CreateProjectSchema = z.object({
   hourlyRateMinor: RateSchema.optional().openapi({
     description: 'Defaults to the Hourly Rate of the Customer',
   }),
+  tasks: TaskListSchema.optional().openapi({ description: 'Defaults to the Default Tasks' }),
 });
 
 export type CreateProject = z.infer<typeof CreateProjectSchema>;
@@ -39,15 +42,26 @@ export const UpdateProjectSchema = z
     name: NameSchema,
     hourlyRateMinor: RateSchema,
     archived: z.boolean(),
+    tasks: TaskListSchema.openapi({
+      description:
+        'Replaces the list: Tasks with id change, without id are new, missing ones are deleted or, if they have Time Entries, archived',
+    }),
     applyToTimeEntries: ApplyRateSchema.openapi({
-      description: 'Existing Time Entries that take over the new Hourly Rate',
+      description:
+        'Existing Time Entries whose Hourly Rate (of the Project or of their Task) changes take it over',
     }),
   })
   .partial()
   .refine(nonEmpty, 'Nothing to change')
-  .refine((b) => b.applyToTimeEntries === undefined || b.hourlyRateMinor !== undefined, {
-    message: 'applyToTimeEntries requires hourlyRateMinor',
-    path: ['applyToTimeEntries'],
-  });
+  .refine(
+    (b) =>
+      b.applyToTimeEntries === undefined ||
+      b.hourlyRateMinor !== undefined ||
+      b.tasks !== undefined,
+    {
+      message: 'applyToTimeEntries requires hourlyRateMinor or tasks',
+      path: ['applyToTimeEntries'],
+    },
+  );
 
 export type UpdateProject = z.infer<typeof UpdateProjectSchema>;

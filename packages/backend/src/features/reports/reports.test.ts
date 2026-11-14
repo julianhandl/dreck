@@ -124,9 +124,9 @@ describe('reports', () => {
       expect([...bytes.slice(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
       const lines = new TextDecoder().decode(bytes.slice(3)).trimEnd().split('\r\n');
       expect(lines).toEqual([
-        'Typ;Customer;Project;Datum;Dauer gerundet (Minuten);Beschreibung;Hourly Rate;Betrag;Billable',
-        'Zeit;beta;Web;2026-03-02;15;;"90,00";"22,50";',
-        'Ausgabe;beta;Web;2026-03-05;;"Hotel; ""Zentrum""";;"1234,56";ja',
+        'Typ;Customer;Project;Task;Datum;Dauer gerundet (Minuten);Beschreibung;Hourly Rate;Betrag;Billable',
+        'Zeit;beta;Web;;2026-03-02;15;;"90,00";"22,50";ja',
+        'Ausgabe;beta;Web;;2026-03-05;;"Hotel; ""Zentrum""";;"1234,56";ja',
       ]);
     });
 
@@ -140,10 +140,10 @@ describe('reports', () => {
       });
       const lines = (await res.text()).replace('﻿', '').trimEnd().split('\r\n');
       expect(lines[0]).toBe(
-        'Type,Customer,Project,Date,Rounded duration (minutes),Description,Hourly rate,Amount,Billable',
+        'Type,Customer,Project,Task,Date,Rounded duration (minutes),Description,Hourly rate,Amount,Billable',
       );
-      expect(lines[1]).toBe('Time,beta,Web,2026-03-02,15,,90.00,22.50,');
-      expect(lines[2]).toBe('Expense,beta,Web,2026-03-05,,"Hotel; ""Zentrum""",,1234.56,yes');
+      expect(lines[1]).toBe('Time,beta,Web,,2026-03-02,15,,90.00,22.50,yes');
+      expect(lines[2]).toBe('Expense,beta,Web,,2026-03-05,,"Hotel; ""Zentrum""",,1234.56,yes');
     });
   });
 });

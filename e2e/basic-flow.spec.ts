@@ -34,7 +34,7 @@ test('Customer, Project und Time Entries anlegen, Report des Projects stimmt', a
     await expect(page.getByRole('heading', { name: 'Neuer Customer' })).toBeVisible();
     await page.getByLabel('Name').fill(customer);
     // Takes over the Default Hourly Rate from the settings
-    const rate = page.getByLabel('Hourly Rate');
+    const rate = page.getByLabel('Hourly Rate', { exact: true });
     await expect(rate).toHaveValue('80,00');
     await rate.fill('90,00');
     await page.getByRole('button', { name: 'Customer speichern' }).click();
@@ -44,7 +44,7 @@ test('Customer, Project und Time Entries anlegen, Report des Projects stimmt', a
     await expect(page.getByRole('heading', { name: 'Neues Project' })).toBeVisible();
     await expect(page.getByRole('combobox', { name: 'Customer' })).toHaveText(customer);
     // Takes over the Hourly Rate of its Customer
-    await expect(page.getByLabel('Hourly Rate')).toHaveValue('90,00');
+    await expect(page.getByLabel('Hourly Rate', { exact: true })).toHaveValue('90,00');
     await page.getByLabel('Project-Name').fill(project);
     await page.getByRole('button', { name: 'Project speichern' }).click();
     await expect(page.getByRole('heading', { name: project })).toBeVisible();

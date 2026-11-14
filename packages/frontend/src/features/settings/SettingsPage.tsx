@@ -9,13 +9,15 @@ import { useI18n } from '@/i18n/useI18n';
 import { Button } from '@/ui/Button';
 import { Page, PageTitle } from '@/ui/Page';
 import { Select } from '@/ui/Select';
+import { SettingsNav } from './SettingsNav';
 import { useSettingsPage } from './useSettingsPage';
 
 const TIME_ZONES = Intl.supportedValuesOf('timeZone');
 
 /**
- * Settings screen in the two-column form layout: language, time zone, currency, Default
- * Hourly Rate, Rounding; below backup and logout.
+ * Settings page "Allgemein" in the two-column form layout: language, time zone, currency,
+ * Default Hourly Rate, Rounding, invoicing; below backup and logout. The Default Tasks have
+ * their own page.
  * @example <Route path="settings" element={<SettingsPage />} />
  */
 export function SettingsPage(): ReactElement {
@@ -28,6 +30,7 @@ export function SettingsPage(): ReactElement {
   return (
     <Page>
       <PageTitle>{messages.nav.settings}</PageTitle>
+      <SettingsNav />
       <Form
         ref={submit.formRef}
         errors={submit.errors}

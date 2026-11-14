@@ -28,7 +28,7 @@ describe('runMigrations', () => {
     const dir = await tempDir();
     const db = openDatabase(join(dir, 'dreck.db'));
     const applied = await runMigrations(db, { migrationsFolder: MIGRATIONS_DIR, backupDir: dir });
-    expect(applied).toEqual(['0000_init', '0001_seed-settings', '0002_invoices']);
+    expect(applied).toEqual(['0000_init', '0001_seed-settings', '0002_invoices', '0003_tasks']);
     expect(await backups(dir)).toEqual([]);
     expect(await runMigrations(db, { migrationsFolder: MIGRATIONS_DIR, backupDir: dir })).toEqual(
       [],
@@ -41,7 +41,7 @@ describe('runMigrations', () => {
     await runMigrations(db, { migrationsFolder: await migrationsUpTo(1), backupDir: dir });
 
     const applied = await runMigrations(db, { migrationsFolder: MIGRATIONS_DIR, backupDir: dir });
-    expect(applied).toEqual(['0001_seed-settings', '0002_invoices']);
+    expect(applied).toEqual(['0001_seed-settings', '0002_invoices', '0003_tasks']);
     expect(await backups(dir)).toEqual(['backup-before-0000_init.db']);
 
     // The backup holds the state before the migration

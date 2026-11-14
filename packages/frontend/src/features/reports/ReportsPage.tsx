@@ -147,7 +147,12 @@ export function ReportsPage(): ReactElement {
                 <StatCard
                   title={t.hours}
                   value={formatDuration(totals.roundedSeconds)}
-                  rows={[[t.exact, formatDuration(totals.seconds)]]}
+                  rows={(
+                    [
+                      [t.exact, formatDuration(totals.seconds)],
+                      [t.nonBillable, formatDuration(totals.nonBillableSeconds)],
+                    ] satisfies [string, string][]
+                  ).slice(0, totals.nonBillableSeconds > 0 ? 2 : 1)}
                 />
                 <StatCard
                   title={t.toInvoice}

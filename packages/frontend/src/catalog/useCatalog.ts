@@ -1,5 +1,6 @@
 import type { Customer } from '@dreck/shared/api/customers';
 import type { Project } from '@dreck/shared/api/projects';
+import type { Task } from '@dreck/shared/api/tasks';
 import { combineQueries, type QueryState, useQuery } from '@/api/useQuery';
 
 export type CustomerGroup = { customer: Customer; projects: Project[] };
@@ -10,6 +11,8 @@ export type Catalog = {
   projects: Project[];
   customerOf: (project: Project) => Customer | undefined;
   project: (id: number) => Project | undefined;
+  /** Task by id, from any Project. */
+  task: (id: number | null) => Task | undefined;
   /** Every Customer with its Projects, Archived included. */
   groups: CustomerGroup[];
   /** Projects that can be picked: neither they nor their Customer are Archived. */
@@ -31,6 +34,7 @@ export function useCatalog(): QueryState<Catalog> {
 export function buildCatalog(customers: Customer[], projects: Project[]): Catalog {
   const customerById = new Map(customers.map((c) => [c.id, c]));
   const projectById = new Map(projects.map((p) => [p.id, p]));
+  const taskById = new Map(projects.flatMap((p) => p.tasks.map((t) => [t.id, t] as const)));
   const groups = customers.map((customer) => ({
     customer,
     projects: projects.filter((p) => p.customerId === customer.id),
@@ -45,6 +49,7 @@ export function buildCatalog(customers: Customer[], projects: Project[]): Catalo
     projects,
     customerOf: (project) => customerById.get(project.customerId),
     project: (id) => projectById.get(id),
+    task: (id) => (id === null ? undefined : taskById.get(id)),
     groups,
     selectable,
   };

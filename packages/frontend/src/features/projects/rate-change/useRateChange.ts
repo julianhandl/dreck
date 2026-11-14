@@ -17,9 +17,12 @@ export type RateChoice = {
 };
 
 export type RateQuestion = {
-  /** Time Entries of the Project, or of all Projects of the Customer. */
+  /** Time Entries whose rate source changed: of the Project, or of the Customer's Projects. */
   entries: TimeEntry[];
-  newRateMinor: number;
+  /** The new rate; `null` when Project and Tasks bring different ones (see `rateOf`). */
+  newRateMinor: number | null;
+  /** New rate per Time Entry; without it every entry gets `newRateMinor`. */
+  rateOf?: (entry: TimeEntry) => number;
   /** Customer only: its Projects with the ones preselected that had the old Customer rate. */
   projects?: { project: Project; preselected: boolean }[];
 };
@@ -47,7 +50,12 @@ export type RateChange = {
 };
 
 /** State of the question "Bestehende Time Entries übernehmen?" with a live preview. */
-export function useRateChange({ entries, newRateMinor, projects }: RateQuestion): RateChange {
+export function useRateChange({
+  entries,
+  newRateMinor,
+  rateOf = () => newRateMinor ?? 0,
+  projects,
+}: RateQuestion): RateChange {
   const { roundingMinutes } = useSettings();
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
@@ -80,7 +88,7 @@ export function useRateChange({ entries, newRateMinor, projects }: RateQuestion)
       count: affected.length,
       seconds: affected.reduce((sum, e) => sum + e.durationSeconds, 0),
       oldMinor: amount((e) => e.hourlyRateMinor),
-      newMinor: amount(() => newRateMinor),
+      newMinor: amount(rateOf),
       overriddenCount: inScope.filter((e) => e.hourlyRateOverridden).length,
     },
     choice: {

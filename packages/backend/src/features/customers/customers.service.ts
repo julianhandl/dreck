@@ -2,7 +2,8 @@ import { and, eq, sql } from 'drizzle-orm';
 import type { Db } from '@/db/db';
 import {
   type ApplyToTimeEntries,
-  applyRateToTimeEntries,
+  applyChangedRates,
+  projectRates,
 } from '@/features/projects/projects.service';
 import { projects } from '@/features/projects/projects.table';
 import { getSettings } from '@/features/settings/settings.service';
@@ -55,6 +56,7 @@ export function updateCustomer(
     const rate = changes.hourlyRateMinor;
     if (applyToProjects && rate !== undefined) {
       for (const projectId of applyToProjects.projectIds) {
+        const before = projectRates(tx, projectId);
         const project = tx
           .update(projects)
           .set({ hourlyRateMinor: rate })
@@ -68,7 +70,8 @@ export function updateCustomer(
           );
         }
         const { applyToTimeEntries } = applyToProjects;
-        if (applyToTimeEntries) applyRateToTimeEntries(tx, projectId, rate, applyToTimeEntries);
+        // Tasks with an own rate keep it, so their Time Entries stay too
+        if (applyToTimeEntries) applyChangedRates(tx, projectId, before, applyToTimeEntries);
       }
     }
     return customer;

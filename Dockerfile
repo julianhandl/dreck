@@ -17,8 +17,12 @@ WORKDIR /app
 COPY --from=build /repo/packages/backend/dist backend/dist
 COPY --from=build /repo/packages/backend/drizzle backend/drizzle
 COPY --from=build /repo/packages/frontend/dist frontend/dist
-RUN mkdir /data && chown bun:bun /data
+# Group 0 may write too: platforms like OpenShift run the container with a random UID in group 0
+RUN mkdir /data && chown bun:0 /data && chmod 0770 /data
 VOLUME /data
 USER bun
+ENV DRECK_PORT=3000 DRECK_DATA_DIR=/data
 EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --start-interval=1s \
+  CMD wget -qO- "http://127.0.0.1:${DRECK_PORT}/api/health" > /dev/null || exit 1
 CMD ["bun", "backend/dist/server.js"]
