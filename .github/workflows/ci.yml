@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     # Releases: a tag vX.Y.Z publishes the image as X.Y.Z, X.Y and X
-    tags: ['v*.*.*']
+    tags: ["v*.*.*"]
   pull_request:
 
 concurrency:

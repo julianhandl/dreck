@@ -27,7 +27,7 @@ export function TimePage(): ReactElement {
       <DayHeader date={page.date} today={page.today} onSelectDate={page.handleSelectDate} />
       <div className="flex flex-col gap-6 sm:flex-row">
         {/* Mobile: floating round button at the bottom right */}
-        <div className="flex shrink-0 flex-col items-center gap-2 max-sm:fixed max-sm:right-4 max-sm:bottom-6 max-sm:z-10">
+        <div className="flex shrink-0 flex-col items-center gap-2 max-sm:fixed max-sm:right-4 max-sm:bottom-6 max-sm:z-20">
           <button
             type="button"
             onClick={page.handleOpenNew}
