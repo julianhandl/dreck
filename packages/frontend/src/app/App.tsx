@@ -1,5 +1,9 @@
 import type { ReactElement } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
+import { EstimateDetailPage } from '@/features/estimates/EstimateDetailPage';
+import { EstimateFormPage } from '@/features/estimates/EstimateFormPage';
+import { EstimatesPage } from '@/features/estimates/EstimatesPage';
+import { NewEstimatePage } from '@/features/estimates/NewEstimatePage';
 import { ExpensesPage } from '@/features/expenses/ExpensesPage';
 import { InvoiceDetailPage } from '@/features/invoices/InvoiceDetailPage';
 import { InvoiceFormPage } from '@/features/invoices/InvoiceFormPage';
@@ -40,6 +44,10 @@ export function App(): ReactElement {
               <Route path="projects/customers/new" element={<CustomerFormPage />} />
               <Route path="projects/customers/:customerId/edit" element={<CustomerFormPage />} />
               <Route path="reports" element={<ReportsPage />} />
+              <Route path="estimates" element={<EstimatesPage />} />
+              <Route path="estimates/new" element={<NewEstimatePage />} />
+              <Route path="estimates/:estimateId" element={<EstimateDetailPage />} />
+              <Route path="estimates/:estimateId/edit" element={<EstimateFormPage />} />
               <Route path="invoices" element={<InvoicesPage />} />
               <Route path="invoices/new" element={<NewInvoicePage />} />
               <Route path="invoices/:invoiceId" element={<InvoiceDetailPage />} />

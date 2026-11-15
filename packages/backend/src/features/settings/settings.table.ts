@@ -18,6 +18,7 @@ export const settings = sqliteTable(
     senderVatId: text('sender_vat_id'),
     defaultTaxBasisPoints: integer('default_tax_basis_points').notNull().default(0),
     defaultInvoiceNotes: text('default_invoice_notes'),
+    defaultEstimateNotes: text('default_estimate_notes'),
   },
   (t) => [
     check('settings_single_row', sql`${t.id} = 1`),

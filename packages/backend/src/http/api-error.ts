@@ -11,6 +11,7 @@ const STATUS: Record<ApiErrorCode, ContentfulStatusCode> = {
   no_running_timer: 409,
   invoiced: 409,
   invoice_locked: 409,
+  estimate_locked: 409,
   number_taken: 409,
   rate_limited: 429,
   internal_error: 500,

@@ -161,6 +161,17 @@ export function SettingsPage(): ReactElement {
           onValueChange={page.handleInvoicingChange('defaultInvoiceNotes')}
           inputClassName="max-w-md"
         />
+        <TextField
+          name="defaultEstimateNotes"
+          layout="row"
+          label={t.defaultEstimateNotes}
+          description={t.defaultEstimateNotesHint}
+          multiline
+          autoComplete="off"
+          value={page.invoicing.defaultEstimateNotes}
+          onValueChange={page.handleInvoicingChange('defaultEstimateNotes')}
+          inputClassName="max-w-md"
+        />
         <FormStatus submit={submit} />
         <p role="status" className="font-medium text-temp-success empty:sr-only">
           {page.saved ? t.saved : ''}

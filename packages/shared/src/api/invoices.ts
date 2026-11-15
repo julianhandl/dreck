@@ -6,10 +6,10 @@ import { DateSchema, nonEmpty, RateSchema } from './common';
 /** Percentage in basis points: 2000 = 20 %. */
 export const BasisPointsSchema = z.number().int().min(0).max(10000).openapi({ example: 2000 });
 
-const NumberSchema = z.string().trim().min(1).max(50).openapi({ example: 'RE-2026-001' });
-const TextSchema = z.string().trim().max(5000);
+export const NumberSchema = z.string().trim().min(1).max(50).openapi({ example: 'RE-2026-001' });
+export const TextSchema = z.string().trim().max(5000);
 
-const ItemFieldsSchema = z.object({
+export const ItemFieldsSchema = z.object({
   description: z.string().trim().min(1).max(2000),
   quantityHundredths: z
     .number()

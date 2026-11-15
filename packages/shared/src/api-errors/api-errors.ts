@@ -9,6 +9,7 @@ export const API_ERROR_CODES = [
   'no_running_timer',
   'invoiced',
   'invoice_locked',
+  'estimate_locked',
   'number_taken',
   'rate_limited',
   'internal_error',

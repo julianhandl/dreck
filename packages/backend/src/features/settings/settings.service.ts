@@ -15,6 +15,7 @@ const OPTIONAL_TEXTS = [
   'senderAddress',
   'senderVatId',
   'defaultInvoiceNotes',
+  'defaultEstimateNotes',
 ] as const satisfies (keyof Settings)[];
 
 /** Reads the single settings row. */

@@ -1,6 +1,6 @@
 # Dreck
 
-**Dreck** (German for “dirt”, and a slightly misspelled “track”) is a very simple time and expense tracker with invoicing for one person.
+**Dreck** (German for “dirt”, and a slightly misspelled “track”) is a very simple time and expense tracker with estimates and invoicing for one person.
 
 <p>
   <img src="docs/dreck.png" alt="Screenshot of dreck timetracking on desktop" width="79%">
@@ -27,6 +27,7 @@ Remove it again with `docker rm -f dreck && docker volume rm dreck-data`.
 - [Tasks](docs/tasks.md): default tasks, tasks per project, billable and own hourly rates
 - [Hourly rates](docs/hourly-rates.md): how rates are copied, what changing a rate does, how amounts are calculated
 - [Reports and rounding](docs/reports.md): rounding rules, report figures, CSV format
+- [Estimates](docs/estimates.md): estimates, status, creating an invoice from one
 - [Invoicing](docs/invoicing.md): invoices from tracked time, locking, status, printing
 - [Keyboard and gestures](docs/keyboard.md): shortcuts and touch gestures
 - [Self-hosting](docs/self-hosting.md): configuration, own reverse proxy, several instances, Kubernetes

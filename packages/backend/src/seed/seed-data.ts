@@ -78,6 +78,20 @@ type InvoiceSeed = {
   discountBasisPoints?: number;
 };
 
+type EstimateSeed = {
+  customer: string;
+  /** Days ago. */
+  issued: number;
+  /** Days after the issue date. */
+  validDays: number;
+  /** Without `sent` the Estimate stays a draft. */
+  sent?: boolean;
+  /** Days ago; implies sent. */
+  accepted?: number;
+  subject: string;
+  items: readonly { description: string; quantityHundredths: number; unitPriceMinor: number }[];
+};
+
 export const DAYS_OF_HISTORY = 365;
 export const PAYMENT_TERM_DAYS = 14;
 export const TIMEZONE = 'Europe/Vienna';
@@ -94,6 +108,8 @@ export const SETTINGS: UpdateSettings = {
   defaultTaxBasisPoints: 2000,
   defaultInvoiceNotes:
     'Zahlbar innerhalb von 14 Tagen ohne Abzug.\nIBAN: AT00 1234 5678 9012 3456 · BIC: MUSTATXXXXX\nVielen Dank für die gute Zusammenarbeit!',
+  defaultEstimateNotes:
+    'Dieses Angebot ist 30 Tage gültig. Der Aufwand wird nach tatsächlicher Zeit abgerechnet.\nVielen Dank für Ihre Anfrage!',
   defaultTasks: [
     { name: 'Design', billable: true },
     { name: 'Entwicklung', billable: true },
@@ -690,4 +706,59 @@ export const VACATIONS: readonly (readonly [string, string])[] = [
   ['12-22', '01-06'],
   ['05-26', '05-30'],
   ['08-04', '08-18'],
+];
+
+/** In issue order, so the numbers ascend: an accepted, an expired and a draft Estimate. */
+export const ESTIMATES: readonly EstimateSeed[] = [
+  {
+    customer: 'Bergbäckerei Lechner GmbH',
+    issued: 120,
+    validDays: 30,
+    sent: true,
+    accepted: 110,
+    subject: 'Newsletter-Anbindung',
+    items: [
+      {
+        description: 'Konzept und Schnittstellenanalyse',
+        quantityHundredths: 600,
+        unitPriceMinor: 9000,
+      },
+      { description: 'Umsetzung der Anbindung', quantityHundredths: 1600, unitPriceMinor: 9000 },
+      { description: 'Test und Übergabe', quantityHundredths: 400, unitPriceMinor: 9000 },
+    ],
+  },
+  {
+    customer: 'Kanzlei Huber & Partner',
+    issued: 60,
+    validDays: 30,
+    sent: true,
+    subject: 'Mandantenportal: Erweiterung um Dokumenten-Upload',
+    items: [
+      {
+        description: 'Datenmodell und Upload-Endpunkt',
+        quantityHundredths: 1200,
+        unitPriceMinor: 9500,
+      },
+      { description: 'Oberfläche für den Upload', quantityHundredths: 1000, unitPriceMinor: 9500 },
+    ],
+  },
+  {
+    customer: 'Bergbäckerei Lechner GmbH',
+    issued: 2,
+    validDays: 30,
+    subject: 'Relaunch Produktseiten',
+    items: [
+      {
+        description: 'Neues Layout der Produktseiten',
+        quantityHundredths: 1400,
+        unitPriceMinor: 9000,
+      },
+      {
+        description: 'Umsetzung und Responsive-Anpassungen',
+        quantityHundredths: 2400,
+        unitPriceMinor: 9000,
+      },
+      { description: 'Inhalte einpflegen', quantityHundredths: 800, unitPriceMinor: 9000 },
+    ],
+  },
 ];

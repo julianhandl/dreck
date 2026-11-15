@@ -389,3 +389,31 @@ test('Invoices', async () => {
   await expect(page.getByText('Invoiced').first()).toBeVisible();
   await shot(page, 'time-invoiced');
 });
+
+test('Estimates', async () => {
+  await openApp('/estimates');
+  await expect(page.getByRole('link', { name: 'AN-', exact: false }).first()).toBeVisible();
+  await shot(page, 'estimates');
+
+  await openApp('/estimates/new');
+  await page.getByRole('combobox', { name: 'Customer' }).click();
+  await page.getByRole('option', { name: 'Kanzlei Huber & Partner' }).click();
+  await page.getByRole('button', { name: 'Create estimate' }).click();
+
+  // Draft opens for editing
+  await expect(page.getByRole('heading', { name: /^Edit estimate/ })).toBeVisible();
+  await page.getByLabel('Subject').fill('Document upload for the client portal');
+  await page.getByRole('button', { name: 'Add item' }).click();
+  await page.getByLabel('Description of item 1').fill('Data model and upload endpoint');
+  await page.getByLabel('Quantity of item 1').fill('12');
+  await page.getByLabel('Unit price of item 1').fill('95,00');
+  await page.getByRole('button', { name: 'Add item' }).click();
+  await page.getByLabel('Description of item 2').fill('Upload screen');
+  await page.getByLabel('Quantity of item 2').fill('10');
+  await page.getByLabel('Unit price of item 2').fill('95,00');
+  await shot(page, 'estimate-edit', true);
+  await page.getByRole('button', { name: 'Save estimate' }).click();
+
+  await expect(page.getByRole('button', { name: 'Print / PDF' })).toBeVisible();
+  await shot(page, 'estimate-detail', true);
+});

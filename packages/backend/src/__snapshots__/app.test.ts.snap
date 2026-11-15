@@ -68,6 +68,7 @@ exports[`openapi.json snapshot 1`] = `
               "no_running_timer",
               "invoiced",
               "invoice_locked",
+              "estimate_locked",
               "number_taken",
               "rate_limited",
               "internal_error",
@@ -85,6 +86,171 @@ exports[`openapi.json snapshot 1`] = `
         "required": [
           "code",
           "message",
+        ],
+        "type": "object",
+      },
+      "Estimate": {
+        "properties": {
+          "acceptedOn": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "customerId": {
+            "type": "integer",
+          },
+          "declinedOn": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "discountBasisPoints": {
+            "example": 2000,
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "integer",
+          },
+          "discountMinor": {
+            "type": "integer",
+          },
+          "id": {
+            "type": "integer",
+          },
+          "issueDate": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": "string",
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EstimateItem",
+            },
+            "type": "array",
+          },
+          "notes": {
+            "description": "Text below the items",
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "number": {
+            "type": "string",
+          },
+          "recipient": {
+            "description": "Name and address as printed on the estimate",
+            "type": "string",
+          },
+          "sentOn": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "status": {
+            "description": "From acceptedOn, declinedOn and sentOn",
+            "enum": [
+              "draft",
+              "sent",
+              "accepted",
+              "declined",
+            ],
+            "type": "string",
+          },
+          "subject": {
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+          "subtotalMinor": {
+            "type": "integer",
+          },
+          "taxBasisPoints": {
+            "example": 2000,
+            "maximum": 10000,
+            "minimum": 0,
+            "type": "integer",
+          },
+          "taxMinor": {
+            "type": "integer",
+          },
+          "totalMinor": {
+            "type": "integer",
+          },
+          "validUntil": {
+            "example": "2026-11-09",
+            "format": "date",
+            "type": [
+              "string",
+              "null",
+            ],
+          },
+        },
+        "required": [
+          "id",
+          "number",
+          "customerId",
+          "recipient",
+          "issueDate",
+          "validUntil",
+          "subject",
+          "notes",
+          "taxBasisPoints",
+          "discountBasisPoints",
+          "sentOn",
+          "acceptedOn",
+          "declinedOn",
+          "status",
+          "items",
+          "subtotalMinor",
+          "discountMinor",
+          "taxMinor",
+          "totalMinor",
+        ],
+        "type": "object",
+      },
+      "EstimateItem": {
+        "properties": {
+          "amountMinor": {
+            "description": "round(quantity × unit price)",
+            "type": "integer",
+          },
+          "description": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string",
+          },
+          "id": {
+            "type": "integer",
+          },
+          "quantityHundredths": {
+            "description": "Quantity × 100, e.g. 1917 = 19.17 hours",
+            "example": 1917,
+            "maximum": 100000000,
+            "minimum": 0,
+            "type": "integer",
+          },
+          "unitPriceMinor": {
+            "example": 9000,
+            "minimum": 0,
+            "type": "integer",
+          },
+        },
+        "required": [
+          "description",
+          "quantityHundredths",
+          "unitPriceMinor",
+          "id",
+          "amountMinor",
         ],
         "type": "object",
       },
@@ -523,6 +689,14 @@ exports[`openapi.json snapshot 1`] = `
             "example": "EUR",
             "type": "string",
           },
+          "defaultEstimateNotes": {
+            "description": "Text below the items of new estimates, e.g. terms and validity",
+            "maxLength": 5000,
+            "type": [
+              "string",
+              "null",
+            ],
+          },
           "defaultHourlyRateMinor": {
             "example": 9000,
             "minimum": 0,
@@ -603,6 +777,7 @@ exports[`openapi.json snapshot 1`] = `
           "senderVatId",
           "defaultTaxBasisPoints",
           "defaultInvoiceNotes",
+          "defaultEstimateNotes",
           "defaultTasks",
         ],
         "type": "object",
@@ -1061,6 +1236,375 @@ exports[`openapi.json snapshot 1`] = `
           },
         },
         "summary": "Change a customer",
+      },
+    },
+    "/estimates": {
+      "get": {
+        "description": "With items and totals, sorted by issue date descending.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Estimate",
+                  },
+                  "type": "array",
+                },
+              },
+            },
+            "description": "Estimates",
+          },
+        },
+        "summary": "List estimates",
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "customerId": {
+                    "exclusiveMinimum": 0,
+                    "type": "integer",
+                  },
+                  "discountBasisPoints": {
+                    "example": 2000,
+                    "maximum": 10000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "issueDate": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "items": {
+                    "items": {
+                      "properties": {
+                        "description": {
+                          "maxLength": 2000,
+                          "minLength": 1,
+                          "type": "string",
+                        },
+                        "quantityHundredths": {
+                          "description": "Quantity × 100, e.g. 1917 = 19.17 hours",
+                          "example": 1917,
+                          "maximum": 100000000,
+                          "minimum": 0,
+                          "type": "integer",
+                        },
+                        "unitPriceMinor": {
+                          "example": 9000,
+                          "minimum": 0,
+                          "type": "integer",
+                        },
+                      },
+                      "required": [
+                        "description",
+                        "quantityHundredths",
+                        "unitPriceMinor",
+                      ],
+                      "type": "object",
+                    },
+                    "maxItems": 1000,
+                    "type": "array",
+                  },
+                  "notes": {
+                    "description": "Defaults to the default estimate notes",
+                    "maxLength": 5000,
+                    "type": "string",
+                  },
+                  "number": {
+                    "description": "Defaults to the next number",
+                    "example": "RE-2026-001",
+                    "maxLength": 50,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                  "recipient": {
+                    "description": "Defaults to name and address of the Customer",
+                    "maxLength": 5000,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                  "subject": {
+                    "maxLength": 5000,
+                    "type": "string",
+                  },
+                  "taxBasisPoints": {
+                    "description": "Defaults to the default tax",
+                    "example": 2000,
+                    "maximum": 10000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "validUntil": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "customerId",
+                  "issueDate",
+                ],
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Estimate",
+                },
+              },
+            },
+            "description": "The created estimate",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "number_taken",
+          },
+        },
+        "summary": "Create a draft estimate",
+      },
+    },
+    "/estimates/{id}": {
+      "delete": {
+        "description": "In any status, with its items.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": 1,
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "not_found",
+          },
+        },
+        "summary": "Delete an estimate",
+      },
+      "patch": {
+        "description": "Content changes only while it is a draft or in the same call that sets \`sentOn\`, \`acceptedOn\` and \`declinedOn\` to null (409 estimate_locked).",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "example": 1,
+              "exclusiveMinimum": 0,
+              "type": "integer",
+            },
+          },
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "acceptedOn": {
+                    "description": "Set = accepted; locks the content",
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "declinedOn": {
+                    "description": "Set = declined; locks the content",
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "discountBasisPoints": {
+                    "example": 2000,
+                    "maximum": 10000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "issueDate": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": "string",
+                  },
+                  "items": {
+                    "description": "The complete list. Existing items missing here are removed.",
+                    "items": {
+                      "properties": {
+                        "description": {
+                          "maxLength": 2000,
+                          "minLength": 1,
+                          "type": "string",
+                        },
+                        "id": {
+                          "description": "Existing item to keep; without a new one",
+                          "exclusiveMinimum": 0,
+                          "type": "integer",
+                        },
+                        "quantityHundredths": {
+                          "description": "Quantity × 100, e.g. 1917 = 19.17 hours",
+                          "example": 1917,
+                          "maximum": 100000000,
+                          "minimum": 0,
+                          "type": "integer",
+                        },
+                        "unitPriceMinor": {
+                          "example": 9000,
+                          "minimum": 0,
+                          "type": "integer",
+                        },
+                      },
+                      "required": [
+                        "description",
+                        "quantityHundredths",
+                        "unitPriceMinor",
+                      ],
+                      "type": "object",
+                    },
+                    "maxItems": 1000,
+                    "type": "array",
+                  },
+                  "notes": {
+                    "maxLength": 5000,
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "number": {
+                    "example": "RE-2026-001",
+                    "maxLength": 50,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                  "recipient": {
+                    "maxLength": 5000,
+                    "minLength": 1,
+                    "type": "string",
+                  },
+                  "sentOn": {
+                    "description": "Set = sent; locks the content",
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "subject": {
+                    "maxLength": 5000,
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                  "taxBasisPoints": {
+                    "example": 2000,
+                    "maximum": 10000,
+                    "minimum": 0,
+                    "type": "integer",
+                  },
+                  "validUntil": {
+                    "example": "2026-11-09",
+                    "format": "date",
+                    "type": [
+                      "string",
+                      "null",
+                    ],
+                  },
+                },
+                "type": "object",
+              },
+            },
+          },
+          "required": true,
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Estimate",
+                },
+              },
+            },
+            "description": "The changed estimate",
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "Invalid input",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "not_found",
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error",
+                },
+              },
+            },
+            "description": "estimate_locked or number_taken",
+          },
+        },
+        "summary": "Change an estimate",
       },
     },
     "/expenses": {
@@ -2175,6 +2719,14 @@ exports[`openapi.json snapshot 1`] = `
                   "currency": {
                     "example": "EUR",
                     "type": "string",
+                  },
+                  "defaultEstimateNotes": {
+                    "description": "Text below the items of new estimates, e.g. terms and validity",
+                    "maxLength": 5000,
+                    "type": [
+                      "string",
+                      "null",
+                    ],
                   },
                   "defaultHourlyRateMinor": {
                     "example": 9000,

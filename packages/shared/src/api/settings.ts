@@ -30,6 +30,9 @@ export const SettingsSchema = z
     defaultInvoiceNotes: OptionalTextSchema.openapi({
       description: 'Text below the items of new invoices, e.g. bank details',
     }),
+    defaultEstimateNotes: OptionalTextSchema.openapi({
+      description: 'Text below the items of new estimates, e.g. terms and validity',
+    }),
     defaultTasks: DefaultTaskListSchema.openapi({
       description: 'Tasks a new Project copies, sorted by name; PATCH replaces the list',
     }),

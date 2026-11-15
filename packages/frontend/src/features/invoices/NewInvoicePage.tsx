@@ -3,6 +3,7 @@ import { INVOICE_GROUPINGS } from '@dreck/shared/invoice-items';
 import type { ReactElement } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { type Catalog, useCatalog } from '@/catalog/useCatalog';
+import { formatQuantity } from '@/features/documents/document-display';
 import { formatDuration } from '@/format/duration';
 import { formatMoney } from '@/format/money';
 import { CheckboxField } from '@/forms/CheckboxField';
@@ -15,7 +16,6 @@ import { Page, PageTitle } from '@/ui/Page';
 import { QueryView } from '@/ui/QueryView';
 import { Select } from '@/ui/Select';
 import { BackLink } from './BackLink';
-import { formatQuantity } from './invoice-display';
 import {
   type InvoiceSource,
   type InvoiceStart,
@@ -173,16 +173,16 @@ function NewInvoiceForm({ catalog, start }: NewInvoiceFormProps): ReactElement {
                         <thead className="border-temp-divider border-b text-temp-ink-muted">
                           <tr>
                             <th scope="col" className="px-4 py-3 text-left font-normal">
-                              {messages.invoices.form.description}
+                              {messages.documents.description}
                             </th>
                             <th scope="col" className={`${NUM} font-normal`}>
-                              {messages.invoices.form.quantity}
+                              {messages.documents.quantity}
                             </th>
                             <th scope="col" className={`${NUM} font-normal max-sm:hidden`}>
-                              {messages.invoices.form.unitPrice}
+                              {messages.documents.unitPrice}
                             </th>
                             <th scope="col" className={`${NUM} font-normal`}>
-                              {messages.invoices.form.amount}
+                              {messages.documents.amount}
                             </th>
                           </tr>
                         </thead>
@@ -203,7 +203,7 @@ function NewInvoiceForm({ catalog, start }: NewInvoiceFormProps): ReactElement {
                         <tfoot>
                           <tr className="font-semibold">
                             <th scope="row" className="px-4 py-3 text-left">
-                              {messages.invoices.document.subtotal}
+                              {messages.documents.subtotal}
                             </th>
                             <td className={NUM} />
                             <td className={`${NUM} max-sm:hidden`} />

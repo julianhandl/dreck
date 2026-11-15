@@ -48,6 +48,10 @@ _Avoid_: Stundensatz, Tarif, Preis
 Die Hourly Rate, die ein neuer Customer beim Anlegen übernimmt. Spätere Änderungen betreffen nur neue Customers.
 _Avoid_: Standardsatz, globaler Satz
 
+**Budget**:
+Die geplante Obergrenze eines Projects, entweder in Stunden oder als Betrag, für die ganze Laufzeit oder je Kalendermonat. Sein Verbrauch wird wie im Report berechnet; ein überschrittenes Budget sperrt nichts.
+_Avoid_: Kontingent, Limit, Rahmen, Estimate (das ist ein Angebot)
+
 **Report**:
 Die Auswertung von Stunden, Beträgen und Ausgaben für einen Zeitraum, gegliedert nach Customer und Project.
 _Avoid_: Auswertung, Statistik, Abrechnung
@@ -56,8 +60,12 @@ _Avoid_: Auswertung, Statistik, Abrechnung
 Die Abrechnung an genau einen Customer mit Nummer, Positionen, Steuer und Rabatt. Sie ist Entwurf (Draft), Gesendet (Sent) oder Bezahlt (Paid); nur ein Entwurf lässt sich ändern. Im Code, in der API und in der englischen UI: Invoice.
 _Avoid_: Invoice (im deutschen Text), Faktura, Beleg, Bill; „Rechnung“ im Sinn von Berechnung
 
+**Angebot**:
+Ein Angebot an genau einen Customer mit Nummer, frei geschriebenen Positionen, Steuer und Rabatt, ohne Bezug zu Projects oder erfasster Zeit. Es ist Entwurf (Draft), Gesendet (Sent), Angenommen (Accepted) oder Abgelehnt (Declined); nur ein Entwurf lässt sich ändern. Aus einem Angebot lässt sich eine Rechnung mit denselben Positionen anlegen. Im Code, in der API und in der englischen UI: Estimate.
+_Avoid_: Estimate (im deutschen Text), Kostenvoranschlag, Offerte, Quote, Schätzung
+
 **Position**:
-Eine Zeile einer Rechnung: Beschreibung, Menge, Einzelpreis. Aus erfasster Zeit entstanden, hält sie ihre Time Entries und Ausgaben fest. Im Code und in der API: Invoice Item.
+Eine Zeile einer Rechnung oder eines Angebots: Beschreibung, Menge, Einzelpreis. Aus erfasster Zeit entstanden, hält sie ihre Time Entries und Ausgaben fest; am Angebot gibt es nur freie Positionen. Im Code und in der API: Invoice Item bzw. Estimate Item.
 _Avoid_: Line Item, Rechnungsposten
 
 **Abgerechnet**:

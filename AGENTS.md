@@ -68,6 +68,24 @@ Keep planning compact. Single file preferred over multiple documents.
 Avoid creating excessive planning artifacts.
 Focus on actionable decisions, not documentation overhead.
 
+### Feature specs
+
+A feature spec lives in `.specs/<feature>.md`, one file per feature, written in German like `docs/spec.md`. [`.specs/estimates.md`](.specs/estimates.md) is the reference for structure and depth.
+
+Detail bar: a smaller model with no access to this conversation implements the feature from the spec alone, without asking a single product or technical question. The spec is done when every item below holds:
+
+- **Decisions table:** every product choice with its reason, including the ones you made without asking the user, so they can veto them.
+- **Out of scope:** listed explicitly.
+- **Rules checked against the code:** each rule names the existing function, schema, or file it reuses or mirrors, with its path. Claims about current behaviour were verified in the code, not assumed.
+- **Data model:** tables, columns, nullability, constraints, migration command.
+- **API:** endpoints, request and response shapes, every error code with status and field.
+- **UI:** routes, components to create or extract with their props, an action table per status, and the UI texts in `de` and `en`.
+- **Tests:** unit, API, and e2e cases listed one by one. Seed and docs updates (`docs/`, screenshots, README) included.
+- **Order of implementation:** steps, each ending on a check that turns green.
+- **No open questions:** resolve each one with the user or decide it and record it in the decisions table.
+
+After the implementation, move the spec's decisions into `docs/spec.md` and delete the file in `.specs/`.
+
 ## Documentation
 
 Always fetch current docs before implementation.

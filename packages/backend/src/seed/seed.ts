@@ -2,6 +2,7 @@ import { mkdir } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import type { Customer } from '@dreck/shared/api/customers';
+import type { Estimate } from '@dreck/shared/api/estimates';
 import type { Invoice } from '@dreck/shared/api/invoices';
 import type { Project } from '@dreck/shared/api/projects';
 import type { TimeEntry } from '@dreck/shared/api/time-entries';
@@ -13,6 +14,7 @@ import { loadSecret } from '@/features/auth/secret/load-secret';
 import {
   CUSTOMERS,
   DAYS_OF_HISTORY,
+  ESTIMATES,
   EXPENSES,
   HOLIDAYS,
   INVOICES,
@@ -210,6 +212,28 @@ async function seed(dir: string): Promise<void> {
     });
   }
 
+  // Estimates, numbered per year of issue
+  const estimatesPerYear = new Map<string, number>();
+  for (const seedEstimate of ESTIMATES) {
+    const issueDate = daysAgo(seedEstimate.issued);
+    const year = issueDate.slice(0, 4);
+    const serial = (estimatesPerYear.get(year) ?? 0) + 1;
+    estimatesPerYear.set(year, serial);
+    const estimate = await call<Estimate>('POST', '/estimates', {
+      customerId: customerId(seedEstimate.customer),
+      number: `AN-${year}-${String(serial).padStart(3, '0')}`,
+      issueDate,
+      validUntil: addDays(issueDate, seedEstimate.validDays),
+      subject: seedEstimate.subject,
+      items: seedEstimate.items,
+    });
+    if (!seedEstimate.sent) continue;
+    await call('PATCH', `/estimates/${estimate.id}`, {
+      sentOn: issueDate,
+      acceptedOn: seedEstimate.accepted === undefined ? null : daysAgo(seedEstimate.accepted),
+    });
+  }
+
   // Archive last: archived Customers and Projects drop out of the pickers, not out of history
   for (const customer of CUSTOMERS) {
     for (const project of customer.projects.filter((p) => p.archived)) {
@@ -223,7 +247,7 @@ async function seed(dir: string): Promise<void> {
   db.$client.close();
   console.log(`Seeded ${dir}`);
   console.log(
-    `${customers.size} customers, ${projects.size} projects, ${timeEntryCount} time entries, ${monthly.length + oneOff.length} expenses, ${INVOICES.length} invoices`,
+    `${customers.size} customers, ${projects.size} projects, ${timeEntryCount} time entries, ${monthly.length + oneOff.length} expenses, ${INVOICES.length} invoices, ${ESTIMATES.length} estimates`,
   );
   console.log(
     generated

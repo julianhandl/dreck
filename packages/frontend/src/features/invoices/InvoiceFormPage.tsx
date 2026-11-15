@@ -2,14 +2,11 @@ import { Form } from '@base-ui/react/form';
 import type { Invoice } from '@dreck/shared/api/invoices';
 import type { ReactElement } from 'react';
 import { Link } from 'react-router';
-import { formatPercent } from '@/format/decimal';
-import { currencySymbol, formatMoney } from '@/format/money';
+import { ItemsEditor } from '@/features/documents/ItemsEditor';
 import { FormStatus } from '@/forms/FormStatus';
 import { TextField } from '@/forms/TextField';
 import { useI18n } from '@/i18n/useI18n';
-import { useSettings } from '@/settings/useSettings';
 import { Button } from '@/ui/Button';
-import { PlusIcon, XIcon } from '@/ui/icons';
 import { PageTitle } from '@/ui/Page';
 import { BackLink } from './BackLink';
 import { InvoicePage } from './InvoicePage';
@@ -39,12 +36,10 @@ type InvoiceFormContentProps = {
 };
 
 function InvoiceFormContent({ invoice, invoices }: InvoiceFormContentProps): ReactElement {
-  const { language, messages } = useI18n();
-  const { currency } = useSettings();
+  const { messages } = useI18n();
   const form = useInvoiceForm(invoice);
   const { submit, values } = form;
   const t = messages.invoices.form;
-  const money = (minor: number): string => formatMoney(minor, currency, language);
   // The API lists newest issue date first; "last used" is the latest other number by id
   const lastUsed = invoices
     .filter((i) => i.id !== invoice.id)
@@ -166,108 +161,7 @@ function InvoiceFormContent({ invoice, invoices }: InvoiceFormContentProps): Rea
           onValueChange={form.handleChange('subject')}
         />
 
-        <section
-          aria-labelledby="invoice-items"
-          className="flex flex-col rounded-temp-card bg-temp-surface shadow-temp-card"
-        >
-          <h2 id="invoice-items" className="sr-only">
-            {t.items}
-          </h2>
-          <div
-            aria-hidden="true"
-            className="hidden grid-cols-[2.75rem_1fr_7rem_9rem_8rem] gap-4 border-temp-divider border-b px-4 py-3 text-temp-ink-muted md:grid"
-          >
-            <span />
-            <span>{t.description}</span>
-            <span className="text-right">{t.quantity}</span>
-            <span className="text-right">{t.unitPrice}</span>
-            <span className="text-right">{t.amount}</span>
-          </div>
-          <ol>
-            {form.items.map((item, index) => (
-              <li
-                key={item.key}
-                className="grid grid-cols-[2.75rem_1fr] items-start gap-4 border-temp-divider border-b p-4 md:grid-cols-[2.75rem_1fr_7rem_9rem_8rem]"
-              >
-                <Button
-                  size="icon"
-                  aria-label={t.removeItem(index + 1)}
-                  onClick={() => form.handleRemoveItem(item.key)}
-                >
-                  <XIcon />
-                </Button>
-                <TextField
-                  name={`item-${item.key}-description`}
-                  label={t.descriptionFor(index + 1)}
-                  hideLabel
-                  multiline
-                  value={item.description}
-                  onValueChange={(v) => form.handleItemChange(item.key, 'description', v)}
-                  inputClassName="field-sizing-content min-h-11"
-                />
-                <div className="col-start-2 grid grid-cols-3 items-start gap-4 md:col-span-3 md:col-start-3 md:grid-cols-[7rem_9rem_8rem]">
-                  <TextField
-                    name={`item-${item.key}-quantity`}
-                    label={t.quantityFor(index + 1)}
-                    hideLabel
-                    inputMode="decimal"
-                    autoComplete="off"
-                    value={item.quantity}
-                    onValueChange={(v) => form.handleItemChange(item.key, 'quantity', v)}
-                    inputClassName="text-right"
-                  />
-                  <TextField
-                    name={`item-${item.key}-unitPrice`}
-                    label={t.unitPriceFor(index + 1)}
-                    hideLabel
-                    inputMode="decimal"
-                    autoComplete="off"
-                    prefix={<span aria-hidden="true">{currencySymbol(currency, language)}</span>}
-                    value={item.unitPrice}
-                    onValueChange={(v) => form.handleItemChange(item.key, 'unitPrice', v)}
-                    inputClassName="text-right"
-                  />
-                  <span className="pt-2.5 text-right font-semibold whitespace-nowrap">
-                    {money(form.amounts.get(item.key) ?? 0)}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ol>
-          <div className="flex flex-wrap items-start justify-between gap-6 p-4">
-            <div className="flex flex-col gap-2">
-              <Button className="w-fit" onClick={form.handleAddItem}>
-                <PlusIcon />
-                {t.addItem}
-              </Button>
-              <p className="text-sm text-temp-ink-muted">{t.removeHint}</p>
-            </div>
-            <dl className="ml-auto grid grid-cols-[auto_auto] gap-x-8 gap-y-2 text-right">
-              <dt>{messages.invoices.document.subtotal}</dt>
-              <dd>{money(form.totals.subtotalMinor)}</dd>
-              {form.discountBasisPoints > 0 && (
-                <>
-                  <dt>
-                    {messages.invoices.document.discount(
-                      formatPercent(form.discountBasisPoints, language),
-                    )}
-                  </dt>
-                  <dd>−{money(form.totals.discountMinor)}</dd>
-                </>
-              )}
-              {form.taxBasisPoints > 0 && (
-                <>
-                  <dt>
-                    {messages.invoices.document.tax(formatPercent(form.taxBasisPoints, language))}
-                  </dt>
-                  <dd>{money(form.totals.taxMinor)}</dd>
-                </>
-              )}
-              <dt className="font-semibold">{messages.invoices.document.total}</dt>
-              <dd className="font-semibold">{money(form.totals.totalMinor)}</dd>
-            </dl>
-          </div>
-        </section>
+        <ItemsEditor rows={form.rows} removeHint={t.removeHint} />
 
         <TextField
           name="notes"

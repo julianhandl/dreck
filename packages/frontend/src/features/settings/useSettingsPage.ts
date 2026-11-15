@@ -39,7 +39,8 @@ export type InvoicingField =
   | 'senderAddress'
   | 'senderVatId'
   | 'defaultTax'
-  | 'defaultInvoiceNotes';
+  | 'defaultInvoiceNotes'
+  | 'defaultEstimateNotes';
 
 /** Form state of the settings screen plus logout. */
 export function useSettingsPage(): SettingsPage {
@@ -64,6 +65,7 @@ export function useSettingsPage(): SettingsPage {
     senderVatId: settings.senderVatId ?? '',
     defaultTax: formatPercentInput(settings.defaultTaxBasisPoints, settings.language),
     defaultInvoiceNotes: settings.defaultInvoiceNotes ?? '',
+    defaultEstimateNotes: settings.defaultEstimateNotes ?? '',
   }));
   const [saved, setSaved] = useState(false);
 
@@ -83,6 +85,7 @@ export function useSettingsPage(): SettingsPage {
       'senderAddress',
       'senderVatId',
       'defaultInvoiceNotes',
+      'defaultEstimateNotes',
     ] as const) {
       const value = invoicing[key].trim() || null;
       if (value !== settings[key]) body[key] = value;
