@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prototype": "vite --open /prototype/setup-recovery",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
     "test": "bun test"

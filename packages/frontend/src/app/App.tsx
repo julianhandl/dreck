@@ -10,6 +10,7 @@ import { InvoiceFormPage } from '@/features/invoices/InvoiceFormPage';
 import { InvoicesPage } from '@/features/invoices/InvoicesPage';
 import { NewInvoicePage } from '@/features/invoices/NewInvoicePage';
 import { LoginDialog } from '@/features/login/LoginDialog';
+import { SetupRecoveryPrototype } from '@/features/login/prototype/SetupRecoveryPrototype';
 import { CustomerFormPage } from '@/features/projects/CustomerFormPage';
 import { ProjectDetailPage } from '@/features/projects/ProjectDetailPage';
 import { ProjectFormPage } from '@/features/projects/ProjectFormPage';
@@ -28,6 +29,16 @@ import { NotFoundPage } from './NotFoundPage';
  * @example <App />
  */
 export function App(): ReactElement {
+  // PROTOTYPE (throwaway branch): without SettingsProvider, so it runs without the backend
+  if (import.meta.env.DEV && window.location.pathname.startsWith('/prototype/')) {
+    return (
+      <BrowserRouter>
+        <Routes>
+          <Route path="prototype/setup-recovery" element={<SetupRecoveryPrototype />} />
+        </Routes>
+      </BrowserRouter>
+    );
+  }
   return (
     <SettingsProvider>
       <I18nProvider>
