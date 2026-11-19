@@ -34,6 +34,7 @@ describe('runMigrations', () => {
       '0002_invoices',
       '0003_tasks',
       '0004_estimates',
+      '0005_budgets',
     ]);
     expect(await backups(dir)).toEqual([]);
     expect(await runMigrations(db, { migrationsFolder: MIGRATIONS_DIR, backupDir: dir })).toEqual(
@@ -52,6 +53,7 @@ describe('runMigrations', () => {
       '0002_invoices',
       '0003_tasks',
       '0004_estimates',
+      '0005_budgets',
     ]);
     expect(await backups(dir)).toEqual(['backup-before-0000_init.db']);
 

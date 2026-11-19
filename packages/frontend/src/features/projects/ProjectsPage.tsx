@@ -6,6 +6,7 @@ import { FormStatus } from '@/forms/FormStatus';
 import { useI18n } from '@/i18n/useI18n';
 import { useSettings } from '@/settings/useSettings';
 import { ActionsMenu } from '@/ui/ActionsMenu';
+import { BudgetBar } from '@/ui/BudgetBar';
 import { Button } from '@/ui/Button';
 import { PlusIcon } from '@/ui/icons';
 import { Page, PageTitle } from '@/ui/Page';
@@ -14,6 +15,7 @@ import { projectColorStyle } from '@/ui/project-color';
 import { QueryView } from '@/ui/QueryView';
 import { SearchField } from '@/ui/SearchField';
 import { Select } from '@/ui/Select';
+import { useBudgetText } from './useBudgetText';
 import { STATUS_FILTERS, useProjectsPage } from './useProjectsPage';
 
 const NUM = 'px-4 py-4 text-right whitespace-nowrap';
@@ -28,6 +30,7 @@ export function ProjectsPage(): ReactElement {
   const { currency } = useSettings();
   const navigate = useNavigate();
   const page = useProjectsPage();
+  const budgetText = useBudgetText();
   const t = messages.projects;
   const money = (minor: number): string => formatMoney(minor, currency, language);
 
@@ -131,6 +134,8 @@ export function ProjectsPage(): ReactElement {
                       </tr>
                       {projects.map((project) => {
                         const sums = page.sums(project.id);
+                        const budget = page.budget(project);
+                        const text = budget && budgetText(budget);
                         const actions = [
                           {
                             label: messages.common.edit,
@@ -174,6 +179,18 @@ export function ProjectsPage(): ReactElement {
                                 </Link>
                                 {project.archived && <Pill>{messages.common.archived}</Pill>}
                               </span>
+                              {budget && text && (
+                                <div className="mt-2 max-w-72 pl-6 font-normal">
+                                  <BudgetBar
+                                    label={messages.budget.barLabel(project.name)}
+                                    used={budget.usage.used}
+                                    limit={budget.usage.limit}
+                                    state={budget.usage.state}
+                                    stateLabel={text.stateLabel}
+                                    valueText={text.valueText}
+                                  />
+                                </div>
+                              )}
                             </th>
                             <td className={NUM}>{money(project.hourlyRateMinor)}</td>
                             <td className={NUM}>{formatDuration(sums?.roundedSeconds ?? 0)}</td>

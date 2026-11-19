@@ -37,9 +37,10 @@ type Result<T> =
 
 /**
  * GET request bound to the component; loads again when the URL changes or after
- * `invalidateQueries()`. Keeps the old data while a reload runs.
+ * `invalidateQueries()`. Keeps the old data while a reload runs. While `enabled` is false
+ * nothing is requested and the state stays `loading`.
  */
-export function useQuery<T>(path: string, query?: Query): QueryState<T> {
+export function useQuery<T>(path: string, query?: Query, enabled = true): QueryState<T> {
   const url = withQuery(path, query);
   const currentVersion = useQueryVersion();
   const [attempt, setAttempt] = useState(0);
@@ -47,6 +48,7 @@ export function useQuery<T>(path: string, query?: Query): QueryState<T> {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: version and attempt trigger the reload
   useEffect(() => {
+    if (!enabled) return;
     let current = true;
     api
       .get<T>(url)
@@ -60,7 +62,7 @@ export function useQuery<T>(path: string, query?: Query): QueryState<T> {
     return () => {
       current = false;
     };
-  }, [url, currentVersion, attempt]);
+  }, [url, currentVersion, attempt, enabled]);
 
   const retry = (): void => setAttempt((n) => n + 1);
   if (result === null || result.url !== url) return { status: 'loading' };

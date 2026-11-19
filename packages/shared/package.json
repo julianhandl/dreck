@@ -8,6 +8,7 @@
     "./api/*": "./src/api/*.ts",
     "./api-errors": "./src/api-errors/api-errors.ts",
     "./i18n": "./src/i18n/i18n.ts",
+    "./budget": "./src/budget/budget.ts",
     "./estimate": "./src/invoice/estimate.ts",
     "./invoice": "./src/invoice/invoice.ts",
     "./invoice-items": "./src/invoice/invoice-items.ts",

@@ -1,10 +1,11 @@
-import type { Project, UpdateProject } from '@dreck/shared/api/projects';
+import type { Budget, Project, UpdateProject } from '@dreck/shared/api/projects';
 import type { TaskInput } from '@dreck/shared/api/tasks';
 import type { TimeEntry } from '@dreck/shared/api/time-entries';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { api } from '@/api/api-client';
 import type { Catalog } from '@/catalog/useCatalog';
+import { formatDuration, parseDuration } from '@/format/duration';
 import { formatAmountInput, parseAmount } from '@/format/money';
 import { type Submit, useSubmit } from '@/forms/useSubmit';
 import { useI18n } from '@/i18n/useI18n';
@@ -21,6 +22,10 @@ type ProjectFormOptions = {
   customerId?: number;
 };
 
+export const BUDGET_KINDS = ['none', 'hours', 'amount'] as const;
+
+export type BudgetKind = (typeof BUDGET_KINDS)[number];
+
 type Command = 'save' | 'archive' | 'restore' | 'delete';
 
 export type ProjectForm = {
@@ -29,6 +34,11 @@ export type ProjectForm = {
   rate: string;
   /** Tasks of the Project; a new one starts with the Default Tasks. */
   tasks: TaskList;
+  budgetKind: BudgetKind;
+  /** Limit as text: hours (`40:00`, `12,5`) or an amount, depending on `budgetKind`. */
+  budgetValue: string;
+  budgetMonthly: boolean;
+  budgetExpenses: boolean;
   submit: Submit<Command>;
   /** Open while the user decides about existing Time Entries. */
   rateQuestion: RateQuestion | null;
@@ -36,6 +46,10 @@ export type ProjectForm = {
   handleCustomerChange: (value: string) => void;
   handleNameChange: (value: string) => void;
   handleRateChange: (value: string) => void;
+  handleBudgetKindChange: (value: BudgetKind) => void;
+  handleBudgetValueChange: (value: string) => void;
+  handleBudgetMonthlyChange: (value: boolean) => void;
+  handleBudgetExpensesChange: (value: boolean) => void;
   handleCancelRateQuestion: () => void;
 };
 
@@ -60,7 +74,35 @@ export function useProjectForm({ catalog, project, customerId }: ProjectFormOpti
     return minor === undefined ? '' : rateText(minor);
   });
   const [rateQuestion, setRateQuestion] = useState<RateQuestion | null>(null);
+  const [budgetKind, setBudgetKind] = useState<BudgetKind>(project?.budget?.type ?? 'none');
+  const [budgetValue, setBudgetValue] = useState(() => {
+    const budget = project?.budget;
+    if (!budget) return '';
+    return budget.type === 'hours' ? formatDuration(budget.seconds) : rateText(budget.amountMinor);
+  });
+  const [budgetMonthly, setBudgetMonthly] = useState(project?.budget?.monthly ?? false);
+  const [budgetExpenses, setBudgetExpenses] = useState(
+    project?.budget?.type === 'amount' && project.budget.includeExpenses,
+  );
   const tasks = useTaskList(() => taskRows(project?.tasks ?? defaultTasks, rateText));
+
+  // Limit greater than 0 in seconds or minor units; `null` while the text is invalid
+  function parseBudgetValue(): number | null {
+    const value = budgetKind === 'hours' ? parseDuration(budgetValue) : parseRate(budgetValue);
+    return value !== null && value > 0 ? value : null;
+  }
+
+  function budget(): Budget | null {
+    const value = parseBudgetValue();
+    if (budgetKind === 'none' || value === null) return null;
+    if (budgetKind === 'hours') return { type: 'hours', seconds: value, monthly: budgetMonthly };
+    return {
+      type: 'amount',
+      amountMinor: value,
+      monthly: budgetMonthly,
+      includeExpenses: budgetExpenses,
+    };
+  }
 
   function body(): UpdateProject {
     const changes: UpdateProject = {};
@@ -72,6 +114,10 @@ export function useProjectForm({ catalog, project, customerId }: ProjectFormOpti
     const unchanged =
       project && sameTasks(list, taskInputs(taskRows(project.tasks, rateText), parseRate));
     if (!unchanged) changes.tasks = list;
+    const newBudget = budget();
+    if (JSON.stringify(newBudget) !== JSON.stringify(project?.budget ?? null)) {
+      changes.budget = newBudget;
+    }
     return changes;
   }
 
@@ -85,6 +131,12 @@ export function useProjectForm({ catalog, project, customerId }: ProjectFormOpti
       ...messages.tasks.errors,
       rate: messages.expenses.errors.amount,
     });
+    if (budgetKind !== 'none' && parseBudgetValue() === null) {
+      errors.budget =
+        budgetKind === 'hours'
+          ? messages.projects.form.errors.budgetHours
+          : messages.projects.form.errors.budgetAmount;
+    }
     return { ...errors, ...rowErrors };
   }
 
@@ -153,6 +205,10 @@ export function useProjectForm({ catalog, project, customerId }: ProjectFormOpti
     name,
     rate,
     tasks,
+    budgetKind,
+    budgetValue,
+    budgetMonthly,
+    budgetExpenses,
     submit,
     rateQuestion,
     rateSubmit,
@@ -164,6 +220,10 @@ export function useProjectForm({ catalog, project, customerId }: ProjectFormOpti
     },
     handleNameChange: setName,
     handleRateChange: setRate,
+    handleBudgetKindChange: setBudgetKind,
+    handleBudgetValueChange: setBudgetValue,
+    handleBudgetMonthlyChange: setBudgetMonthly,
+    handleBudgetExpensesChange: setBudgetExpenses,
     handleCancelRateQuestion: () => setRateQuestion(null),
   };
 }

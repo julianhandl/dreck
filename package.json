@@ -17,7 +17,7 @@
     "test": "bun run --filter '*' test",
     "test:e2e": "playwright test",
     "docs:screenshots": "playwright test -c playwright.docs.config.ts",
-    "test:e2e:headed": "E2E_SLOW_MO=500 playwright test --headed --project=desktop"
+    "test:e2e:headed": "E2E_SLOW_MO=1000 playwright test --headed --project=desktop"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.6",

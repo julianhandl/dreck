@@ -2,6 +2,25 @@ import { z } from '@hono/zod-openapi';
 import { DateSchema, NameSchema, nonEmpty, RateSchema } from './common';
 import { TaskListSchema, TaskSchema } from './tasks';
 
+/** Upper limit of a Project in hours or as an amount; `monthly` counts per calendar month. */
+export const BudgetSchema = z
+  .discriminatedUnion('type', [
+    z.strictObject({
+      type: z.literal('hours'),
+      seconds: z.number().int().positive(),
+      monthly: z.boolean(),
+    }),
+    z.strictObject({
+      type: z.literal('amount'),
+      amountMinor: z.number().int().positive(),
+      monthly: z.boolean(),
+      includeExpenses: z.boolean().openapi({ description: 'Count billable Expenses too' }),
+    }),
+  ])
+  .openapi('Budget');
+
+export type Budget = z.infer<typeof BudgetSchema>;
+
 export const ProjectSchema = z
   .object({
     id: z.number().int(),
@@ -9,6 +28,7 @@ export const ProjectSchema = z
     name: z.string(),
     hourlyRateMinor: RateSchema,
     archived: z.boolean(),
+    budget: BudgetSchema.nullable(),
     tasks: z.array(TaskSchema).openapi({ description: 'Including Archived, sorted by name' }),
   })
   .openapi('Project');
@@ -32,6 +52,7 @@ export const CreateProjectSchema = z.object({
     description: 'Defaults to the Hourly Rate of the Customer',
   }),
   tasks: TaskListSchema.optional().openapi({ description: 'Defaults to the Default Tasks' }),
+  budget: BudgetSchema.nullable().optional().openapi({ description: 'Defaults to no Budget' }),
 });
 
 export type CreateProject = z.infer<typeof CreateProjectSchema>;
@@ -42,6 +63,9 @@ export const UpdateProjectSchema = z
     name: NameSchema,
     hourlyRateMinor: RateSchema,
     archived: z.boolean(),
+    budget: BudgetSchema.nullable().openapi({
+      description: 'Replaces the Budget as a whole; null removes it',
+    }),
     tasks: TaskListSchema.openapi({
       description:
         'Replaces the list: Tasks with id change, without id are new, missing ones are deleted or, if they have Time Entries, archived',

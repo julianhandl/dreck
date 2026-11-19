@@ -5,6 +5,66 @@ exports[`openapi.json snapshot 1`] = `
   "components": {
     "parameters": {},
     "schemas": {
+      "Budget": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "monthly": {
+                "type": "boolean",
+              },
+              "seconds": {
+                "exclusiveMinimum": 0,
+                "type": "integer",
+              },
+              "type": {
+                "enum": [
+                  "hours",
+                ],
+                "type": "string",
+              },
+            },
+            "required": [
+              "type",
+              "seconds",
+              "monthly",
+            ],
+            "type": "object",
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "amountMinor": {
+                "exclusiveMinimum": 0,
+                "type": "integer",
+              },
+              "includeExpenses": {
+                "description": "Count billable Expenses too",
+                "type": "boolean",
+              },
+              "monthly": {
+                "type": "boolean",
+              },
+              "type": {
+                "enum": [
+                  "amount",
+                ],
+                "type": "string",
+              },
+            },
+            "required": [
+              "type",
+              "amountMinor",
+              "monthly",
+              "includeExpenses",
+            ],
+            "type": "object",
+          },
+          {
+            "type": "null",
+          },
+        ],
+      },
       "Customer": {
         "properties": {
           "address": {
@@ -477,6 +537,9 @@ exports[`openapi.json snapshot 1`] = `
           "archived": {
             "type": "boolean",
           },
+          "budget": {
+            "$ref": "#/components/schemas/Budget",
+          },
           "customerId": {
             "type": "integer",
           },
@@ -505,6 +568,7 @@ exports[`openapi.json snapshot 1`] = `
           "name",
           "hourlyRateMinor",
           "archived",
+          "budget",
           "tasks",
         ],
         "type": "object",
@@ -2322,6 +2386,67 @@ exports[`openapi.json snapshot 1`] = `
             "application/json": {
               "schema": {
                 "properties": {
+                  "budget": {
+                    "description": "Defaults to no Budget",
+                    "oneOf": [
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "monthly": {
+                            "type": "boolean",
+                          },
+                          "seconds": {
+                            "exclusiveMinimum": 0,
+                            "type": "integer",
+                          },
+                          "type": {
+                            "enum": [
+                              "hours",
+                            ],
+                            "type": "string",
+                          },
+                        },
+                        "required": [
+                          "type",
+                          "seconds",
+                          "monthly",
+                        ],
+                        "type": "object",
+                      },
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "amountMinor": {
+                            "exclusiveMinimum": 0,
+                            "type": "integer",
+                          },
+                          "includeExpenses": {
+                            "description": "Count billable Expenses too",
+                            "type": "boolean",
+                          },
+                          "monthly": {
+                            "type": "boolean",
+                          },
+                          "type": {
+                            "enum": [
+                              "amount",
+                            ],
+                            "type": "string",
+                          },
+                        },
+                        "required": [
+                          "type",
+                          "amountMinor",
+                          "monthly",
+                          "includeExpenses",
+                        ],
+                        "type": "object",
+                      },
+                      {
+                        "type": "null",
+                      },
+                    ],
+                  },
                   "customerId": {
                     "exclusiveMinimum": 0,
                     "type": "integer",
@@ -2501,6 +2626,16 @@ exports[`openapi.json snapshot 1`] = `
                   },
                   "archived": {
                     "type": "boolean",
+                  },
+                  "budget": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Budget",
+                      },
+                      {
+                        "description": "Replaces the Budget as a whole; null removes it",
+                      },
+                    ],
                   },
                   "customerId": {
                     "exclusiveMinimum": 0,

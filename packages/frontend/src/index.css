@@ -33,6 +33,7 @@
   --color-temp-chart-soft: oklch(93% 0.035 250);
   --color-temp-success: oklch(47% 0.1 175);
   --color-temp-danger: oklch(52% 0.2 27);
+  --color-temp-warning: oklch(52% 0.12 70); /* Budget from 80 % */
   --color-temp-selected: oklch(43% 0.13 258); /* highlighted option in a list */
   --color-temp-on-selected: oklch(99.6% 0.004 90);
   --color-temp-backdrop: oklch(23% 0.035 258 / 0.45);
@@ -103,6 +104,7 @@
     --color-temp-chart-soft: oklch(28% 0.045 250);
     --color-temp-success: oklch(76% 0.12 175);
     --color-temp-danger: oklch(72% 0.16 27);
+    --color-temp-warning: oklch(80% 0.13 80);
     --color-temp-selected: oklch(74% 0.12 245);
     --color-temp-on-selected: oklch(17% 0.03 258);
     --color-temp-backdrop: oklch(0% 0 0 / 0.6);

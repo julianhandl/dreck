@@ -6,6 +6,8 @@ import { combineQueries, type QueryState, useQuery } from '@/api/useQuery';
 import { type Catalog, type CustomerGroup, useCatalog } from '@/catalog/useCatalog';
 import { ALL_TIME } from '@/format/calendar';
 import { type Submit, useSubmit } from '@/forms/useSubmit';
+import { type BudgetView, budgetView } from './budget-display';
+import { useMonthlySums } from './useMonthlySums';
 
 export const STATUS_FILTERS = ['active', 'archived', 'all'] as const;
 
@@ -23,6 +25,8 @@ export type ProjectsPage = {
   }>;
   /** Sums of all time per Project. */
   sums: (projectId: number) => ProjectSums | undefined;
+  /** Budget with consumption; `null` for a Project without Budget. */
+  budget: (project: Project) => BudgetView | null;
   search: string;
   status: StatusFilter;
   /** `all` or the id of a Customer. */
@@ -38,7 +42,13 @@ export function useProjectsPage(): ProjectsPage {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<StatusFilter>('active');
   const [customerFilter, setCustomerFilter] = useState('all');
-  const state = combineQueries(useCatalog(), useQuery<Report>('/reports', { ...ALL_TIME }));
+  const catalogState = useCatalog();
+  const monthly = useMonthlySums(catalogState.status === 'ready' ? catalogState.data.projects : []);
+  const state = combineQueries(
+    catalogState,
+    useQuery<Report>('/reports', { ...ALL_TIME }),
+    monthly,
+  );
 
   const action = useSubmit(async ({ kind, project }: Command) => {
     if (kind === 'delete') await api.delete(`/projects/${project.id}`);
@@ -49,6 +59,7 @@ export function useProjectsPage(): ProjectsPage {
     return {
       data: state,
       sums: () => undefined,
+      budget: () => null,
       search,
       status,
       customerFilter,
@@ -56,7 +67,7 @@ export function useProjectsPage(): ProjectsPage {
       ...handlers(),
     };
   }
-  const [catalog, report] = state.data;
+  const [catalog, report, monthSums] = state.data;
   const sums = new Map(report.customers.flatMap((c) => c.projects).map((p) => [p.id, p]));
   const counts = {
     active: catalog.projects.filter((p) => matchesStatus(catalog, p, 'active')).length,
@@ -86,6 +97,8 @@ export function useProjectsPage(): ProjectsPage {
   return {
     data: { status: 'ready', data: { catalog, groups, counts } },
     sums: (id) => sums.get(id),
+    budget: (project) =>
+      budgetView(project.budget, sums.get(project.id), monthSums.get(project.id)),
     search,
     status,
     customerFilter,

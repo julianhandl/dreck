@@ -1,0 +1,4 @@
+ALTER TABLE `projects` ADD `budget_seconds` integer CONSTRAINT "projects_budget_seconds_positive" CHECK(`budget_seconds` IS NULL OR `budget_seconds` > 0);--> statement-breakpoint
+ALTER TABLE `projects` ADD `budget_amount_minor` integer CONSTRAINT "projects_budget_amount_positive" CHECK(`budget_amount_minor` IS NULL OR `budget_amount_minor` > 0) CONSTRAINT "projects_budget_one_kind" CHECK(NOT (`budget_seconds` IS NOT NULL AND `budget_amount_minor` IS NOT NULL));--> statement-breakpoint
+ALTER TABLE `projects` ADD `budget_monthly` integer DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE `projects` ADD `budget_includes_expenses` integer DEFAULT false NOT NULL CONSTRAINT "projects_budget_expenses_need_amount" CHECK(`budget_includes_expenses` = 0 OR `budget_amount_minor` IS NOT NULL);

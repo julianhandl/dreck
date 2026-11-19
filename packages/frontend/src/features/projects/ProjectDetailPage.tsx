@@ -9,6 +9,7 @@ import { formatDuration } from '@/format/duration';
 import { formatMoney } from '@/format/money';
 import { useI18n } from '@/i18n/useI18n';
 import { useSettings } from '@/settings/useSettings';
+import { BudgetBar } from '@/ui/BudgetBar';
 import { Button } from '@/ui/Button';
 import { ArrowLeftIcon, BarsIcon, PencilIcon, TrendIcon } from '@/ui/icons';
 import { Page } from '@/ui/Page';
@@ -16,6 +17,7 @@ import { Pill } from '@/ui/Pill';
 import { QueryView } from '@/ui/QueryView';
 import { StatCard } from '@/ui/StatCard';
 import { WeeklyChart } from '@/ui/WeeklyChart';
+import { useBudgetText } from './useBudgetText';
 import { useProjectDetail } from './useProjectDetail';
 
 const TOGGLE =
@@ -34,6 +36,7 @@ export function ProjectDetailPage(): ReactElement {
   const { language, messages } = useI18n();
   const { currency } = useSettings();
   const { projectId, data } = useProjectDetail();
+  const budgetText = useBudgetText();
   const t = messages.projectDetail;
   const money = (minor: number): string => formatMoney(minor, currency, language);
   const hours = (value: number): string => formatDuration(Math.round(value * 3600));
@@ -51,7 +54,8 @@ export function ProjectDetailPage(): ReactElement {
       <QueryView state={data}>
         {(detail) => {
           if (!detail) return <p>{messages.errors.not_found}</p>;
-          const { project, customer, totals, entries, expenses } = detail;
+          const { project, customer, totals, entries, expenses, budget } = detail;
+          const text = budget && budgetText(budget);
           const expensesTotal = totals.billableExpensesMinor + totals.ownExpensesMinor;
           return (
             <>
@@ -142,6 +146,23 @@ export function ProjectDetailPage(): ReactElement {
                   rows={[]}
                 />
               </div>
+
+              {budget && text && (
+                <section className="flex flex-col gap-3 rounded-temp-card bg-temp-surface p-6 shadow-temp-card">
+                  <h2>{messages.budget.title}</h2>
+                  <p className="font-medium text-temp-kpi leading-tight tracking-tight text-temp-primary">
+                    {text.remainingText}
+                  </p>
+                  <BudgetBar
+                    label={messages.budget.barLabel(project.name)}
+                    used={budget.usage.used}
+                    limit={budget.usage.limit}
+                    state={budget.usage.state}
+                    stateLabel={text.stateLabel}
+                    valueText={text.valueText}
+                  />
+                </section>
+              )}
 
               <Tabs.Root defaultValue="time" className="flex flex-col gap-4">
                 <Tabs.List className="flex gap-8 border-temp-divider border-b">

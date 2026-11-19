@@ -137,3 +137,47 @@ describe('projects', () => {
     });
   });
 });
+
+describe('budgets', () => {
+  const hours = { type: 'hours', seconds: 144_000, monthly: false };
+  const amount = { type: 'amount', amountMinor: 500_000, monthly: true, includeExpenses: true };
+
+  test('a new Project has no Budget', async () => {
+    expect((await api.seedProject()).budget).toBeNull();
+  });
+
+  test('POST with a Budget returns it, also in the list', async () => {
+    const customer = await api.call<{ id: number }>('POST', '/customers', { name: 'Acme' });
+    const created = await api.call('POST', '/projects', {
+      customerId: customer.body.id,
+      name: 'Web',
+      budget: amount,
+    });
+    expect(created.status).toBe(201);
+    expect(created.body.budget).toEqual(amount);
+    const list = await api.call<{ budget: unknown }[]>('GET', '/projects');
+    expect(list.body[0]?.budget).toEqual(amount);
+  });
+
+  test('PATCH replaces the Budget as a whole, without budget it stays, null removes it', async () => {
+    const project = await api.seedProject();
+    const url = `/projects/${project.id}`;
+    expect((await api.call('PATCH', url, { budget: amount })).body.budget).toEqual(amount);
+    expect((await api.call('PATCH', url, { budget: hours })).body.budget).toEqual(hours);
+    expect((await api.call('PATCH', url, { name: 'Renamed' })).body.budget).toEqual(hours);
+    expect((await api.call('PATCH', url, { budget: null })).body.budget).toBeNull();
+  });
+
+  test.each([
+    ['includeExpenses on hours', { ...hours, includeExpenses: true }],
+    ['zero hours', { ...hours, seconds: 0 }],
+    ['negative amount', { ...amount, amountMinor: -1 }],
+    ['unknown type', { type: 'days', seconds: 1, monthly: false }],
+    ['amount without includeExpenses', { type: 'amount', amountMinor: 1, monthly: false }],
+  ])('invalid Budget: %s is 400', async (_name, budget) => {
+    const project = await api.seedProject();
+    const res = await api.call('PATCH', `/projects/${project.id}`, { budget });
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('validation_failed');
+  });
+});

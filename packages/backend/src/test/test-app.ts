@@ -23,7 +23,13 @@ type Api = {
   seedProject: (input?: { rate?: number; customer?: string; name?: string }) => Promise<Project>;
 };
 
-export type Project = { id: number; customerId: number; name: string; hourlyRateMinor: number };
+export type Project = {
+  id: number;
+  customerId: number;
+  name: string;
+  hourlyRateMinor: number;
+  budget: unknown;
+};
 
 /** App with a fresh, migrated `:memory:` database and a temp data dir. */
 export async function createTestApp(): Promise<Api> {

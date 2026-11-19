@@ -11,6 +11,8 @@ import { ALL_TIME, addDays, startOfWeek } from '@/format/calendar';
 import { formatDate, formatDateRange } from '@/format/date';
 import { useI18n } from '@/i18n/useI18n';
 import type { ChartPoint } from '@/ui/WeeklyChart';
+import { type BudgetView, budgetView } from './budget-display';
+import { useMonthlySums } from './useMonthlySums';
 
 const MAX_WEEKS = 26;
 const MIN_WEEKS = 12;
@@ -19,6 +21,8 @@ export type ProjectDetail = {
   project: Project;
   customer: Customer | undefined;
   totals: Report['totals'];
+  /** Budget with consumption; `null` without Budget. */
+  budget: BudgetView | null;
   entries: TimeEntry[];
   expenses: Expense[];
   weekly: ChartPoint[];
@@ -31,18 +35,22 @@ export function useProjectDetail(): { projectId: number; data: QueryState<Projec
   const { language } = useI18n();
   const projectId = Number(useParams().projectId);
   const today = useToday();
+  const catalogState = useCatalog();
+  const project =
+    catalogState.status === 'ready' ? catalogState.data.project(projectId) : undefined;
+  const monthly = useMonthlySums(project ? [project] : [], projectId);
   const state = combineQueries(
-    useCatalog(),
+    catalogState,
     useQuery<Report>('/reports', { ...ALL_TIME, projectId }),
     useQuery<TimeEntry[]>('/time-entries', { projectId }),
     useQuery<Expense[]>('/expenses', { projectId }),
+    monthly,
   );
   const running = state.status === 'ready' && state.data[2].some((e) => e.runningSince !== null);
   const now = useNow(running, 60_000);
 
   if (state.status !== 'ready') return { projectId, data: state };
-  const [catalog, report, entries, expenses] = state.data;
-  const project = catalog.project(projectId);
+  const [catalog, report, entries, expenses, monthSums] = state.data;
   if (!project) return { projectId, data: { status: 'ready', data: null } };
 
   const weeks = weekRange(entries, today);
@@ -76,6 +84,7 @@ export function useProjectDetail(): { projectId: number; data: QueryState<Projec
         project,
         customer: catalog.customerOf(project),
         totals: report.totals,
+        budget: budgetView(project.budget, report.totals, monthSums.get(projectId)),
         entries,
         expenses,
         weekly,

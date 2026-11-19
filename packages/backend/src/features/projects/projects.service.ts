@@ -1,4 +1,4 @@
-import type { Project as ProjectResponse } from '@dreck/shared/api/projects';
+import type { Budget, Project as ProjectResponse } from '@dreck/shared/api/projects';
 import { type TaskInput, taskRateMinor } from '@dreck/shared/api/tasks';
 import { and, eq, gte, isNull, lte, sql } from 'drizzle-orm';
 import type { Db } from '@/db/db';
@@ -25,10 +25,12 @@ type ProjectInput = {
   name: string;
   hourlyRateMinor?: number;
   tasks?: TaskInput[];
+  budget?: Budget | null;
 };
 
-type ProjectChanges = Partial<Omit<Project, 'id'>> & {
+type ProjectChanges = Partial<Omit<Project, 'id' | `budget${string}`>> & {
   tasks?: TaskInput[];
+  budget?: Budget | null;
   applyToTimeEntries?: ApplyToTimeEntries;
 };
 
@@ -43,7 +45,7 @@ export function listProjects(db: Db): ProjectResponse[] {
     db,
     rows.map((p) => p.id),
   );
-  return rows.map((p) => ({ ...p, tasks: byProject.get(p.id) ?? [] }));
+  return rows.map((p) => toResponse(p, byProject.get(p.id) ?? []));
 }
 
 /** Project referenced in a request body; a missing one fails validation at `projectId`. */
@@ -57,13 +59,20 @@ export function requireProject(db: Db, id: number): Project {
  * Creates a Project; without a rate it copies the Hourly Rate of its Customer, without Tasks
  * the Default Tasks.
  */
-export function createProject(db: Db, { tasks: list, ...input }: ProjectInput): ProjectResponse {
+export function createProject(
+  db: Db,
+  { tasks: list, budget, ...input }: ProjectInput,
+): ProjectResponse {
   return db.transaction((tx) => {
     const customer = tx.select().from(customers).where(eq(customers.id, input.customerId)).get();
     if (!customer) throw fieldError('customerId', 'Customer not found');
     const project = tx
       .insert(projects)
-      .values({ ...input, hourlyRateMinor: input.hourlyRateMinor ?? customer.hourlyRateMinor })
+      .values({
+        ...input,
+        ...budgetColumns(budget ?? null),
+        hourlyRateMinor: input.hourlyRateMinor ?? customer.hourlyRateMinor,
+      })
       .returning()
       .get();
     replaceTasks(tx, project.id, list ?? listDefaultTasks(tx));
@@ -78,7 +87,7 @@ export function createProject(db: Db, { tasks: list, ...input }: ProjectInput): 
 export function updateProject(
   db: Db,
   id: number,
-  { applyToTimeEntries, tasks: list, ...changes }: ProjectChanges,
+  { applyToTimeEntries, tasks: list, budget, ...changes }: ProjectChanges,
 ): ProjectResponse {
   return db.transaction((tx) => {
     if (changes.customerId !== undefined) {
@@ -90,9 +99,10 @@ export function updateProject(
       if (!customer) throw fieldError('customerId', 'Customer not found');
     }
     const before = projectRates(tx, id);
+    const columns = { ...changes, ...(budget === undefined ? {} : budgetColumns(budget)) };
     const project =
-      Object.keys(changes).length > 0
-        ? tx.update(projects).set(changes).where(eq(projects.id, id)).returning().get()
+      Object.keys(columns).length > 0
+        ? tx.update(projects).set(columns).where(eq(projects.id, id)).returning().get()
         : tx.select().from(projects).where(eq(projects.id, id)).get();
     if (!project) throw new ApiError('not_found', 'Project not found');
     if (list) replaceTasks(tx, id, list);
@@ -152,5 +162,33 @@ export function deleteProject(db: Db, id: number): void {
 }
 
 function withTasks(db: Db, project: Project): ProjectResponse {
-  return { ...project, tasks: tasksByProject(db, [project.id]).get(project.id) ?? [] };
+  return toResponse(project, tasksByProject(db, [project.id]).get(project.id) ?? []);
+}
+
+function toResponse(
+  { budgetSeconds, budgetAmountMinor, budgetMonthly, budgetIncludesExpenses, ...project }: Project,
+  list: ProjectResponse['tasks'],
+): ProjectResponse {
+  let budget: Budget | null = null;
+  if (budgetSeconds !== null) {
+    budget = { type: 'hours', seconds: budgetSeconds, monthly: budgetMonthly };
+  } else if (budgetAmountMinor !== null) {
+    budget = {
+      type: 'amount',
+      amountMinor: budgetAmountMinor,
+      monthly: budgetMonthly,
+      includeExpenses: budgetIncludesExpenses,
+    };
+  }
+  return { ...project, budget, tasks: list };
+}
+
+/** Columns of a Budget; `null` clears all four. */
+function budgetColumns(budget: Budget | null): Partial<Project> {
+  return {
+    budgetSeconds: budget?.type === 'hours' ? budget.seconds : null,
+    budgetAmountMinor: budget?.type === 'amount' ? budget.amountMinor : null,
+    budgetMonthly: budget?.monthly ?? false,
+    budgetIncludesExpenses: budget?.type === 'amount' && budget.includeExpenses,
+  };
 }

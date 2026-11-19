@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 import { Link } from 'react-router';
 import type { Catalog } from '@/catalog/useCatalog';
 import { currencySymbol } from '@/format/money';
+import { CheckboxField } from '@/forms/CheckboxField';
 import { FormStatus } from '@/forms/FormStatus';
 import { TextField } from '@/forms/TextField';
 import { useI18n } from '@/i18n/useI18n';
@@ -13,7 +14,7 @@ import { Page, PageTitle } from '@/ui/Page';
 import { QueryView } from '@/ui/QueryView';
 import { Select } from '@/ui/Select';
 import { RateChangeDialog } from './rate-change/RateChangeDialog';
-import { useProjectForm } from './useProjectForm';
+import { BUDGET_KINDS, useProjectForm } from './useProjectForm';
 import { useProjectRoute } from './useProjectRoute';
 
 /**
@@ -126,6 +127,51 @@ function ProjectFormContent({
           <div className="flex max-w-4xl flex-col gap-4">
             <p className="text-temp-ink-muted">{t.tasksHint}</p>
             <TaskListEditor list={form.tasks} withRates error={submit.errors.tasks} />
+          </div>
+        </div>
+        <div className="grid gap-x-8 gap-y-3 border-temp-divider border-t pt-6 sm:grid-cols-[12rem_1fr]">
+          <h2 className="font-medium">{t.budgetTitle}</h2>
+          <div className="flex max-w-xl flex-col gap-4">
+            <p className="text-temp-ink-muted">{t.budgetHint}</p>
+            <Select
+              label={t.budgetKind}
+              value={form.budgetKind}
+              options={BUDGET_KINDS.map((kind) => ({ value: kind, label: t.budgetKinds[kind] }))}
+              onValueChange={form.handleBudgetKindChange}
+              className="w-64"
+            />
+            {form.budgetKind !== 'none' && (
+              <>
+                <div className="w-72">
+                  <TextField
+                    name="budget"
+                    label={form.budgetKind === 'hours' ? t.budgetHours : t.budgetAmount}
+                    inputMode={form.budgetKind === 'hours' ? 'text' : 'decimal'}
+                    autoComplete="off"
+                    prefix={
+                      form.budgetKind === 'amount' ? (
+                        <span>{currencySymbol(currency, language)}</span>
+                      ) : undefined
+                    }
+                    suffix={form.budgetKind === 'hours' ? <span>h</span> : undefined}
+                    value={form.budgetValue}
+                    onValueChange={form.handleBudgetValueChange}
+                  />
+                </div>
+                <CheckboxField
+                  label={t.budgetMonthly}
+                  checked={form.budgetMonthly}
+                  onCheckedChange={form.handleBudgetMonthlyChange}
+                />
+                {form.budgetKind === 'amount' && (
+                  <CheckboxField
+                    label={t.budgetExpenses}
+                    checked={form.budgetExpenses}
+                    onCheckedChange={form.handleBudgetExpensesChange}
+                  />
+                )}
+              </>
+            )}
           </div>
         </div>
         <FormStatus submit={submit} />

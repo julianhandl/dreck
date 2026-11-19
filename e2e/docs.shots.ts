@@ -417,3 +417,23 @@ test('Estimates', async () => {
   await expect(page.getByRole('button', { name: 'Print / PDF' })).toBeVisible();
   await shot(page, 'estimate-detail', true);
 });
+
+test('Budgets', async () => {
+  const shop = project('Online-Shop');
+  // Sized so the shop sits at about 90 % of its budget: bar in the warning state
+  const { totals } = await get<{ totals: { roundedSeconds: number } }>(
+    `/reports?from=1970-01-01&to=9999-12-31&projectId=${shop.id}`,
+  );
+  const hours = Math.ceil(totals.roundedSeconds / 0.9 / 3600);
+  await send('patch', `/projects/${shop.id}`, {
+    budget: { type: 'hours', seconds: hours * 3600, monthly: false },
+  });
+
+  await openApp(`/projects/${shop.id}/edit`);
+  await expect(page.getByLabel('Budget in hours')).toBeVisible();
+  await shot(page, 'project-edit-budget', true);
+
+  await openApp('/projects');
+  await expect(page.getByRole('progressbar').first()).toBeVisible();
+  await shot(page, 'projects-budget', true);
+});
