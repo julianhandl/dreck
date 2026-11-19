@@ -26,6 +26,12 @@ export function SettingsNav(): ReactElement {
             {t.tasks}
           </NavLink>
         </li>
+        {/* PROTOTYPE (ticket 08) */}
+        <li>
+          <NavLink to="/settings/team-prototype" className={LINK}>
+            Team (Prototyp)
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );

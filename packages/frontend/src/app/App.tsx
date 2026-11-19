@@ -17,6 +17,7 @@ import { ProjectsPage } from '@/features/projects/ProjectsPage';
 import { ReportsPage } from '@/features/reports/ReportsPage';
 import { DefaultTasksPage } from '@/features/settings/DefaultTasksPage';
 import { SettingsPage } from '@/features/settings/SettingsPage';
+import { TeamPrototypePage } from '@/features/settings/team-prototype/TeamPrototypePage';
 import { TimePage } from '@/features/time/TimePage';
 import { I18nProvider } from '@/i18n/I18nProvider';
 import { SettingsProvider } from '@/settings/SettingsProvider';
@@ -54,6 +55,8 @@ export function App(): ReactElement {
               <Route path="invoices/:invoiceId/edit" element={<InvoiceFormPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="settings/tasks" element={<DefaultTasksPage />} />
+              {/* PROTOTYPE (ticket 08): throwaway, lives on branch prototype/team-settings-tab */}
+              <Route path="settings/team-prototype" element={<TeamPrototypePage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>
