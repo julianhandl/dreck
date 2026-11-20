@@ -10,6 +10,7 @@ import {
   isLastActiveAdmin,
   lostProjects,
   type MemberToggles,
+  ROLE_LABEL,
   type Role,
   type TeamUser,
   VIEWER_USER_ID,
@@ -23,6 +24,9 @@ export type RevealedLink = { userId: number; kind: 'invite' | 'reset'; url: stri
 export type Draft = { email: string; name: string; role: Role; access: Access };
 
 export type DraftErrors = { email?: string; name?: string };
+
+/** Unsaved Role and Assignment of the expanded row (variant C saves with a button). */
+export type RowDraft = { role: Role; access: Access };
 
 /** What the viewer may do with one User, with the reason when the rule blocks it. */
 export type Permissions = {
@@ -40,6 +44,8 @@ const EMPTY_DRAFT: Draft = {
   role: 'member',
   access: { allProjects: true, projectIds: [] },
 };
+
+const ALL_ACCESS: Access = { allProjects: true, projectIds: [] };
 
 const LAST_ADMIN =
   'Der letzte aktive Admin lässt sich weder deaktivieren noch herabstufen. Mach zuerst einen anderen User zum Admin.';
@@ -59,6 +65,7 @@ export function useTeamPrototype() {
   });
   const [selectedId, setSelectedId] = useState<number | 'new'>(3);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [rowDraft, setRowDraft] = useState<RowDraft | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [draftErrors, setDraftErrors] = useState<DraftErrors>({});
@@ -81,8 +88,8 @@ export function useTeamPrototype() {
       manage,
       changeRole: viewer === 'admin' && !lastAdmin,
       deactivate: manage && user.status !== 'deactivated' && !lastAdmin,
-      // GLOSSARY: „Ein Admin kann ihn reaktivieren."
-      reactivate: viewer === 'admin' && user.status === 'deactivated',
+      // Ticket 08: Manager reaktiviert Members, Admin alle.
+      reactivate: manage && user.status === 'deactivated',
       lastAdminReason: lastAdmin ? LAST_ADMIN : '',
     };
   };
@@ -162,10 +169,11 @@ export function useTeamPrototype() {
   const handleRoleChange = (userId: number, role: Role): void => {
     const user = userById(userId);
     if (!user || role === user.role) return;
-    update(userId, { role });
+    // Ticket 08: wer zum Member herabgestuft wird, bekommt „Alle Projects".
+    update(userId, role === 'member' ? { role, access: ALL_ACCESS } : { role });
     setNotice(
       role === 'member'
-        ? `${user.name} ist jetzt Member und sieht ${user.access.allProjects ? 'alle Projects' : 'nur die ausgewählten Projects'}.`
+        ? `${user.name} ist jetzt Member und sieht alle Projects.`
         : `${user.name} ist jetzt ${role === 'admin' ? 'Admin' : 'Manager'} und sieht alle Projects.`,
     );
   };
@@ -245,8 +253,52 @@ export function useTeamPrototype() {
 
   const handleDismissLink = (): void => setRevealed(null);
 
-  const handleExpand = (userId: number): void =>
-    setExpandedId((id) => (id === userId ? null : userId));
+  const handleExpand = (userId: number): void => {
+    const user = userById(userId);
+    const open = expandedId !== userId && user !== undefined;
+    setExpandedId(open ? userId : null);
+    setRowDraft(open ? { role: user.role, access: user.access } : null);
+  };
+
+  /** Variant C: changes stay in the row until „Speichern". */
+  const handleRowDraftChange = (patch: Partial<RowDraft>): void =>
+    setRowDraft((d) => {
+      if (!d) return d;
+      const next = { ...d, ...patch };
+      // Ticket 08: herabgestuft zum Member heißt „Alle Projects".
+      if (patch.role === 'member' && d.role !== 'member') next.access = ALL_ACCESS;
+      return next;
+    });
+
+  const rowDirty = (user: TeamUser): boolean =>
+    rowDraft !== null &&
+    (rowDraft.role !== user.role ||
+      JSON.stringify(rowDraft.access) !== JSON.stringify(user.access));
+
+  /** Simulates `PATCH /users/:id` with Role and Assignment in one request. */
+  const handleSaveRow = (userId: number): void => {
+    const user = userById(userId);
+    if (!user || !rowDraft) return;
+    const roleChanged = rowDraft.role !== user.role;
+    const access = rowDraft.role === 'member' ? rowDraft.access : user.access;
+    update(userId, { role: rowDraft.role, access });
+    const loss =
+      user.role === 'member' && rowDraft.role === 'member'
+        ? accessLossText(user.name, lostProjects(user.access, access))
+        : '';
+    setNotice(
+      [
+        roleChanged
+          ? `${user.name} ist jetzt ${ROLE_LABEL[rowDraft.role]}.`
+          : `${user.name} ist gespeichert.`,
+        loss,
+      ]
+        .filter(Boolean)
+        .join(' '),
+    );
+    setExpandedId(null);
+    setRowDraft(null);
+  };
 
   return {
     variant,
@@ -256,6 +308,7 @@ export function useTeamPrototype() {
     toggles,
     selectedId,
     expandedId,
+    rowDraft,
     createOpen,
     draft,
     draftErrors,
@@ -291,6 +344,9 @@ export function useTeamPrototype() {
     handleCopy,
     handleDismissLink,
     handleExpand,
+    handleRowDraftChange,
+    rowDirty,
+    handleSaveRow,
   };
 }
 

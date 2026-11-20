@@ -13,6 +13,7 @@ import {
   STATUS_LABEL,
   type TeamUser,
   type TOGGLES,
+  VISIBLE_PROJECTS,
 } from './team-prototype-data';
 import type { RevealedLink, TeamPrototype } from './useTeamPrototype';
 
@@ -48,6 +49,8 @@ export function AssignmentEditor({
         : access.projectIds.filter((p) => !ids.includes(p)),
     });
 
+  const selected = VISIBLE_PROJECTS.filter((p) => access.projectIds.includes(p.id)).length;
+
   return (
     <div className="flex flex-col gap-3">
       <fieldset className="flex flex-col gap-1">
@@ -69,10 +72,14 @@ export function AssignmentEditor({
       {!access.allProjects && (
         <div className="flex flex-col gap-3 rounded-temp-control border border-temp-divider p-4">
           <p className="text-sm text-temp-ink-muted" role="status">
-            {access.projectIds.length} Projects ausgewählt
+            {selected === 0
+              ? 'Kein Project ausgewählt: sieht keine Projects.'
+              : `${selected} Projects ausgewählt`}
           </p>
           {CUSTOMERS.map((customer) => {
-            const ids = customer.projects.map((p) => p.id);
+            const projects = customer.projects.filter((p) => !p.archived);
+            if (projects.length === 0) return null;
+            const ids = projects.map((p) => p.id);
             const allOn = ids.every((id) => access.projectIds.includes(id));
             return (
               <fieldset key={customer.name} className="flex flex-col">
@@ -88,7 +95,7 @@ export function AssignmentEditor({
                   </Button>
                 </div>
                 <div className="grid sm:grid-cols-2">
-                  {customer.projects.map((project) => (
+                  {projects.map((project) => (
                     <label key={project.id} className="flex min-h-10 w-fit items-center gap-3">
                       <input
                         type="checkbox"
@@ -97,7 +104,6 @@ export function AssignmentEditor({
                         onChange={(e) => toggle(project.id, e.target.checked)}
                       />
                       {project.name}
-                      {project.archived && <Pill>Archived</Pill>}
                     </label>
                   ))}
                 </div>

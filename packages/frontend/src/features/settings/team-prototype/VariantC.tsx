@@ -1,6 +1,7 @@
 // PROTOTYPE (ticket 08), variant C „Alles auf einer Seite": User zuerst, „Was Members sehen"
-// unten mit einem Mock-Bildschirm des Members; User als aufklappbare Zeilen, die inline bearbeitet werden;
-// „User anlegen" als Formular direkt über der Liste; der Link steht in der Zeile des Users.
+// unten mit einem Mock-Bildschirm des Members; User als aufklappbare Zeilen in einem Spaltenraster,
+// Role und Assignment gelten erst mit „Speichern"; „User anlegen" als Formular über der Liste;
+// der Link steht in der Zeile des Users.
 import { Form } from '@base-ui/react/form';
 import type { ReactElement } from 'react';
 import { TextField } from '@/forms/TextField';
@@ -22,6 +23,10 @@ import {
   TOGGLES,
 } from './team-prototype-data';
 import type { TeamPrototype } from './useTeamPrototype';
+
+/** One column template for header, rows and deactivated rows, so columns line up. */
+const ROW_GRID =
+  'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 sm:grid-cols-[minmax(0,1fr)_6.5rem_9rem_7rem_8.5rem]';
 
 type VariantProps = {
   /** State of the Team tab. */
@@ -56,6 +61,16 @@ export function VariantC({ team }: VariantProps): ReactElement {
           {team.notice}
         </p>
         <ul className="flex flex-col divide-y divide-temp-divider rounded-temp-card border border-temp-divider bg-temp-surface">
+          <li
+            aria-hidden="true"
+            className={`${ROW_GRID} hidden px-4 py-2 text-sm text-temp-ink-muted sm:grid`}
+          >
+            <span>Name</span>
+            <span>Role</span>
+            <span>Projects</span>
+            <span>Status</span>
+            <span />
+          </li>
           {current.map((user) => (
             <UserRow key={user.id} team={team} user={user} />
           ))}
@@ -63,7 +78,7 @@ export function VariantC({ team }: VariantProps): ReactElement {
         {deactivated.length > 0 && (
           <>
             <h3 className="font-medium text-temp-ink-muted">Deactivated ({deactivated.length})</h3>
-            <ul className="flex flex-col divide-y divide-temp-divider rounded-temp-card border border-temp-divider border-dashed">
+            <ul className="flex flex-col divide-y divide-temp-divider rounded-temp-card border border-temp-divider border-dashed bg-temp-surface">
               {deactivated.map((user) => (
                 <UserRow key={user.id} team={team} user={user} />
               ))}
@@ -186,58 +201,76 @@ function RoleRadios({ value, options, onChange, name }: RoleRadiosProps): ReactE
 function UserRow({ team, user }: VariantProps & { user: TeamUser }): ReactElement {
   const p = team.permissions(user);
   const open = team.expandedId === user.id;
+  const draft = open ? team.rowDraft : null;
+  const dirty = team.rowDirty(user);
   const link = team.revealed?.userId === user.id ? team.revealed : null;
   const panelId = `c-user-${user.id}`;
   return (
-    <li className={`flex flex-col gap-4 p-4 ${link ? 'bg-temp-highlight' : ''}`}>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <div className="min-w-48 flex-1">
-          <p className="font-medium">
+    <li
+      className={`flex flex-col ${
+        open
+          ? 'relative z-10 -mx-px bg-temp-band shadow-temp-card ring-2 ring-temp-nav-active'
+          : link
+            ? 'bg-temp-highlight'
+            : ''
+      }`}
+    >
+      <div className={`${ROW_GRID} p-4`}>
+        <div className="min-w-0">
+          <p className={open ? 'font-semibold' : 'font-medium'}>
             {user.name}
             {user.id === team.viewerId && (
               <span className="font-normal text-temp-ink-muted"> (du)</span>
             )}
           </p>
-          <p className="text-sm text-temp-ink-muted">{user.email}</p>
+          <p className="truncate text-sm text-temp-ink-muted">{user.email}</p>
         </div>
-        <RolePill role={user.role} />
-        <span className="w-36 text-sm">{accessSummary(user)}</span>
-        <StatusPill user={user} />
-        {p.manage ? (
-          <Button
-            size="sm"
-            variant="ghost"
-            aria-expanded={open}
-            aria-controls={panelId}
-            onClick={() => team.handleExpand(user.id)}
-            aria-label={`${user.name} bearbeiten`}
-          >
-            Bearbeiten
-            <ChevronDownIcon className={open ? 'rotate-180' : ''} />
-          </Button>
-        ) : (
-          <span className="w-28 text-right text-sm text-temp-ink-muted">nur lesen</span>
-        )}
+        <span className="hidden sm:block">
+          <RolePill role={user.role} />
+        </span>
+        <span className="hidden text-sm sm:block">{accessSummary(user)}</span>
+        <span className="hidden sm:block">
+          <StatusPill user={user} />
+        </span>
+        <span className="justify-self-end">
+          {p.manage ? (
+            <Button
+              size="sm"
+              variant={open ? 'secondary' : 'ghost'}
+              aria-expanded={open}
+              aria-controls={panelId}
+              onClick={() => team.handleExpand(user.id)}
+              aria-label={`${user.name} ${open ? 'zuklappen' : 'bearbeiten'}`}
+            >
+              {open ? 'Zuklappen' : 'Bearbeiten'}
+              <ChevronDownIcon className={open ? 'rotate-180' : ''} />
+            </Button>
+          ) : (
+            <span className="text-sm text-temp-ink-muted">nur lesen</span>
+          )}
+        </span>
       </div>
 
       {link && (
-        <LinkBox
-          link={link}
-          name={user.name}
-          copied={team.copied}
-          onCopy={team.handleCopy}
-          onDismiss={team.handleDismissLink}
-        />
+        <div className="px-4 pb-4">
+          <LinkBox
+            link={link}
+            name={user.name}
+            copied={team.copied}
+            onCopy={team.handleCopy}
+            onDismiss={team.handleDismissLink}
+          />
+        </div>
       )}
 
-      <div id={panelId} hidden={!open} className="flex flex-col gap-5 sm:pl-4">
-        {open && (
-          <>
+      <div id={panelId} hidden={!open} className="px-4 pb-4">
+        {open && draft && (
+          <div className="flex flex-col gap-5 rounded-temp-control border border-temp-divider bg-temp-surface p-5">
             {p.changeRole ? (
               <RoleRadios
-                value={user.role}
+                value={draft.role}
                 options={team.roleOptions}
-                onChange={(role) => team.handleRoleChange(user.id, role)}
+                onChange={(role) => team.handleRowDraftChange({ role })}
                 name={`c-role-${user.id}`}
               />
             ) : (
@@ -245,11 +278,34 @@ function UserRow({ team, user }: VariantProps & { user: TeamUser }): ReactElemen
                 <p className="text-sm text-temp-ink-muted">{p.lastAdminReason}</p>
               )
             )}
-            {user.role === 'member' && user.status !== 'deactivated' && (
+            {draft.role === 'member' && user.status !== 'deactivated' && (
               <AssignmentEditor
-                access={user.access}
-                onChange={(access) => team.handleAccessChange(user.id, access)}
+                access={draft.access}
+                onChange={(access) => team.handleRowDraftChange({ access })}
               />
+            )}
+            {draft.role === 'member' && user.role !== 'member' && (
+              <p className="text-sm text-temp-ink-muted">
+                Als Member sieht {user.name} zunächst alle Projects. Schränke den Zugriff vor dem
+                Speichern ein, falls nötig.
+              </p>
+            )}
+            {(p.changeRole || user.role === 'member') && user.status !== 'deactivated' && (
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  variant="primary"
+                  disabled={!dirty}
+                  onClick={() => team.handleSaveRow(user.id)}
+                >
+                  Speichern
+                </Button>
+                <Button variant="secondary" onClick={() => team.handleExpand(user.id)}>
+                  Abbrechen
+                </Button>
+                {dirty && (
+                  <span className="text-sm text-temp-ink-muted">Ungespeicherte Änderungen</span>
+                )}
+              </div>
             )}
             <div className="flex flex-wrap gap-3 border-temp-divider border-t pt-4">
               {user.status !== 'deactivated' && (
@@ -281,7 +337,7 @@ function UserRow({ team, user }: VariantProps & { user: TeamUser }): ReactElemen
                 </Button>
               )}
             </div>
-          </>
+          </div>
         )}
       </div>
     </li>

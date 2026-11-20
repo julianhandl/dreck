@@ -152,6 +152,9 @@ export const STATUS_LABEL: Record<UserStatus, string> = {
 
 export const ALL_PROJECTS = CUSTOMERS.flatMap((c) => c.projects);
 
+/** Ticket 08: archived Projects are hidden in the Assignment; their Assignments stay. */
+export const VISIBLE_PROJECTS = ALL_PROJECTS.filter((p) => !p.archived);
+
 /** Whether `user` is the only active Admin: neither deactivate nor demote. */
 export function isLastActiveAdmin(users: TeamUser[], user: TeamUser): boolean {
   if (user.role !== 'admin' || user.status !== 'active') return false;
@@ -167,8 +170,8 @@ export function canManage(viewer: Viewer, user: TeamUser): boolean {
 export function accessSummary(user: TeamUser): string {
   if (user.role !== 'member') return 'Alle (Role)';
   if (user.access.allProjects) return 'Alle Projects';
-  const n = user.access.projectIds.length;
-  return `${n} von ${ALL_PROJECTS.length} Projects`;
+  const n = VISIBLE_PROJECTS.filter((p) => user.access.projectIds.includes(p.id)).length;
+  return `${n} von ${VISIBLE_PROJECTS.length} Projects`;
 }
 
 /** Projects the Member sees before but not after the change. */
