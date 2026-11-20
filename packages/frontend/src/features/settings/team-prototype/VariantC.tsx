@@ -1,5 +1,5 @@
-// PROTOTYPE (ticket 08), variant C „Alles auf einer Seite": „Was Members sehen" zuerst, mit
-// einem Mock-Bildschirm des Members; User als aufklappbare Zeilen, die inline bearbeitet werden;
+// PROTOTYPE (ticket 08), variant C „Alles auf einer Seite": User zuerst, „Was Members sehen"
+// unten mit einem Mock-Bildschirm des Members; User als aufklappbare Zeilen, die inline bearbeitet werden;
 // „User anlegen" als Formular direkt über der Liste; der Link steht in der Zeile des Users.
 import { Form } from '@base-ui/react/form';
 import type { ReactElement } from 'react';
@@ -29,7 +29,7 @@ type VariantProps = {
 };
 
 /**
- * Team tab on one page: Member view first, then inline-editable User rows.
+ * Team tab on one page: inline-editable User rows first, then the Member view.
  * @example <VariantC team={team} />
  */
 export function VariantC({ team }: VariantProps): ReactElement {
@@ -37,33 +37,6 @@ export function VariantC({ team }: VariantProps): ReactElement {
   const deactivated = team.users.filter((u) => u.status === 'deactivated');
   return (
     <div className="flex flex-col gap-10">
-      <section
-        aria-labelledby="c-members"
-        className="grid gap-6 rounded-temp-card border border-temp-divider bg-temp-surface p-6 shadow-temp-card lg:grid-cols-[1fr_1.2fr]"
-      >
-        <div className="flex flex-col gap-3">
-          <h2 id="c-members" className="font-medium text-xl">
-            Was Members sehen
-          </h2>
-          <p className="text-temp-ink-muted">
-            Gilt für alle Members. Admin und Manager sehen immer alles.
-          </p>
-          {TOGGLES.map((item) => (
-            <MemberSwitch
-              key={item.key}
-              item={item}
-              toggles={team.toggles}
-              readOnly={team.viewer !== 'admin'}
-              onChange={team.handleToggle}
-            />
-          ))}
-          {team.viewer !== 'admin' && (
-            <p className="text-sm text-temp-ink-muted">Nur Admins ändern diese Schalter.</p>
-          )}
-        </div>
-        <MemberScreen team={team} />
-      </section>
-
       <section aria-labelledby="c-users" className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="c-users" className="font-medium text-xl">
@@ -97,6 +70,33 @@ export function VariantC({ team }: VariantProps): ReactElement {
             </ul>
           </>
         )}
+      </section>
+
+      <section
+        aria-labelledby="c-members"
+        className="grid gap-6 rounded-temp-card border border-temp-divider bg-temp-surface p-6 shadow-temp-card lg:grid-cols-[1fr_1.2fr]"
+      >
+        <div className="flex flex-col gap-3">
+          <h2 id="c-members" className="font-medium text-xl">
+            Was Members sehen
+          </h2>
+          <p className="text-temp-ink-muted">
+            Gilt für alle Members. Admin und Manager sehen immer alles.
+          </p>
+          {TOGGLES.map((item) => (
+            <MemberSwitch
+              key={item.key}
+              item={item}
+              toggles={team.toggles}
+              readOnly={team.viewer !== 'admin'}
+              onChange={team.handleToggle}
+            />
+          ))}
+          {team.viewer !== 'admin' && (
+            <p className="text-sm text-temp-ink-muted">Nur Admins ändern diese Schalter.</p>
+          )}
+        </div>
+        <MemberScreen team={team} />
       </section>
     </div>
   );
