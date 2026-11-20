@@ -8,7 +8,7 @@ import { type LogMethod, LogMethodBody } from './LogHelp';
 import { LoginDialogMock } from './LoginDialogMock';
 import { LogPreview } from './LogPreview';
 import { StartMethodPicker } from './StartMethodPicker';
-import type { LogLine, SetupRecovery } from './useSetupRecoveryPrototype';
+import type { SetupRecovery } from './useSetupRecoveryPrototype';
 import { useSetupText } from './useSetupText';
 import { BackToLogin, Callout, Step, WriteLink } from './VariantB';
 import { RESET_EXAMPLE, SETUP_EXAMPLE } from './VariantC';
@@ -26,22 +26,14 @@ function Wordmark(): ReactElement {
   );
 }
 
-/** Variant C's two columns: the steps in a dialog-like card, the log sample next to it. */
-function Split({ example, children }: { example: LogLine[]; children: ReactNode }): ReactElement {
-  const t = useSetupText().setup;
+/** One column: the steps in a dialog-like card as in variant C. */
+function Split({ children }: { children: ReactNode }): ReactElement {
   return (
-    <main className="mx-auto grid w-full max-w-6xl gap-8 px-4 pt-10 pb-48 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)]">
+    <main className="mx-auto w-full max-w-3xl px-4 pt-10 pb-48 sm:px-8">
       <div className={CARD}>
         <Wordmark />
         {children}
       </div>
-      <figure className="flex flex-col gap-3 self-start rounded-temp-card bg-temp-surface p-5 shadow-temp-card lg:sticky lg:top-8">
-        <figcaption className="flex flex-col gap-1">
-          <span className="font-medium text-xl">{t.lookLike}</span>
-          <span className="text-sm text-temp-ink-muted">{t.lookLikeHint}</span>
-        </figcaption>
-        <LogPreview lines={example} label={t.lookLike} />
-      </figure>
     </main>
   );
 }
@@ -71,6 +63,13 @@ function LogSteps({ first, kind }: { first: number; kind: 'setup' | 'reset' }): 
       <Step number={first + 1} title={t.stepOpen}>
         <LogMethodBody method={method} />
         <p>{t.whatIsLog}</p>
+        <figure className="flex flex-col gap-2">
+          <figcaption className="flex flex-col gap-1">
+            <span className="font-medium">{t.lookLike}</span>
+            <span className="text-sm text-temp-ink-muted">{t.lookLikeHint}</span>
+          </figcaption>
+          <LogPreview lines={kind === 'setup' ? SETUP_EXAMPLE : RESET_EXAMPLE} label={t.lookLike} />
+        </figure>
         <p className="text-temp-ink-muted">{t.newestBottom}</p>
       </Step>
       <Step number={first + 2} title={t.stepBrowser}>
@@ -84,7 +83,7 @@ function LogSteps({ first, kind }: { first: number; kind: 'setup' | 'reset' }): 
 /**
  * PROTOTYPE variant D "B + C kombiniert": B's numbered steps with the start methods as stacked
  * cards showing the README start command, the browser address bar instead of a paste field,
- * C's log sample beside the steps and C's dialog card for the forms. Form fields as in B.
+ * C's log sample inside step 2, one column in C's dialog card. Form fields as in B.
  * @example <VariantD p={p} />
  */
 export function VariantD({ p }: VariantProps): ReactElement {
@@ -93,7 +92,7 @@ export function VariantD({ p }: VariantProps): ReactElement {
   switch (p.screen) {
     case 'setup':
       return (
-        <Split example={SETUP_EXAMPLE}>
+        <Split>
           <PageTitle>{t.setup.title}</PageTitle>
           <p className="text-lg">{t.setup.intro}</p>
           <LogSteps first={1} kind="setup" />
@@ -114,7 +113,7 @@ export function VariantD({ p }: VariantProps): ReactElement {
       );
     case 'setup-expired':
       return (
-        <Split example={SETUP_EXAMPLE}>
+        <Split>
           <Callout>
             <PageTitle>{t.expired.title}</PageTitle>
             <p>{t.expired.setupBody}</p>
@@ -144,7 +143,7 @@ export function VariantD({ p }: VariantProps): ReactElement {
       );
     case 'forgot-sent':
       return (
-        <Split example={RESET_EXAMPLE}>
+        <Split>
           <PageTitle>{t.forgot.sentTitle}</PageTitle>
           <p role="status" className="text-lg">
             {t.forgot.sent}
