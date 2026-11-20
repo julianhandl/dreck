@@ -10,6 +10,7 @@ export const VARIANTS = [
   { key: 'A', name: 'Accordion-Seite' },
   { key: 'B', name: 'Assistent mit Auswahl' },
   { key: 'C', name: 'Log im Blick' },
+  { key: 'D', name: 'B + C kombiniert' },
 ] as const;
 
 export type VariantKey = (typeof VARIANTS)[number]['key'];
@@ -39,7 +40,7 @@ export type LogLine = {
 
 type Admin = { email: string; name: string };
 
-const ORIGIN = 'http://localhost:3000';
+export const ORIGIN = 'http://localhost:3000';
 const RETRY_AFTER_SECONDS = 30;
 // Admin for the login and recovery screens when the setup was skipped via the URL
 const DEMO_ADMIN: Admin = { email: 'julia.beispiel@example.com', name: 'Julia Beispiel' };

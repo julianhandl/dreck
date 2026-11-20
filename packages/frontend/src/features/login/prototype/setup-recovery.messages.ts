@@ -25,6 +25,19 @@ const de = {
     stepPasteHint: 'Klick den Link im Log an oder kopier ihn hierher.',
     lookLike: 'So sieht es im Log aus',
     lookLikeHint: 'Das hier ist ein Beispiel. Dein Link ist ein anderer.',
+    stepBrowser: 'Link im Browser öffnen',
+    stepBrowserBody:
+      'Markier den Link im Log und kopier ihn. Klick oben in die Adresszeile deines Browsers, füg den Link ein und drück Enter.',
+    browserMock: 'So geht es: Adresszeile anklicken, Link einfügen, Enter drücken.',
+    browserPhases: [
+      'Adresszeile anklicken',
+      'Link einfügen: Strg+V, am Mac ⌘+V',
+      'Enter drücken',
+      'Dreck zeigt das Formular',
+    ],
+    pasteKey: 'Strg+V',
+    pause: 'Animation anhalten',
+    play: 'Animation abspielen',
   },
   logHelp: {
     title: 'So öffnest du den Log',
@@ -35,19 +48,23 @@ const de = {
     desktop: {
       title: 'Docker Desktop',
       body: 'Öffne Docker Desktop. Klick links auf „Containers“, dann auf „dreck“ und oben auf „Logs“.',
+      started: 'In Docker Desktop mit „Run“ gestartet, Image:',
     },
     run: {
       title: 'Terminal (docker run)',
       body: 'Öffne ein Terminal. Unter Windows geht PowerShell oder dein WSL-Terminal. Gib ein:',
       otherName: 'Heißt dein Container anders? Dieser Befehl zeigt alle Namen:',
+      started: 'Im Terminal gestartet mit:',
     },
     compose: {
       title: 'Docker Compose',
       body: 'Öffne ein Terminal im Ordner mit der Datei compose.yaml und gib ein:',
+      started: 'Mit einer Datei compose.yaml gestartet durch:',
     },
     kubernetes: {
       title: 'Kubernetes',
       body: 'Namespace und Name des Deployments stehen in deinem Manifest:',
+      started: 'Als Deployment gestartet, Image:',
     },
   },
   form: {
@@ -144,6 +161,19 @@ const en: SetupMessages = {
     stepPasteHint: 'Click the link in the log or copy it here.',
     lookLike: 'What it looks like in the log',
     lookLikeHint: 'This is an example. Your link is a different one.',
+    stepBrowser: 'Open the link in your browser',
+    stepBrowserBody:
+      'Select the link in the log and copy it. Click the address bar at the top of your browser, paste the link and press Enter.',
+    browserMock: 'How it works: click the address bar, paste the link, press Enter.',
+    browserPhases: [
+      'Click the address bar',
+      'Paste the link: Ctrl+V, on a Mac ⌘+V',
+      'Press Enter',
+      'Dreck shows the form',
+    ],
+    pasteKey: 'Ctrl+V',
+    pause: 'Pause animation',
+    play: 'Play animation',
   },
   logHelp: {
     title: 'How to open the log',
@@ -154,19 +184,23 @@ const en: SetupMessages = {
     desktop: {
       title: 'Docker Desktop',
       body: 'Open Docker Desktop. Click “Containers” on the left, then “dreck”, then “Logs” at the top.',
+      started: 'Started in Docker Desktop with “Run”, image:',
     },
     run: {
       title: 'Terminal (docker run)',
       body: 'Open a terminal. On Windows, PowerShell or your WSL terminal works. Type:',
       otherName: 'Is your container called something else? This command lists all names:',
+      started: 'Started in a terminal with:',
     },
     compose: {
       title: 'Docker Compose',
       body: 'Open a terminal in the folder with the compose.yaml file and type:',
+      started: 'Started from a compose.yaml file with:',
     },
     kubernetes: {
       title: 'Kubernetes',
       body: 'Your manifest has the namespace and the name of the deployment:',
+      started: 'Started as a deployment, image:',
     },
   },
   form: {

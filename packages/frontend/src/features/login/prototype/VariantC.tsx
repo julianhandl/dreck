@@ -16,7 +16,7 @@ type VariantProps = {
 };
 
 // Static example: shows what to look for, never a working link
-const SETUP_EXAMPLE: LogLine[] = [
+export const SETUP_EXAMPLE: LogLine[] = [
   { id: 1, text: 'Listening on port 3000' },
   { id: 2, text: LOG_RULE },
   { id: 3, text: 'SETUP LINK  Open this link in your browser to create your login:', marker: true },
@@ -25,7 +25,7 @@ const SETUP_EXAMPLE: LogLine[] = [
   { id: 6, text: LOG_RULE },
 ];
 
-const RESET_EXAMPLE: LogLine[] = [
+export const RESET_EXAMPLE: LogLine[] = [
   { id: 1, text: LOG_RULE },
   {
     id: 2,

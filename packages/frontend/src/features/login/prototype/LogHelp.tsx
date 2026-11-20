@@ -9,6 +9,14 @@ export const LOG_METHODS = ['desktop', 'run', 'compose', 'kubernetes'] as const;
 
 export type LogMethod = (typeof LOG_METHODS)[number];
 
+/** How each way starts Dreck, as in the README; lets the user recognise their own setup. */
+export const START_COMMANDS: Record<LogMethod, string> = {
+  desktop: 'ghcr.io/julianhandl/dreck',
+  run: 'docker run -d --name dreck -p 127.0.0.1:3000:3000 -v dreck-data:/data ghcr.io/julianhandl/dreck',
+  compose: 'docker compose up -d',
+  kubernetes: 'ghcr.io/julianhandl/dreck',
+};
+
 type LogMethodBodyProps = {
   /** How Dreck is started. */
   method: LogMethod;

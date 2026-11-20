@@ -1,6 +1,6 @@
 // PROTOTYPE (branch prototype/setup-recovery-page, ticket 09): three variants of the setup
 // page, the setup form behind /setup/<token>, "Passwort vergessen?" and the reset page,
-// switchable via ?variant=A|B|C and ?screen=…, on /prototype/setup-recovery. In-memory only.
+// switchable via ?variant=A|B|C|D and ?screen=…, on /prototype/setup-recovery. In-memory only.
 import { LANGUAGES, messages } from '@dreck/shared/i18n';
 import type { ReactElement } from 'react';
 import { I18nContext } from '@/i18n/i18n-context';
@@ -16,6 +16,7 @@ import {
 import { VariantA } from './VariantA';
 import { VariantB } from './VariantB';
 import { VariantC } from './VariantC';
+import { VariantD } from './VariantD';
 
 const SCREEN_LABELS: Record<Screen, string> = {
   setup: 'Setup-Seite',
@@ -46,6 +47,7 @@ export function SetupRecoveryPrototype(): ReactElement {
         {p.variant === 'A' && <VariantA p={p} />}
         {p.variant === 'B' && <VariantB p={p} />}
         {p.variant === 'C' && <VariantC p={p} />}
+        {p.variant === 'D' && <VariantD p={p} />}
       </div>
 
       {panel.open && (

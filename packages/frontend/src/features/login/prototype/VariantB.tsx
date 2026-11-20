@@ -33,7 +33,7 @@ function Frame({ children }: { children: ReactNode }): ReactElement {
   );
 }
 
-function Step({
+export function Step({
   number,
   title,
   children,
@@ -110,7 +110,7 @@ function LogSteps({ p, first }: VariantProps & { first: number }): ReactElement 
   );
 }
 
-function WriteLink({ p }: VariantProps): ReactElement {
+export function WriteLink({ p }: VariantProps): ReactElement {
   const t = useSetupText().setup;
   return (
     <div className="flex flex-col gap-2 border-temp-divider border-t pt-6">
@@ -129,7 +129,7 @@ function WriteLink({ p }: VariantProps): ReactElement {
   );
 }
 
-function Callout({ children }: { children: ReactNode }): ReactElement {
+export function Callout({ children }: { children: ReactNode }): ReactElement {
   return (
     <div className="flex flex-col gap-2 rounded-temp-card border border-temp-highlight-border bg-temp-highlight p-5">
       {children}
@@ -257,7 +257,7 @@ export function VariantB({ p }: VariantProps): ReactElement {
   }
 }
 
-function BackToLogin({ p }: VariantProps): ReactElement {
+export function BackToLogin({ p }: VariantProps): ReactElement {
   const t = useSetupText().forgot;
   return (
     <div>
