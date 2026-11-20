@@ -63,6 +63,8 @@ export function useTeamPrototype() {
     budget: false,
     projectReport: false,
   });
+  // Variant C: the switches apply only with „Speichern".
+  const [togglesDraft, setTogglesDraft] = useState<MemberToggles>(toggles);
   const [selectedId, setSelectedId] = useState<number | 'new'>(3);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [rowDraft, setRowDraft] = useState<RowDraft | null>(null);
@@ -246,6 +248,21 @@ export function useTeamPrototype() {
     setToggles((t) => ({ ...t, [key]: value }));
   };
 
+  const handleToggleDraft = (key: keyof MemberToggles, value: boolean): void => {
+    if (viewer !== 'admin') return;
+    setTogglesDraft((t) => ({ ...t, [key]: value }));
+  };
+
+  const togglesDirty = JSON.stringify(togglesDraft) !== JSON.stringify(toggles);
+
+  /** Simulates `PATCH /settings` with the three switches „Was Members sehen". */
+  const handleSaveToggles = (): void => {
+    setToggles(togglesDraft);
+    setNotice('„Was Members sehen" ist gespeichert.');
+  };
+
+  const handleResetToggles = (): void => setTogglesDraft(toggles);
+
   const handleCopy = async (url: string): Promise<void> => {
     await navigator.clipboard.writeText(url);
     setCopied(true);
@@ -306,6 +323,8 @@ export function useTeamPrototype() {
     viewerId,
     users,
     toggles,
+    togglesDraft,
+    togglesDirty,
     selectedId,
     expandedId,
     rowDraft,
@@ -341,6 +360,9 @@ export function useTeamPrototype() {
     handleReactivate,
     handleDelete,
     handleToggle,
+    handleToggleDraft,
+    handleSaveToggles,
+    handleResetToggles,
     handleCopy,
     handleDismissLink,
     handleExpand,

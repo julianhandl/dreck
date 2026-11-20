@@ -102,11 +102,34 @@ export function VariantC({ team }: VariantProps): ReactElement {
             <MemberSwitch
               key={item.key}
               item={item}
-              toggles={team.toggles}
+              toggles={team.togglesDraft}
               readOnly={team.viewer !== 'admin'}
-              onChange={team.handleToggle}
+              onChange={team.handleToggleDraft}
             />
           ))}
+          {team.viewer === 'admin' && (
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                variant="primary"
+                disabled={!team.togglesDirty}
+                onClick={team.handleSaveToggles}
+              >
+                Speichern
+              </Button>
+              <Button
+                variant="secondary"
+                disabled={!team.togglesDirty}
+                onClick={team.handleResetToggles}
+              >
+                Verwerfen
+              </Button>
+              {team.togglesDirty && (
+                <span className="text-sm text-temp-ink-muted">
+                  Ungespeichert: die Vorschau zeigt den Entwurf.
+                </span>
+              )}
+            </div>
+          )}
           {team.viewer !== 'admin' && (
             <p className="text-sm text-temp-ink-muted">Nur Admins ändern diese Schalter.</p>
           )}
@@ -346,7 +369,7 @@ function UserRow({ team, user }: VariantProps & { user: TeamUser }): ReactElemen
 
 /** Mock of what Lena (Member) sees on a Project and in the Report with the current switches. */
 function MemberScreen({ team }: VariantProps): ReactElement {
-  const t = team.toggles;
+  const t = team.togglesDraft;
   return (
     <figure className="flex flex-col gap-3 rounded-temp-control border-4 border-temp-band bg-temp-canvas p-4">
       <figcaption className="text-sm text-temp-ink-muted">
