@@ -1,6 +1,6 @@
 # The Bun version lives only here; CI reads it from this line.
 # The build output is plain JS, so the build stage runs natively and only the final stage is per platform.
-FROM --platform=$BUILDPLATFORM oven/bun:1.4.4-alpine AS build
+FROM --platform=$BUILDPLATFORM oven/bun:1.4.5-alpine AS build
 WORKDIR /repo
 COPY package.json bun.lock ./
 COPY packages/shared/package.json packages/shared/
@@ -11,7 +11,7 @@ COPY tsconfig.base.json ./
 COPY packages packages
 RUN bun run build
 
-FROM oven/bun:1.4.4-alpine
+FROM oven/bun:1.4.5-alpine
 WORKDIR /app
 # Same relative layout as in the repo: backend/dist/server.js finds ../drizzle and ../../frontend/dist
 COPY --from=build /repo/packages/backend/dist backend/dist
